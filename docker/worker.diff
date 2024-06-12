@@ -1,5 +1,7 @@
---- worker.old.Dockerfile	2024-06-12 10:31:14
-+++ worker.new.Dockerfile	2024-06-12 10:30:51
+diff --git a/worker.Dockerfile b/worker.Dockerfile
+index ecf7ae9..3082017 100644
+--- a/worker.Dockerfile
++++ b/worker.Dockerfile
 @@ -1,7 +1,7 @@
  FROM rustlang/rust:nightly-bullseye-slim as builder
  

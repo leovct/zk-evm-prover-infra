@@ -1,5 +1,7 @@
---- leader.old.Dockerfile	2024-06-12 10:27:03
-+++ leader.new.Dockerfile	2024-06-12 10:28:17
+diff --git a/leader.Dockerfile b/leader.Dockerfile
+index 18b0a91..31d9817 100644
+--- a/leader.Dockerfile
++++ b/leader.Dockerfile
 @@ -1,7 +1,7 @@
  FROM rustlang/rust:nightly-bullseye-slim as builder
  
