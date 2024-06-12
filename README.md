@@ -2,6 +2,8 @@
 
 A Helm chart to deploy Polygon Zero's [Type 1 Prover](https://github.com/0xPolygonZero/zero-bin) on [Kubernetes](https://kubernetes.io/).
 
+![architecture-diagram](./docs/architecture-diagram.png)
+
 ## Usage
 
 1. Install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernetes/operator/operator-overview).
