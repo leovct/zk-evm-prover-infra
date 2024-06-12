@@ -31,7 +31,7 @@ jobs:
         run: |
           mkdir /opt/zero-bin
           cd /opt/zero-bin
-          git clone https://github.com/0xPolygonZero/zero-bin
+          git clone https://github.com/0xPolygonZero/zero-bin.git
           git checkout ${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
 
       - uses: docker/setup-qemu-action@v3
