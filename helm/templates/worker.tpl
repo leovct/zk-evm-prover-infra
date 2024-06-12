@@ -12,6 +12,8 @@ spec:
     metadata:
       labels:
         app: worker
+    # Worker pods can only be scheduled on high memory nodes.
+    nodeSelector: cloud.google.com/gke-nodepool: highmem-pool
     spec:
       containers:
       - name: worker
