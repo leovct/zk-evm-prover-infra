@@ -1,5 +1,5 @@
 diff --git a/leader.Dockerfile b/leader.Dockerfile
-index 18b0a91..214d7a2 100644
+index 18b0a91..0ac2f44 100644
 --- a/leader.Dockerfile
 +++ b/leader.Dockerfile
 @@ -1,7 +1,7 @@
@@ -11,3 +11,21 @@ index 18b0a91..214d7a2 100644
  
  RUN \
    mkdir -p ops/src     && touch ops/src/lib.rs && \
+@@ -22,7 +22,7 @@ COPY leader/Cargo.toml ./leader/Cargo.toml
+ 
+ COPY ./rust-toolchain.toml ./
+ 
+-RUN cargo build --release --bin leader 
++RUN cargo build --release --bin leader
+ 
+ COPY ops ./ops
+ COPY common ./common
+@@ -36,7 +36,7 @@ RUN \
+   touch prover/src/lib.rs && \
+   touch leader/src/main.rs
+ 
+-RUN cargo build --release --bin leader 
++RUN cargo build --release --bin leader -Clink-arg=-Wl,-z,nostart-stop-gc
+ 
+ FROM debian:bullseye-slim
+ RUN apt-get update && apt-get install -y ca-certificates libjemalloc2
