@@ -1,5 +1,5 @@
 diff --git a/leader.Dockerfile b/leader.Dockerfile
-index 18b0a91..31d9817 100644
+index 18b0a91..214d7a2 100644
 --- a/leader.Dockerfile
 +++ b/leader.Dockerfile
 @@ -1,7 +1,7 @@
@@ -7,7 +7,7 @@ index 18b0a91..31d9817 100644
  
  # Install jemalloc
 -RUN apt-get update && apt-get install -y libjemalloc2 libjemalloc-dev make
-+RUN apt-get update && apt-get install -y libjemalloc2 libjemalloc-dev make pkg-config
++RUN apt-get update && apt-get install -y libjemalloc2 libjemalloc-dev make pkg-config libssl-dev
  
  RUN \
    mkdir -p ops/src     && touch ops/src/lib.rs && \
