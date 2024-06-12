@@ -1,0 +1,10 @@
+apiVersion: v2
+name: test
+description: >
+  A Helm chart for deploying the Type 1 Prover infrastructure in Kubernetes
+home: https://github.com/0xPolygonZero/zero-bin
+type: application
+version: 0.1.0
+maintainers:
+  - name: leovct
+    email: lvincent@polygon.technology
