@@ -1,6 +1,6 @@
-# Zero-bin Helm Chart
+# 📦 Polygon Zero Type 1 Prover Helm Chart
 
-An Helm chart to run Polygon's [Type 1 Prover](https://github.com/0xPolygonZero/zero-bin) on [Kubernetes](https://kubernetes.io/).
+A Helm chart to deploy Polygon Zero's [Type 1 Prover](https://github.com/0xPolygonZero/zero-bin) on [Kubernetes](https://kubernetes.io/).
 
 ## Usage
 
