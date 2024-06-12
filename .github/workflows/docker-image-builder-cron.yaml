@@ -28,10 +28,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Clone zero-bin repository
+        working-directory: /opt
         run: |
-          mkdir /opt/zero-bin
-          cd /opt/zero-bin
           git clone https://github.com/0xPolygonZero/zero-bin.git
+          cd zero-bin
           git checkout ${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
 
       - uses: docker/setup-qemu-action@v3
