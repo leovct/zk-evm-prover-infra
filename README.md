@@ -29,8 +29,8 @@ helm install keda kedacore/keda \
 To get the latest version of these helm charts, you can use:
 
 ```bash
-helm search repo bitnami/rabbitmq-cluster-operator
-helm search repo kedacore/keda
+helm search hub rabbitmq-cluster-operator --output yaml | yq '.[] | select(.repository.url == "https://charts.bitnami.com/bitnami")'
+helm search hub keda --output yaml | yq '.[] | select(.repository.url == "https://kedacore.github.io/charts")'
 ```
 
 Deploy the [zero-prover](https://github.com/0xPolygonZero/zero-bin) infrastructure in Kubernetes.
