@@ -1,0 +1,59 @@
+name: Helm
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+env:
+  HELM_VERSION: "v3.15.0"
+
+concurrency:
+  group: helm-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/setup-helm@v4
+        with:
+          version: ${{ env.HELM_VERSION }}
+      - name: helm lint
+        run: helm lint ./helm
+
+    deploy:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: azure/setup-helm@v4
+            with:
+            version: ${{ env.HELM_VERSION }}
+
+        - name: Create kind cluster
+          uses: helm/kind-action@v1.9.0
+
+        - name: Install RabbitMQ Cluster Operator
+          run: |
+            helm repo add bitnami https://charts.bitnami.com/bitnami
+            helm repo update
+            helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
+              --version 2.9.0 \
+              --namespace rabbitmq-cluster-operator \
+              --create-namespace
+
+        - name: Install KEDA
+          run: |
+            helm repo add kedacore https://kedacore.github.io/charts
+            helm repo update
+            helm install keda kedacore/keda \
+              --version 2.14.2 \
+              --namespace keda \
+              --create-namespace
+
+        - name: Render template
+          run: helm template test --namespace zero --create-namespace ./helm
+
+        - name: Deploy the zero-prover infrastructure
+          run: helm install test --namespace zero --create-namespace ./helm
