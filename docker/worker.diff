@@ -1,5 +1,5 @@
 diff --git a/worker.Dockerfile b/worker.Dockerfile
-index ecf7ae9..1e3ba37 100644
+index ecf7ae9..eea322e 100644
 --- a/worker.Dockerfile
 +++ b/worker.Dockerfile
 @@ -1,7 +1,7 @@
@@ -25,7 +25,7 @@ index ecf7ae9..1e3ba37 100644
    touch worker/src/main.rs
  
 -RUN cargo build --release --bin worker 
-+RUN cargo build --release --bin leader -Clink-arg=-Wl,-z,nostart-stop-gc
++RUN cargo build --release --bin worker
  
  FROM debian:bullseye-slim
  RUN apt-get update && apt-get install -y ca-certificates libjemalloc2
