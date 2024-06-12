@@ -12,8 +12,7 @@ spec:
   image: {{ .Values.rabbitmq.cluster.image }}
   # The number of RabbitMQ nodes.
   replicas: {{ .Values.rabbitmq.cluster.nodeCount }}
-  # RabbitMQ pods can only be scheduled on standard nodes.
-  nodeSelector: cloud.google.com/gke-nodepool: standard-pool
+  nodeSelector: nodeSelector: {{ .Values.rabbitmq.nodeSelector.key }}: {{ .Values.rabbitmq.nodeSelector.value }}
   # Additional RabbitMQ configuration.
   rabbitmq:
     # Config added to rabbitmq.conf in addition to the default configurations set by the operator.

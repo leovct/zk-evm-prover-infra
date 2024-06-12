@@ -2,7 +2,10 @@
 worker:
   # The zero-bin worker image to use.
   image: leovct/zero-bin-worker:develop
-  #image: nginx:latest
+  # Worker pods can only be scheduled on high memory nodes.
+  nodeSelector:
+    key: cloud.google.com/gke-nodepool
+    value: highmem-pool
 
   resources:
     # The kube-scheduler will use this information to decide which node to place the Pod on.
@@ -25,6 +28,10 @@ rabbitmq:
     # The number of nodes in the RabbitMQ cluster.
     # It is highly advised to use an odd number of nodes (https://www.rabbitmq.com/docs/clustering#node-count).
     nodeCount: 1
+    # RabbitMQ pods can only be scheduled on standard nodes.
+    nodeSelector:
+      key: cloud.google.com/gke-nodepool
+      value: standard-pool
     # The default username.
     username: guest
     # The default password.
