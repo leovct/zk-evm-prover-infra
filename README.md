@@ -29,5 +29,5 @@ helm install keda kedacore/keda \
 Deploy the [zero-prover](https://github.com/0xPolygonZero/zero-bin) infrastructure in Kubernetes.
 
 ```bash
-helm install test --namespace zero --create-namespace .
+helm install test --namespace zero --create-namespace ./helm
 ```
