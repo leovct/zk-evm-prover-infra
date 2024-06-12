@@ -54,11 +54,11 @@ spec:
 
   # The minimum number of replicas KEDA will scale the resource down to.
   # By default, it’s scale to zero, but you can use it with some other value as well.
-  minReplicaCount: {{ .Values.rabbitmq.hpa.minWorkerCount }}
+  minReplicaCount: {{ .Values.worker.minWorkerCount }}
 
   # This setting is passed to the HPA definition that KEDA will create for a given resource and
   # holds the maximum number of replicas of the target resource.
-  maxReplicaCount: {{ .Values.rabbitmq.hpa.maxWorkerCount }}
+  maxReplicaCount: {{ .Values.worker.maxWorkerCount }}
 
   # The interval to check each trigger on. In a queue scenario, KEDA will check the `queueLength`
   # every `pollingInterval`, and scale the deployment up or down accordingly.
