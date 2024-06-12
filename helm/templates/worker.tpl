@@ -16,3 +16,18 @@ spec:
       containers:
       - name: worker
         image: {{ .Values.worker.image }}
+        command: ["worker"]
+        args:
+        - "--runtime=amqp"
+        env:
+        - name: AMQP_URI
+          value: {{ printf "amqp://%s:%s@%s-rabbitmq-cluster.%s.svc.cluster.local:5672" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Name .Release.Namespace }}
+        - name: RUST_LOG
+          value: debug
+        resources:
+          requests:
+            memory: {{ .Values.worker.resources.requests.memory }}
+            cpu: {{ .Values.worker.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.worker.resources.limits.memory }}
+            cpu: {{ .Values.worker.resources.limits.cpu }}

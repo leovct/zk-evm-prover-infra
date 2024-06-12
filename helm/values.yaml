@@ -1,25 +1,36 @@
 # Type 1 Prover Configuration
 worker:
-  #image: leovct/zero-bin-worker:develop
-  image: nginx:latest
+  # The zero-bin worker image to use.
+  image: leovct/zero-bin-worker:develop
+  #image: nginx:latest
 
-leader:
-  image: leovct/zero-bin-leader:develop
+  resources:
+    # The kube-scheduler will use this information to decide which node to place the Pod on.
+    requests:
+      # We set the memory request to 300Mi so that we can have at least 4 workers on a node of 1.4Ti.
+      memory: "300Mi"
+      cpu: "250m" # TODO: Update this value
+    # The kubelet will enforce those limits so that the container is not allowed to use more of that resource than the limit set.
+    limits:
+      # We set the memory limit to 1Ti. A worker should not need more memory normally.
+      memory: "1Ti"
+      cpu: "4" # TODO: Update this value
 
+# RabbitMQ Configuration
 rabbitmq:
-  # RabbitMQ Cluster Configuration
+  # Cluster Configuration
   cluster:
     # The RabbitMQ image to use.
     image: rabbitmq:3.13.3
     # The number of nodes in the RabbitMQ cluster.
     # It is highly advised to use an odd number of nodes (https://www.rabbitmq.com/docs/clustering#node-count).
-    nodeCount: 3
+    nodeCount: 1
     # The default username.
     username: guest
     # The default password.
     password: guest
 
-  # Horizontal Pod Autoscaler Configuration (RabbitMQ Queue)
+  # Horizontal Pod Autoscaler Configuration
   hpa:
     # The name of the queue to monitor.
     queue: hello
@@ -28,4 +39,5 @@ rabbitmq:
     # The minimum number of workers to which the HPA can scale down.
     minWorkerCount: 1
     # The maximum number of workers to which the HPA can scale up.
-    maxWorkerCount: 10
+    # We start with 2 nodes so we only allow 8 workers at the same time (4 per node).
+    maxWorkerCount: 8
