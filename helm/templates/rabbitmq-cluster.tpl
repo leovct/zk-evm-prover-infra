@@ -12,7 +12,7 @@ spec:
   image: {{ .Values.rabbitmq.cluster.image }}
   # The number of RabbitMQ nodes.
   replicas: {{ .Values.rabbitmq.cluster.nodeCount }}
-  nodeSelector: nodeSelector: {{ .Values.rabbitmq.nodeSelector.key }}: {{ .Values.rabbitmq.nodeSelector.value }}
+  nodeSelector: {{ .Values.rabbitmq.cluster.nodeSelector.key }}: {{ .Values.rabbitmq.cluster.nodeSelector.value }}
   # Additional RabbitMQ configuration.
   rabbitmq:
     # Config added to rabbitmq.conf in addition to the default configurations set by the operator.
