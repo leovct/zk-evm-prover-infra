@@ -4,7 +4,7 @@ A Helm chart to deploy Polygon Zero's [Type 1 Prover](https://github.com/0xPolyg
 
 ## Usage
 
-Install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernetes/operator/operator-overview).
+1. Install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernetes/operator/operator-overview).
 
 ```bash
 helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -15,7 +15,7 @@ helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
   --create-namespace
 ```
 
-Install [KEDA](https://keda.sh/), the Kubernetes Event-Driven Autoscaler containing the [RabbitMQ Queue](https://www.rabbitmq.com/kubernetes/operator/operator-overview) HPA ([Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)).
+2. Install [KEDA](https://keda.sh/), the Kubernetes Event-Driven Autoscaler containing the [RabbitMQ Queue](https://www.rabbitmq.com/kubernetes/operator/operator-overview) HPA ([Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)).
 
 ```bash
 helm repo add kedacore https://kedacore.github.io/charts
@@ -26,14 +26,14 @@ helm install keda kedacore/keda \
   --create-namespace
 ```
 
-To get the latest version of these helm charts, you can use:
+To get the latest version of these [Helm](https://helm.sh/) charts, you can use:
 
 ```bash
 helm search hub rabbitmq-cluster-operator --output yaml | yq '.[] | select(.repository.url == "https://charts.bitnami.com/bitnami")'
 helm search hub keda --output yaml | yq '.[] | select(.repository.url == "https://kedacore.github.io/charts")'
 ```
 
-Deploy the [zero-prover](https://github.com/0xPolygonZero/zero-bin) infrastructure in Kubernetes.
+3. Deploy the [zero-prover](https://github.com/0xPolygonZero/zero-bin) infrastructure in Kubernetes.
 
 ```bash
 helm install test --namespace zero --create-namespace ./helm
