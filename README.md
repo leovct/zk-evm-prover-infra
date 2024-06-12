@@ -6,6 +6,15 @@ A Helm chart to deploy Polygon Zero's [Type 1 Prover](https://github.com/0xPolyg
 
 ## Usage
 
+To be able to run the type 1 prover infrastructure, you will need:
+
+- A Kubernetes cluster (e.g. [GKE](https://cloud.google.com/kubernetes-engine/docs)).
+- Two types of [node pools](https://cloud.google.com/kubernetes-engine/docs/concepts/node-pools):
+  - `standard-pool`: for standard nodes (e.g. `n1-standard-2`) - with at least 1 node.
+  - `highmem-pool`: for high memory nodes (e.g. `c3d-highmen-180` with 1.4Tb of memory) - with at least 2 nodes.
+- This is still a PoC so you can keep all the nodes in the same availability zone.
+- A Blockchain RPC URL, for that you can use [Alchemy](https://dashboard.alchemy.com/apps) for example.
+
 1. Install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernetes/operator/operator-overview).
 
 ```bash
