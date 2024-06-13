@@ -36,7 +36,7 @@ rabbitmq:
     # RabbitMQ pods can only be scheduled on standard nodes.
     nodeSelector:
       key: cloud.google.com/gke-nodepool
-      value: standard-pool
+      value: default-pool
     # The default username.
     username: guest
     # The default password.
