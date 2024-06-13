@@ -7,7 +7,7 @@ index 7e0eb6e..7309a45 100644
    touch leader/src/main.rs
 
 -RUN cargo build --release --bin leader
-+RUN env RUSTFLAGS='-Z linker-features=-lld' cargo build --release --bin leader
++RUN env RUSTFLAGS='-C target-cpu=native -Z linker-features=-lld' cargo build --release --bin leader
 
  FROM debian:bullseye-slim
  RUN apt-get update && apt-get install -y ca-certificates libjemalloc2
