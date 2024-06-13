@@ -1,31 +1,13 @@
 diff --git a/worker.Dockerfile b/worker.Dockerfile
-index ecf7ae9..eea322e 100644
+index 39036aa..4e16c45 100644
 --- a/worker.Dockerfile
 +++ b/worker.Dockerfile
-@@ -1,7 +1,7 @@
- FROM rustlang/rust:nightly-bullseye-slim as builder
- 
- # Install jemalloc
--RUN apt-get update && apt-get install -y libjemalloc2 libjemalloc-dev make
-+RUN apt-get update && apt-get install -y libjemalloc2 libjemalloc-dev make pkg-config libssl-dev
- 
- RUN \
-   mkdir -p common/src  && touch common/src/lib.rs && \
-@@ -18,7 +18,7 @@ COPY worker/Cargo.toml ./worker/Cargo.toml
- 
- COPY ./rust-toolchain.toml ./
- 
--RUN cargo build --release --bin worker 
-+RUN cargo build --release --bin worker
- 
- COPY common ./common
- COPY ops ./ops
-@@ -28,7 +28,7 @@ RUN \
+@@ -27,7 +27,7 @@ RUN \
    touch ops/src/lib.rs && \
    touch worker/src/main.rs
- 
--RUN cargo build --release --bin worker 
-+RUN cargo build --release --bin worker
- 
+
+-RUN cargo build --release --bin worker
++RUN env RUSTFLAGS='-Z linker-features=-lld' cargo build --release --bin worker
+
  FROM debian:bullseye-slim
  RUN apt-get update && apt-get install -y ca-certificates libjemalloc2
