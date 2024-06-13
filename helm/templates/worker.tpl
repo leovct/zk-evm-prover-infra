@@ -12,7 +12,7 @@ spec:
     metadata:
       labels:
         app: worker
-    nodeSelector: {{ pprintf "%s:%s" .Values.worker.nodeSelector.key .Values.worker.nodeSelector.value }}
+    nodeSelector: {{ printf "%s:%s" .Values.worker.nodeSelector.key .Values.worker.nodeSelector.value }}
     spec:
       containers:
       - name: worker
