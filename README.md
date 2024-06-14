@@ -10,10 +10,24 @@ To be able to run the type 1 prover infrastructure, you will need:
 
 - A Kubernetes cluster (e.g. [GKE](https://cloud.google.com/kubernetes-engine/docs)).
 - Two types of [node pools](https://cloud.google.com/kubernetes-engine/docs/concepts/node-pools):
-  - `standard-pool`: for standard nodes (e.g. `n1-standard-2`) - with at least 1 node.
+  - `default-pool`: for standard nodes (e.g. `e2-standard-4`) - with at least 1 node.
   - `highmem-pool`: for high memory nodes (e.g. `c3d-highmen-180` with 1.4Tb of memory) - with at least 2 nodes.
+
+  ![](./gke-node-pools.png)
+
 - This is still a PoC so you can keep all the nodes in the same availability zone.
 - A Blockchain RPC URL, for that you can use [Alchemy](https://dashboard.alchemy.com/apps) for example.
+- Note: It would be great to share a terraform project to spin up the GKE infra?
+- TODO: You will also need a `jerrigon` node to create the witnesses.
+
+0. Connect to the GKE cluster.
+
+```bash
+gcloud auth login
+# You might need to run: gcloud components install gke-gcloud-auth-plugin
+gcloud container clusters get-credentials type-1-prover-test-01 --zone=europe-west1-c
+kubectl get namespaces
+```
 
 1. Install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernetes/operator/operator-overview).
 
