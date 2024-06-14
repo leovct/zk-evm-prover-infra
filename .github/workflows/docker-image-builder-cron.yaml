@@ -74,6 +74,6 @@ jobs:
         with:
           context: docker
           file: docker/jumpbox.Dockerfile
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/zero-jumpbox-${{ matrix.image }}:0.1.0
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/zero-jumpbox:0.1.0
           platforms: linux/amd64,linux/arm64
           push: true
