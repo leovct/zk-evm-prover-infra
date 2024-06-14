@@ -18,3 +18,4 @@ spec:
     additionalConfig: |
       default_user = {{ .Values.rabbitmq.cluster.username }}
       default_pass = {{ .Values.rabbitmq.cluster.password }}
+  # TODO: Make sure those pods can only be assigned to the default pool.
