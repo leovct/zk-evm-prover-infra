@@ -1,2 +1,3 @@
 zero-bin/
-*.Dockerfile
+leader.Dockerfile
+worker.Dockerfile
