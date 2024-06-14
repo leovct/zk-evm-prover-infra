@@ -13,7 +13,7 @@ To be able to run the type 1 prover infrastructure, you will need:
   - `default-pool`: for standard nodes (e.g. `e2-standard-4`) - with at least 1 node.
   - `highmem-pool`: for high memory nodes (e.g. `c3d-highmen-180` with 1.4Tb of memory) - with at least 2 nodes.
 
-  ![](./gke-node-pools.png)
+  ![gke-node-pools](./gke-node-pools.png)
 
 - This is still a PoC so you can keep all the nodes in the same availability zone.
 - A Blockchain RPC URL, for that you can use [Alchemy](https://dashboard.alchemy.com/apps) for example.
