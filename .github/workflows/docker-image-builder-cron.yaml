@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 env:
-  ZERO_BIN_BRANCH_OR_COMMIT: main
+  ZERO_BIN_BRANCH_OR_COMMIT: develop
 
 concurrency:
   group: docker-image-builder-cron-${{ github.event.pull_request.number || github.ref }}
