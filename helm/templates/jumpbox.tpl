@@ -3,8 +3,7 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-jumpbox
 spec:
-  # The number of replicas should be set to zero as it is managed by the HPA.
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: jumpbox
