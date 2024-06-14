@@ -20,7 +20,7 @@ jobs:
       - uses: azure/setup-helm@v4
         with:
           version: ${{ env.HELM_VERSION }}
-      - name: helm lint
+      - name: Lint helm chart
         run: helm lint ./helm
 
   deploy:
@@ -31,7 +31,7 @@ jobs:
         with:
           version: ${{ env.HELM_VERSION }}
 
-      - name: Create kind cluster
+      - name: Create Kind cluster
         uses: helm/kind-action@v1.9.0
 
       - name: Install RabbitMQ Cluster Operator
@@ -43,7 +43,7 @@ jobs:
             --namespace rabbitmq-cluster-operator \
             --create-namespace
 
-      - name: Install KEDA
+      - name: Install KEDA Operator
         run: |
           helm repo add kedacore https://kedacore.github.io/charts
           helm repo update
@@ -52,8 +52,8 @@ jobs:
             --namespace keda \
             --create-namespace
 
-      - name: Render template
+      - name: Render helm template
         run: helm template test --namespace zero --create-namespace ./helm
 
-      - name: Deploy the zero-prover infrastructure
+      - name: Install helm chart
         run: helm install test --namespace zero --create-namespace ./helm
