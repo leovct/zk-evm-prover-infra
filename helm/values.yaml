@@ -48,3 +48,12 @@ rabbitmq:
     queue: hello
     # The interval (in seconds) at which KEDA will check the queue length and scale the deployment accordingly.
     pollingInterval: 10
+
+# Jumpbox Configuration
+jumpbox:
+  # The image to use.
+  image: ubuntu:latest
+  # Jumpbox pods can only be scheduled on standard nodes.
+  nodeSelector:
+    key: cloud.google.com/gke-nodepool
+    value: default-pool
