@@ -63,3 +63,28 @@ helm search hub keda --output yaml | yq '.[] | select(.repository.url == "https:
 ```bash
 helm install test --namespace zero --create-namespace ./helm
 ```
+
+5. Generate a proof!
+
+Get a running shell inside the `jumpbox` container.
+
+```bash
+$ kubectl get pods --namespace zero | grep test-jumpbox
+test-jumpbox-74d44669df-cqrt9    1/1     Running   0          9m40s
+```
+
+```bash
+$ kubectl exec --namespace zero --stdin --tty test-jumpbox-74d44669df-cqrt9 -- /bin/bash
+root@test-jumpbox-74d44669df-cqrt9:/#
+```
+
+Generate a proof using a witness previously saved at `witness.json` (check `data/`).
+
+Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node.
+
+```bash
+leader \
+  --runtime amqp \
+  amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < witness.json
+```
