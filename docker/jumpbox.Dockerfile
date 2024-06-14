@@ -8,7 +8,9 @@ RUN apt-get update \
 FROM debian:bullseye-slim
 RUN apt-get update \
   && apt-get install --yes ca-certificates libjemalloc2
-COPY --from=builder ./target/release/leader /usr/local/bin/leader
-COPY --from=builder ./target/release/rpc /usr/local/bin/rpc
-COPY --from=builder ./target/release/verifier /usr/local/bin/verifier
-COPY --from=builder ./target/release/worker /usr/local/bin/worker
+COPY --from=builder \
+  /opt/zero-bin/target/release/leader \
+  /opt/zero-bin/target/release/rpc \
+  /opt/zero-bin/target/release/verifier \
+  /opt/zero-bin/target/release/worker \
+  /usr/local/bin/
