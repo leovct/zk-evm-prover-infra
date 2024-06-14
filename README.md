@@ -64,7 +64,7 @@ helm search hub keda --output yaml | yq '.[] | select(.repository.url == "https:
 helm install test --namespace zero --create-namespace ./helm
 ```
 
-5. Generate a proof!
+4. Generate a proof! 🥳
 
 Get a running shell inside the `jumpbox` container.
 
