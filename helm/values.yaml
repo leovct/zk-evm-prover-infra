@@ -1,59 +1,74 @@
 # Type 1 Prover Configuration
 worker:
-  # The zero-bin worker image to use.
+  # The Docker image for the worker.
   image: leovct/zero-bin-worker:develop
-  # Worker pods can only be scheduled on high memory nodes.
+
+  # Worker pods can only be scheduled on high-memory nodes.
+  # This is specified using a node selector.
   nodeSelector:
     key: cloud.google.com/gke-nodepool
     value: highmem-pool
-  # The minimum number of workers to which the HPA can scale down.
+
+  # The minimum number of worker pods to maintain.
+  # The Horizontal Pod Autoscaler (HPA) will not scale down below this value.
   minWorkerCount: 1
-  # The maximum number of workers to which the HPA can scale up.
-  # We start with 2 nodes so we only allow 8 workers at the same time (4 per node).
+
+  # The maximum number of worker pods to scale up to.
+  # We start with 2 nodes, so we limit the maximum workers to 8 (4 per node).
   maxWorkerCount: 8
 
   resources:
-    # The kube-scheduler will use this information to decide which node to place the Pod on.
+    # Resource requests are used by the Kubernetes scheduler to decide which node to place the pod on.
     requests:
-      # We set the memory request to 300Mi so that we can have at least 4 workers on a node of 1.4Ti.
+      # We set the memory request to 300Mi so that we can have at least 4 workers on a node with 1.4Ti memory.
       memory: "300Mi"
-      cpu: "250m" # TODO: Update this value
-    # The kubelet will enforce those limits so that the container is not allowed to use more of that resource than the limit set.
+      cpu: "250m" # TODO: Update this value based on our requirements.
+
+    # Resource limits are enforced by the Kubernetes kubelet to prevent containers from using more resources than specified.
     limits:
-      # We set the memory limit to 1Ti. A worker should not need more memory normally.
+      # We set the memory limit to 1Ti. A worker should not need more memory than this under normal circumstances.
       memory: "1Ti"
-      cpu: "4" # TODO: Update this value
+      cpu: "4" # TODO: Update this value based on our requirements.
 
 # RabbitMQ Configuration
 rabbitmq:
-  # Cluster Configuration
   cluster:
-    # The RabbitMQ image to use.
+    # The Docker image for RabbitMQ.
     image: rabbitmq:3.13.3
+
     # The number of nodes in the RabbitMQ cluster.
-    # It is highly advised to use an odd number of nodes (https://www.rabbitmq.com/docs/clustering#node-count).
+    # It is recommended to use an odd number of nodes for better fault tolerance.
+    # https://www.rabbitmq.com/docs/clustering#node-count
     nodeCount: 1
+
     # RabbitMQ pods can only be scheduled on standard nodes.
+    # This is specified using a node selector.
     nodeSelector:
       key: cloud.google.com/gke-nodepool
       value: default-pool
-    # The default username.
+
+    # The default username for RabbitMQ.
     username: guest
-    # The default password.
+
+    # The default password for RabbitMQ.
     password: guest
 
   # Horizontal Pod Autoscaler Configuration
   hpa:
-    # The name of the queue to monitor.
+    # The name of the RabbitMQ queue to monitor for scaling.
     queue: hello
-    # The interval (in seconds) at which KEDA will check the queue length and scale the deployment accordingly.
+
+    # The interval (in seconds) at which KEDA (Kubernetes Event-driven Autoscaler) will check the
+    # queue length and scale the deployment accordingly.
     pollingInterval: 10
 
 # Jumpbox Configuration
 jumpbox:
-  # The image to use.
-  image: ubuntu:latest
+  # The Docker image for the jumpbox (a secure entrypoint for accessing the cluster).
+  image: leovct/zero-jumpbox:0.1.0
+
   # Jumpbox pods can only be scheduled on standard nodes.
+  # This is specified using a node selector.
   nodeSelector:
     key: cloud.google.com/gke-nodepool
     value: default-pool
