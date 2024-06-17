@@ -10,15 +10,14 @@ To be able to run the type 1 prover infrastructure, you will need:
 
 - A Kubernetes cluster (e.g. [GKE](https://cloud.google.com/kubernetes-engine/docs)).
 - Two types of [node pools](https://cloud.google.com/kubernetes-engine/docs/concepts/node-pools):
-  - `default-pool`: for standard nodes (e.g. `e2-standard-4`) - with at least 1 node.
-  - `highmem-pool`: for high memory nodes (e.g. `c3d-highmen-180` with 1.4Tb of memory) - with at least 2 nodes.
+  - `default-pool`: for standard nodes (e.g. `e2-standard-4`) - with at least 1 node and 300Gb of disk.
+  - `highmem-pool`: for high memory nodes (e.g. `c3d-highmen-180` with 1.4Tb of memory) - with at least 1 node and 300Gb of disk.
 
   ![gke-node-pools](./docs/gke-node-pools.png)
 
 - This is still a PoC so you can keep all the nodes in the same availability zone.
-- A Blockchain RPC URL, for that you can use [Alchemy](https://dashboard.alchemy.com/apps) for example.
-- Note: It would be great to share a terraform project to spin up the GKE infra?
-- TODO: You will also need a `jerrigon` node to create the witnesses.
+- A `jerrigon` blockchain RPC URL to create the witnesses.
+- TODO: It would be great to share a Terraform project to spin up the GKE infra.
 
 0. Connect to the GKE cluster.
 
