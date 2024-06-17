@@ -110,7 +110,9 @@ spec:
       # The protocol to be used for communication.
       protocol: amqp
       # The name of the RabbitMQ queue.
-      queueName: {{ .Values.rabbitmq.hpa.queue }}
+      # Proof generation tasks each create their own queue, so rather than targeting a specific queue,
+      # this setting applies to all queues created within the RabbitMQ cluster.
+      queueName: .*
       # The trigger mode. We chose to trigger on number of messages in the queue.
       mode: QueueLength
       # The message backlog to trigger on.

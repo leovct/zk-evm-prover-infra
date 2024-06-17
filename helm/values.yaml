@@ -55,9 +55,6 @@ rabbitmq:
 
   # Horizontal Pod Autoscaler Configuration
   hpa:
-    # The name of the RabbitMQ queue to monitor for scaling.
-    queue: hello
-
     # The interval (in seconds) at which KEDA (Kubernetes Event-driven Autoscaler) will check the
     # queue length and scale the deployment accordingly.
     pollingInterval: 10
