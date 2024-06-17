@@ -26,6 +26,9 @@ spec:
           value: {{ printf "amqp://%s:%s@%s-rabbitmq-cluster.%s.svc.cluster.local:5672" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Name .Release.Namespace }}
         - name: RUST_LOG
           value: debug
+        volumeMounts:
+        - name: circuits
+          mountPath: /circuits
         resources:
           requests:
             memory: {{ .Values.worker.resources.requests.memory }}
@@ -33,3 +36,33 @@ spec:
           limits:
             memory: {{ .Values.worker.resources.limits.memory }}
             cpu: {{ .Values.worker.resources.limits.cpu }}
+      volumes:
+      - name: circuits
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-worker-circuits-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Release.Name }}-worker-circuits-pv
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadOnlyMany
+  hostPath:
+    path: /data/worker-circuits
+
+---
+yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-worker-circuits-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
