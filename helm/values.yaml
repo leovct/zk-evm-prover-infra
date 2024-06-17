@@ -1,7 +1,7 @@
 # Type 1 Prover Configuration
 worker:
   # The Docker image for the worker.
-  image: leovct/zero-bin-worker:develop
+  image: leovct/paladin-worker:latest
 
   # Worker pods can only be scheduled on high-memory nodes.
   # This is specified using a node selector.
@@ -65,7 +65,7 @@ rabbitmq:
 # Jumpbox Configuration
 jumpbox:
   # The Docker image for the jumpbox (a secure entrypoint for accessing the cluster).
-  image: leovct/zero-jumpbox:0.1.0
+  image: leovct/zero-jumpbox:latest
 
   # Jumpbox pods can only be scheduled on standard nodes.
   # This is specified using a node selector.

@@ -2,27 +2,19 @@ name: Docker Image Builder Cron
 
 on:
   schedule:
-    - cron: '0 6 * * 1'  # Every Monday at 6 AM Paris time (UTC+2).
+    - cron: '0 0 * * *'  # Every day at midnight UTC.
   workflow_dispatch:
 
 env:
-  ZERO_BIN_BRANCH_OR_COMMIT: develop
+  ZERO_BIN_BRANCH_OR_COMMIT: feat/cancun
 
 concurrency:
   group: docker-image-builder-cron-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  paladin:
+  paladin-worker:
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        image:
-          - paladin-leader
-          - paladin-worker
-
     steps:
       - uses: actions/checkout@v4
 
@@ -35,7 +27,7 @@ jobs:
 
       - name: Apply patch
         working-directory: /opt/zero-bin
-        run: patch -p1 -i ${{ github.workspace }}/docker/${{ matrix.image }}.diff
+        run: patch -p1 -i ${{ github.workspace }}/docker/paladin-worker.diff
 
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
@@ -50,8 +42,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: /opt/zero-bin
-          file: /opt/zero-bin/${{ matrix.image }}.Dockerfile
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}:${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
+          file: /opt/zero-bin/paladin-worker.Dockerfile
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/paladin-worker:latest
           platforms: linux/amd64,linux/arm64
           push: true
 
@@ -76,6 +68,6 @@ jobs:
           file: docker/jumpbox.Dockerfile
           build-args: |
             ZERO_BIN_BRANCH_OR_COMMIT=${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/zero-jumpbox:${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/zero-jumpbox:latest
           platforms: linux/amd64,linux/arm64
           push: true
