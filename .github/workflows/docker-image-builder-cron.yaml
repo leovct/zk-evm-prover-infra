@@ -13,15 +13,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  zero-bin:
+  paladin:
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
         image:
-          - leader
-          - worker
+          - paladin-leader
+          - paladin-worker
 
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +51,7 @@ jobs:
         with:
           context: /opt/zero-bin
           file: /opt/zero-bin/${{ matrix.image }}.Dockerfile
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/zero-bin-${{ matrix.image }}:${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.image }}:${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
           platforms: linux/amd64,linux/arm64
           push: true
 
@@ -74,6 +74,8 @@ jobs:
         with:
           context: docker
           file: docker/jumpbox.Dockerfile
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/zero-jumpbox:0.1.0
+          build-args: |
+            ZERO_BIN_BRANCH_OR_COMMIT=${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/zero-jumpbox:${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
           platforms: linux/amd64,linux/arm64
           push: true

@@ -1,8 +1,10 @@
 FROM rustlang/rust:nightly-bullseye-slim as builder
+ENV ZERO_BIN_BRANCH_OR_COMMIT=develop
 RUN apt-get update \
   && apt-get install --yes git libjemalloc2 libjemalloc-dev make libssl-dev pkg-config \
-  && git clone --branch develop https://github.com/0xPolygonZero/zero-bin.git /opt/zero-bin \
+  && git clone https://github.com/0xPolygonZero/zero-bin.git /opt/zero-bin \
   && cd /opt/zero-bin \
+  && git checkout $ZERO_BIN_BRANCH_OR_COMMIT \
   && env RUSTFLAGS='-Z linker-features=-lld' cargo build --release
 
 FROM debian:bullseye-slim
