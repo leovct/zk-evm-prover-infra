@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-worker
 spec:
-  # The number of replicas should be set to zero as it is managed by the HPA.
-  replicas: 0
+  # The number of replicas should be set to zero (or one?) as it is managed by the HPA.
+  replicas: 1
   selector:
     matchLabels:
       app: worker
