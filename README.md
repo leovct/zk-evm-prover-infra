@@ -25,9 +25,14 @@ To be able to run the type 1 prover infrastructure, you will need:
 ```bash
 gcloud auth login
 # You might need to run: gcloud components install gke-gcloud-auth-plugin
-gcloud container clusters get-credentials type-1-prover-test-01 --zone=europe-west1-c
+gcloud container clusters get-credentials zero-prover-test-01 --zone=europe-west1-c
 kubectl get namespaces
 ```
+
+You can now start Lens and monitor the state of the cluster.
+
+![observer-cluster-with-lens](./observer-cluster-with-lens.png)
+
 
 1. Install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernetes/operator/operator-overview).
 
@@ -64,27 +69,78 @@ helm search hub keda --output yaml | yq '.[] | select(.repository.url == "https:
 helm install test --namespace zero --create-namespace ./helm
 ```
 
+Your cluster should now be ready!
+
+![cluster-is-ready](./cluster-is-ready.png)
+
 4. Generate a proof! 🥳
 
 Get a running shell inside the `jumpbox` container.
 
 ```bash
-$ kubectl get pods --namespace zero | grep test-jumpbox
-test-jumpbox-74d44669df-cqrt9    1/1     Running   0          9m40s
-```
-
-```bash
-$ kubectl exec --namespace zero --stdin --tty test-jumpbox-74d44669df-cqrt9 -- /bin/bash
-root@test-jumpbox-74d44669df-cqrt9:/#
+jumpbox_pod_name="$(kubectl get pods --namespace zero -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep jumpbox)"
+kubectl exec --namespace zero --stdin --tty "$jumpbox_pod_name" -- /bin/bash
 ```
 
 Generate a proof using a witness previously saved at `witness.json` (check `data/`).
 
+```bash
+apt-get install --yes vim
+vim /home/witness-0034.json
+# copy the content of the witness file
+```
+
 Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node.
 
 ```bash
-leader \
-  --runtime amqp \
-  amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
-  stdio < witness.json
+cd /usr/local/bin
+export ARITHMETIC_CIRCUIT_SIZE="16..21"
+export BYTE_PACKING_CIRCUIT_SIZE="9..21"
+export CPU_CIRCUIT_SIZE="12..23"
+export KECCAK_CIRCUIT_SIZE="14..19"
+export KECCAK_SPONGE_CIRCUIT_SIZE="9..15"
+export LOGIC_CIRCUIT_SIZE="12..18"
+export MEMORY_CIRCUIT_SIZE="17..25"
+env RUST_BACKTRACE=full RUST_LOG=debug leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < /home/witness-0034.json
+```
+
+For the moment, we get an error...
+
+![leader-issue](./leader-issue.png)
+
+```bash
+root@test-jumpbox-7779b5dd7d-shrxz:/# env RUST_BACKTRACE=full RUST_LOG=debug leader   --runtime=amqp   --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672   stdio < /home/witness-0034.json
+2024-06-17T10:02:29.607786Z DEBUG lapin::channels: create channel id=0
+2024-06-17T10:02:29.624745Z DEBUG lapin::channels: create channel
+2024-06-17T10:02:29.624767Z DEBUG lapin::channels: create channel id=1
+2024-06-17T10:02:29.633851Z ERROR lapin::io_loop: error doing IO error=IOError(Custom { kind: Other, error: "A Tokio 1.x context was found, but it is being shutdown." })
+2024-06-17T10:02:29.633914Z ERROR lapin::channels: Connection error error=IO error: A Tokio 1.x context was found, but it is being shutdown.
+Error: invalid type: map, expected a sequence at line 1 column 0
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: leader::main::{{closure}}
+   2: leader::main
+   3: std::sys_common::backtrace::__rust_begin_short_backtrace
+   4: main
+   5: __libc_start_main
+   6: _start
+```
+
+Check that the witness is a correct JSON file.
+
+```bash
+jq . /home/witness-0034.json
+```
+
+Check that the `jumpbox` can connect to the RabbitMQ cluster. These are the logs from the `test-rabbitmq-cluster-server-0` pod. The connection is being established but the client closes it instantly.
+
+```bash
+2024-06-17 10:02:15.679340+00:00 [info] <0.2444.0> accepting AMQP connection <0.2444.0> (10.124.0.10:58642 -> 10.124.1.11:5672)
+2024-06-17 10:02:15.680833+00:00 [info] <0.2444.0> connection <0.2444.0> (10.124.0.10:58642 -> 10.124.1.11:5672): user 'guest' authenticated and granted access to vhost '/'
+2024-06-17 10:02:15.689512+00:00 [warning] <0.2444.0> closing AMQP connection <0.2444.0> (10.124.0.10:58642 -> 10.124.1.11:5672, vhost: '/', user: 'guest'):
+2024-06-17 10:02:15.689512+00:00 [warning] <0.2444.0> client unexpectedly closed TCP connection
 ```
