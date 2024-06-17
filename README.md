@@ -13,7 +13,7 @@ To be able to run the type 1 prover infrastructure, you will need:
   - `default-pool`: for standard nodes (e.g. `e2-standard-4`) - with at least 1 node.
   - `highmem-pool`: for high memory nodes (e.g. `c3d-highmen-180` with 1.4Tb of memory) - with at least 2 nodes.
 
-  ![gke-node-pools](./gke-node-pools.png)
+  ![gke-node-pools](./docs/gke-node-pools.png)
 
 - This is still a PoC so you can keep all the nodes in the same availability zone.
 - A Blockchain RPC URL, for that you can use [Alchemy](https://dashboard.alchemy.com/apps) for example.
@@ -31,7 +31,7 @@ kubectl get namespaces
 
 You can now start Lens and monitor the state of the cluster.
 
-![observer-cluster-with-lens](./observer-cluster-with-lens.png)
+![observer-cluster-with-lens](./docs/observer-cluster-with-lens.png)
 
 
 1. Install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernetes/operator/operator-overview).
@@ -71,7 +71,7 @@ helm install test --namespace zero --create-namespace ./helm
 
 Your cluster should now be ready!
 
-![cluster-is-ready](./cluster-is-ready.png)
+![cluster-is-ready](./docs/cluster-is-ready.png)
 
 4. Generate a proof! 🥳
 
@@ -109,7 +109,7 @@ env RUST_BACKTRACE=full RUST_LOG=debug leader \
 
 For the moment, we get an error...
 
-![leader-issue](./leader-issue.png)
+![leader-issue](./docs/leader-issue.png)
 
 ```bash
 root@test-jumpbox-7779b5dd7d-shrxz:/# env RUST_BACKTRACE=full RUST_LOG=debug leader   --runtime=amqp   --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672   stdio < /home/witness-0034.json
