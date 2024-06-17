@@ -27,7 +27,7 @@ jobs:
 
       - name: Apply patch
         working-directory: /opt/zero-bin
-        run: patch -p1 -i ${{ github.workspace }}/docker/paladin-worker.diff
+        run: patch -p1 -i ${{ github.workspace }}/docker/worker.Dockerfile.diff
 
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
