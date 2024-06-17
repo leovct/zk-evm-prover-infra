@@ -5,7 +5,7 @@ RUN apt-get update \
   && git clone https://github.com/0xPolygonZero/zero-bin.git /opt/zero-bin \
   && cd /opt/zero-bin \
   && git checkout $ZERO_BIN_BRANCH_OR_COMMIT \
-  && env RUSTFLAGS='-Z linker-features=-lld' cargo build --release
+  && env RUSTFLAGS='-C target-cpu=native -Z linker-features=-lld' cargo build --release
 
 FROM debian:bullseye-slim
 RUN apt-get update \
