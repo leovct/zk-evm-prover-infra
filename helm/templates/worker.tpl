@@ -50,12 +50,11 @@ spec:
   capacity:
     storage: 100Gi
   accessModes:
-    - ReadOnlyMany
+    - ReadWriteOnce
   hostPath:
     path: /data/worker-circuits
 
 ---
-yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
