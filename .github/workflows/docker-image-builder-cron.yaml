@@ -44,7 +44,8 @@ jobs:
           context: /opt/zero-bin
           file: /opt/zero-bin/worker.Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/paladin-worker:latest
-          platforms: linux/amd64,linux/arm64
+          #platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
 
   zero-jumpbox:
@@ -69,5 +70,6 @@ jobs:
           build-args: |
             ZERO_BIN_BRANCH_OR_COMMIT=${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/zero-jumpbox:latest
-          platforms: linux/amd64,linux/arm64
+          #platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           push: true
