@@ -18,6 +18,7 @@ spec:
       containers:
       - name: worker
         image: {{ .Values.worker.image }}
+        imagePullPolicy: Always
         command: ["worker"]
         args:
         - "--runtime=amqp"
