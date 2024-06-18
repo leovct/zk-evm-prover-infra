@@ -1,12 +1,12 @@
-# Define the secret containing the AMQP URL.
+# Define the secret containing the RabbitMQ HTTP URL.
 apiVersion: v1
 kind: Secret
 metadata:
   name: {{ .Release.Name }}-keda-rabbitmq-secret
 data:
-  # The AMQP URL should be encoded using base64.
+  # The URL should be encoded using base64.
   # TODO: Implement a more robust secret management system to enhance security.
-  AMQP_URL: {{ printf "amqp://%s:%s@%s-rabbitmq-cluster.%s.svc.cluster.local:5672" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Name .Release.Namespace | b64enc }}
+  host: {{ printf "http://%s:%s@%s-rabbitmq-cluster.%s.svc.cluster.local:15672/" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Name .Release.Namespace | b64enc }}
 
 ---
 # Describe which secret the ScaledObject will use.
@@ -27,8 +27,8 @@ spec:
       # The name of the secret resource.
       # It should be in the same namespace as the ScaledObject.
       name: {{ .Release.Name }}-keda-rabbitmq-secret
-      # The name of the key that contains the AMQP URL.
-      key: AMQP_URL
+      # The name of the key that contains the HTTP URL.
+      key: host
 
 ---
 # Define which resource the HPA will scale and how it will scale it.
@@ -108,16 +108,21 @@ spec:
   - type: rabbitmq
     metadata:
       # The protocol to be used for communication.
-      protocol: amqp
+      protocol: http
+      # Use regex to select queue instead of full name.
+      # Note: Only applies to host that use the http protocol.
+      useRegex: "true"
       # The name of the RabbitMQ queue.
       # Proof generation tasks each create their own queue, so rather than targeting a specific queue,
       # this setting applies to all queues created within the RabbitMQ cluster.
       queueName: .*
+      # Operation that will be applied to compute the number of messages in case of useRegex enabled.
+      operation: sum
       # The trigger mode. We chose to trigger on number of messages in the queue.
       mode: QueueLength
       # The message backlog to trigger on.
       # It must be a string.
-      value: "20"
+      value: "2"
     authenticationRef:
       # The name of the TriggerAuthentication object.
       name: {{ .Release.Name }}-keda-trigger-auth-rabbitmq-conn
