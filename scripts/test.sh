@@ -34,7 +34,7 @@ run_proof() {
 export -f run_proof
 
 # Run the proofs in parallel using GNU Parallel
-parallel --jobs 0 run_proof ::: "${witness_numbers[@]}"
+parallel --jobs 0 --wait run_proof ::: "${witness_numbers[@]}"
 
 end_time=$(date +%s)
 duration=$((end_time - start_time))
