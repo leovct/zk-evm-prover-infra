@@ -13,8 +13,6 @@ spec:
       labels:
         app: worker
     spec:
-      nodeSelector:
-        {{ .Values.worker.nodeSelector.key }}: {{ .Values.worker.nodeSelector.value }}
       containers:
       - name: worker
         image: {{ .Values.worker.image }}
@@ -41,6 +39,11 @@ spec:
       - name: circuits
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-worker-circuits-pvc
+      tolerations:
+      - key: "highmem"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
 
 ---
 apiVersion: v1

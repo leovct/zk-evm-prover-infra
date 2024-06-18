@@ -12,8 +12,6 @@ spec:
       labels:
         app: jumpbox
     spec:
-      nodeSelector:
-        {{ .Values.jumpbox.nodeSelector.key }}: {{ .Values.jumpbox.nodeSelector.value }}
       containers:
       - name: jumpbox
         image: {{ .Values.jumpbox.image }}

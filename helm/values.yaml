@@ -3,12 +3,6 @@ worker:
   # The Docker image for the worker.
   image: leovct/paladin-worker:latest
 
-  # Worker pods can only be scheduled on high-memory nodes.
-  # This is specified using a node selector.
-  nodeSelector:
-    key: cloud.google.com/gke-nodepool
-    value: highmem-pool
-
   # The minimum number of worker pods to maintain.
   # The Horizontal Pod Autoscaler (HPA) will not scale down below this value.
   minWorkerCount: 1
@@ -41,12 +35,6 @@ rabbitmq:
     # https://www.rabbitmq.com/docs/clustering#node-count
     nodeCount: 1
 
-    # RabbitMQ pods can only be scheduled on standard nodes.
-    # This is specified using a node selector.
-    nodeSelector:
-      key: cloud.google.com/gke-nodepool
-      value: default-pool
-
     # The default username for RabbitMQ.
     username: guest
 
@@ -63,9 +51,3 @@ rabbitmq:
 jumpbox:
   # The Docker image for the jumpbox (a secure entrypoint for accessing the cluster).
   image: leovct/zero-jumpbox:latest
-
-  # Jumpbox pods can only be scheduled on standard nodes.
-  # This is specified using a node selector.
-  nodeSelector:
-    key: cloud.google.com/gke-nodepool
-    value: default-pool
