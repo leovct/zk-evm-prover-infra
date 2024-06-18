@@ -84,11 +84,14 @@ jumpbox_pod_name="$(kubectl get pods --namespace zero -o=jsonpath='{range .items
 kubectl exec --namespace zero --stdin --tty "$jumpbox_pod_name" -- /bin/bash
 ```
 
-Generate a proof using a witness (check `data/` for witnesses files).
+Generate proof using a witness (check `data.tar.gz` for blocks and witnesses files).
 
 ```bash
+cd /home
+curl -L -O https://github.com/leovct/zero-prover-infra/raw/8fdf9108482dd63c9424d5a8a555ef892d262c59/data.tar.gz
+tar -xvf data.tar.gz
 apt-get install --yes vim
-vim /home/witness-0001.json
+vim /home/data/witness-0001.json
 # Copy the content of the witness file...
 ```
 
@@ -98,7 +101,7 @@ Note that we would like to be able to generate witnesses on the fly but it requi
 env RUST_BACKTRACE=full RUST_LOG=debug leader \
   --runtime=amqp \
   --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
-  stdio < /home/witness-0001.json &> /home/proof-0001.leader.out
+  stdio < /home/data/witness-0001.json &> /home/data/proof-0001.leader.out
 ```
 
 ```bash
@@ -113,11 +116,11 @@ env RUST_BACKTRACE=full RUST_LOG=debug leader \
 # proof content
 ```
 
-You can check the content of `/home/proof-0001.leader.out` or you can extract the proof and run the `verifier`.
+You can check the content of `/home/data/proof-0001.leader.out` or you can extract the proof and run the `verifier`.
 
 ```bash
-tail -n1 /home/proof-0001.leader.out | jq > /home/proof-0001.json
-env RUST_LOG=info verifier --file-path /home/proof-0001.json
+tail -n1 /home/data/proof-0001.leader.out | jq > /home/data/proof-0001.json
+env RUST_LOG=info verifier --file-path /home/data/proof-0001.json
 ```
 
 The `verifier` fails in this case unfortunately.
@@ -136,7 +139,7 @@ Note that the `leader` might fail to generate proofs for other types of witnesse
 env RUST_BACKTRACE=full RUST_LOG=debug leader \
   --runtime=amqp \
   --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
-  stdio < /home/witness-0034.json
+  stdio < /home/data/witness-0034.json
 ```
 
 ```bash
