@@ -39,6 +39,9 @@ spec:
       - name: circuits
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-worker-circuits-pvc
+      nodeSelector:
+        key: cloud.google.com/gke-nodepool
+        value: highmem-pool
       tolerations:
       - key: "highmem"
         operator: "Equal"
