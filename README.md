@@ -8,6 +8,7 @@ A Helm chart to deploy Polygon Zero's [Type 1 Prover](https://github.com/0xPolyg
 
 To be able to run the type 1 prover infrastructure, you will need:
 
+- A VPC (see [zero-prover-test-vpc](https://console.cloud.google.com/networking/networks/details/zero-prover-test-vpc?project=prj-polygonlabs-devtools-dev&authuser=2&pageTab=OVERVIEW)).
 - A Kubernetes cluster (e.g. [GKE](https://cloud.google.com/kubernetes-engine/docs)).
 - Two types of [node pools](https://cloud.google.com/kubernetes-engine/docs/concepts/node-pools):
   - `default-pool`: for standard nodes (e.g. `e2-standard-4`) - with at least 1 node and 300Gb of disk.
@@ -81,65 +82,81 @@ jumpbox_pod_name="$(kubectl get pods --namespace zero -o=jsonpath='{range .items
 kubectl exec --namespace zero --stdin --tty "$jumpbox_pod_name" -- /bin/bash
 ```
 
-Generate a proof using a witness previously saved at `witness.json` (check `data/`).
+Generate a proof using a witness (check `data/` for witnesses files).
 
 ```bash
 apt-get install --yes vim
-vim /home/witness-0034.json
-# copy the content of the witness file
+vim /home/witness-0001.json
+# Copy the content of the witness file...
 ```
 
 Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node.
 
 ```bash
-cd /usr/local/bin
-export ARITHMETIC_CIRCUIT_SIZE="16..21"
-export BYTE_PACKING_CIRCUIT_SIZE="9..21"
-export CPU_CIRCUIT_SIZE="12..23"
-export KECCAK_CIRCUIT_SIZE="14..19"
-export KECCAK_SPONGE_CIRCUIT_SIZE="9..15"
-export LOGIC_CIRCUIT_SIZE="12..18"
-export MEMORY_CIRCUIT_SIZE="17..25"
+env RUST_BACKTRACE=full RUST_LOG=debug leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < /home/witness-0001.json &> /home/proof-0001.leader.out
+```
+
+```bash
+2024-06-18T00:56:13.907559Z DEBUG lapin::channels: create channel id=0
+2024-06-18T00:56:13.924859Z DEBUG lapin::channels: create channel
+2024-06-18T00:56:13.924884Z DEBUG lapin::channels: create channel id=1
+2024-06-18T00:56:13.932668Z  INFO prover: Proving block 1
+2024-06-18T00:56:43.925763Z DEBUG lapin::channels: received heartbeat from server
+2024-06-18T00:56:43.938936Z DEBUG lapin::channels: send heartbeat
+2024-06-18T00:57:22.704959Z DEBUG lapin::channels: send heartbeat
+2024-06-18T00:57:39.675806Z  INFO prover: Successfully proved block 1
+# proof content
+```
+
+You can check the content of `/home/proof-0001.leader.out` or you can extract the proof and run the `verifier`.
+
+```bash
+tail -n1 /home/proof-0001.leader.out | jq > /home/proof-0001.json
+env RUST_LOG=info verifier --file-path /home/proof-0001.json
+```
+
+The `verifier` fails in this case unfortunately.
+
+```bash
+2024-06-18T00:59:59.440487Z  INFO common::prover_state: initializing verifier state...
+2024-06-18T00:59:59.440547Z  INFO common::prover_state: attempting to load preprocessed verifier circuit from disk...
+2024-06-18T00:59:59.440621Z  INFO common::prover_state: failed to load preprocessed verifier circuit from disk. generating it...
+2024-06-18T01:01:50.693251Z  INFO common::prover_state: saving preprocessed verifier circuit to disk
+2024-06-18T01:01:52.809270Z  INFO verifier: Proof verification failed with error: ProofGenError("Condition failed: `vanishing_polys_zeta [i] == z_h_zeta * reduce_with_powers (chunk, zeta_pow_deg)`")
+```
+
+Note that the `leader` might fail to generate proofs for other types of witnesses. Here is an example.
+
+```bash
 env RUST_BACKTRACE=full RUST_LOG=debug leader \
   --runtime=amqp \
   --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
   stdio < /home/witness-0034.json
 ```
 
-For the moment, we get an error...
-
-![leader-issue](./docs/leader-issue.png)
-
 ```bash
-root@test-jumpbox-7779b5dd7d-shrxz:/# env RUST_BACKTRACE=full RUST_LOG=debug leader   --runtime=amqp   --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672   stdio < /home/witness-0034.json
-2024-06-17T10:02:29.607786Z DEBUG lapin::channels: create channel id=0
-2024-06-17T10:02:29.624745Z DEBUG lapin::channels: create channel
-2024-06-17T10:02:29.624767Z DEBUG lapin::channels: create channel id=1
-2024-06-17T10:02:29.633851Z ERROR lapin::io_loop: error doing IO error=IOError(Custom { kind: Other, error: "A Tokio 1.x context was found, but it is being shutdown." })
-2024-06-17T10:02:29.633914Z ERROR lapin::channels: Connection error error=IO error: A Tokio 1.x context was found, but it is being shutdown.
-Error: invalid type: map, expected a sequence at line 1 column 0
+2024-06-18T01:11:36.217473Z DEBUG lapin::channels: create channel id=0
+2024-06-18T01:11:36.236822Z DEBUG lapin::channels: create channel
+2024-06-18T01:11:36.236842Z DEBUG lapin::channels: create channel id=1
+2024-06-18T01:11:36.245752Z  INFO prover: Proving block 34
+2024-06-18T01:12:06.237640Z DEBUG lapin::channels: received heartbeat from server
+2024-06-18T01:12:06.252661Z DEBUG lapin::channels: send heartbeat
+2024-06-18T01:12:46.964363Z DEBUG lapin::channels: send heartbeat
+Error: Fatal operation error: "Inconsistent pre-state for first block 0x27d9465f649ad19e7e399a0116be7a0ad9225b44d09455c6e2dfa23487a0fb48 with checkpoint state 0x2dab6a1d6d638955507777aecea699e6728825524facbd446bd4e86d44fa5ecd."
 
 Stack backtrace:
-   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
-   1: leader::main::{{closure}}
-   2: leader::main
-   3: std::sys_common::backtrace::__rust_begin_short_backtrace
-   4: main
-   5: __libc_start_main
-   6: _start
-```
-
-Check that the witness is a correct JSON file.
-
-```bash
-jq . /home/witness-0034.json
-```
-
-Check that the `jumpbox` can connect to the RabbitMQ cluster. These are the logs from the `test-rabbitmq-cluster-server-0` pod. The connection is being established but the client closes it instantly.
-
-```bash
-2024-06-17 10:02:15.679340+00:00 [info] <0.2444.0> accepting AMQP connection <0.2444.0> (10.124.0.10:58642 -> 10.124.1.11:5672)
-2024-06-17 10:02:15.680833+00:00 [info] <0.2444.0> connection <0.2444.0> (10.124.0.10:58642 -> 10.124.1.11:5672): user 'guest' authenticated and granted access to vhost '/'
-2024-06-17 10:02:15.689512+00:00 [warning] <0.2444.0> closing AMQP connection <0.2444.0> (10.124.0.10:58642 -> 10.124.1.11:5672, vhost: '/', user: 'guest'):
-2024-06-17 10:02:15.689512+00:00 [warning] <0.2444.0> client unexpectedly closed TCP connection
+   0: anyhow::kind::Adhoc::new
+   1: <futures_util::stream::stream::map::Map<St,F> as futures_core::stream::Stream>::poll_next
+   2: paladin::directive::literal::functor::<impl paladin::directive::Functor<B> for paladin::directive::literal::Literal<A>>::f_map::{{closure}}
+   3: <paladin::directive::Map<Op,D> as paladin::directive::Directive>::run::{{closure}}
+   4: prover::BlockProverInput::prove::{{closure}}
+   5: leader::main::{{closure}}
+   6: leader::main
+   7: std::sys_common::backtrace::__rust_begin_short_backtrace
+   8: main
+   9: __libc_start_main
+  10: _start
 ```
