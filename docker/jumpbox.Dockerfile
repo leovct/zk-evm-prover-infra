@@ -1,7 +1,7 @@
 FROM rustlang/rust:nightly-bullseye-slim
 ARG ZERO_BIN_BRANCH_OR_COMMIT
 RUN apt-get update \
-  && apt-get install --yes git jq libjemalloc2 libjemalloc-dev make libssl-dev pkg-config \
+  && apt-get install --yes git curl jq vim parallel libjemalloc2 libjemalloc-dev make libssl-dev pkg-config \
   && git clone https://github.com/0xPolygonZero/zero-bin.git /opt/zero-bin \
   && cd /opt/zero-bin \
   && git checkout $ZERO_BIN_BRANCH_OR_COMMIT \
