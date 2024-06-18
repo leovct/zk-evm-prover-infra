@@ -115,7 +115,7 @@ spec:
       # The name of the RabbitMQ queue.
       # Proof generation tasks each create their own queue, so rather than targeting a specific queue,
       # this setting applies to all queues created within the RabbitMQ cluster.
-      queueName: ^.*$
+      queueName: .*
       # Operation that will be applied to compute the number of messages in case of useRegex enabled.
       operation: sum
       # The trigger mode. We chose to trigger on number of messages in the queue.
