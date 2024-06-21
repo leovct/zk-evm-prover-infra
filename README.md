@@ -1,6 +1,6 @@
 # 📦 Polygon Zero Type 1 Prover Helm Chart
 
-A Helm chart to deploy Polygon Zero's [Type 1 Prover](https://github.com/0xPolygonZero/zero-bin) on [Kubernetes](https://kubernetes.io/).
+A Helm chart to deploy Polygon Zero's [Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) on [Kubernetes](https://kubernetes.io/).
 
 ![architecture-diagram](./docs/architecture-diagram.png)
 
@@ -65,7 +65,7 @@ helm search hub rabbitmq-cluster-operator --output yaml | yq '.[] | select(.repo
 helm search hub keda --output yaml | yq '.[] | select(.repository.url == "https://kedacore.github.io/charts")'
 ```
 
-3. Deploy the [zero-prover](https://github.com/0xPolygonZero/zero-bin) infrastructure in Kubernetes.
+3. Deploy the [zero-prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
 
 ```bash
 helm install test --namespace zero --create-namespace ./helm
