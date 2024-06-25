@@ -1,8 +1,3 @@
-variable "gke_num_nodes" {
-  default     = 1
-  description = "number of gke nodes"
-}
-
 # GKE cluster
 data "google_container_engine_versions" "gke_version" {
   location = var.region
@@ -28,7 +23,7 @@ resource "google_container_node_pool" "default_nodes" {
   name       = "default-nodes-pool"
   location   = var.region
   cluster    = google_container_cluster.primary.name
-  node_locations = [ "europe-west3-c" ]
+  node_locations = var.node_locations
 
   # version = data.google_container_engine_versions.gke_version.release_channel_latest_version["STABLE"]
   node_count = var.gke_num_nodes
@@ -44,7 +39,7 @@ resource "google_container_node_pool" "default_nodes" {
     }
 
     # preemptible  = true
-    machine_type = "e2-standard-16"
+    machine_type = var.default_node_type
     tags         = ["zero-prover-gke-node", "${var.project_id}-zero-prover-gke"]
     metadata = {
       disable-legacy-endpoints = "true"
@@ -57,7 +52,7 @@ resource "google_container_node_pool" "highmem_nodes" {
   name       = "highmem-nodes-pool"
   location   = var.region
   cluster    = google_container_cluster.primary.name
-  node_locations = [ "europe-west3-c" ]
+  node_locations = var.node_locations
   
   # version = data.google_container_engine_versions.gke_version.release_channel_latest_version["STABLE"]
   node_count = var.gke_num_nodes
@@ -73,7 +68,7 @@ resource "google_container_node_pool" "highmem_nodes" {
     }
 
     # preemptible  = true
-    machine_type = "t2d-standard-32"
+    machine_type = var.highmem_node_type
     tags         = ["zero-prover-gke-node", "${var.project_id}-zero-prover-gke"]
     metadata = {
       disable-legacy-endpoints = "true"
