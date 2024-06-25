@@ -21,5 +21,5 @@ variable "highmem_node_type" {
 variable "node_locations" {
   description = "List of availability zones within the region"
   type        = list(string)
-  default     = ["europe-west2-c"]
+  default     = ["europe-west3-c"]
 }
