@@ -4,6 +4,31 @@ A Helm chart to deploy Polygon Zero's [Type 1 Prover](https://github.com/0xPolyg
 
 ![architecture-diagram](./docs/architecture-diagram.png)
 
+## Deploying GKE with Terraform
+
+The below GKE infrastructure requirement can be automated using the provided terraform scripts under `/terraform` directory.
+
+```!
+# First authenticate with your GCP account
+gcloud auth application-default login
+
+# Check which project is active and switch as necessary under /terraform/variables.tf
+gcloud config get-value project
+
+# Once all the deployment variables have been declared under /terraform/variables.tf start the terraform deployment
+terraform init
+
+# Check the predicted deployment outputs
+terraform plan
+
+# Deploy the infrastructure
+terraform apply
+```
+
+With the above instructions, you should have a setup which mimics the below requirement:
+- A VPC and a subnet
+- GKE cluster and a separately managed node pool
+
 ## Usage
 
 To be able to run the type 1 prover infrastructure, you will need:
