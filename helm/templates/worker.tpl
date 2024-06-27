@@ -23,8 +23,26 @@ spec:
         env:
         - name: AMQP_URI
           value: {{ printf "amqp://%s:%s@%s-rabbitmq-cluster.%s.svc.cluster.local:5672" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Name .Release.Namespace }}
+        - name: RUST_BACKTRACE
+          value: full
         - name: RUST_LOG
-          value: debug
+          value: info
+        - name: RUST_MIN_STACK
+          value: "33554432"
+        - name: ARITHMETIC_CIRCUIT_SIZE
+          value: "15..28"
+        - name: BYTE_PACKING_CIRCUIT_SIZE
+          value: "9..28"
+        - name: CPU_CIRCUIT_SIZE
+          value: "12..28"
+        - name: KECCAK_CIRCUIT_SIZE
+          value: "14..28"
+        - name: KECCAK_SPONGE_CIRCUIT_SIZE
+          value: "9..28"
+        - name: LOGIC_CIRCUIT_SIZE
+          value: "12..28"
+        - name: MEMORY_CIRCUIT_SIZE
+          value: "17..30"
         volumeMounts:
         - name: circuits
           mountPath: /circuits
@@ -40,7 +58,7 @@ spec:
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-worker-circuits-pvc
       nodeSelector:
-        cloud.google.com/gke-nodepool: highmem-pool
+        cloud.google.com/gke-nodepool: highmem-nodes-pool
       tolerations:
       - key: "highmem"
         operator: "Equal"

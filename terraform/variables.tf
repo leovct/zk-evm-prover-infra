@@ -23,3 +23,7 @@ variable "node_locations" {
   type        = list(string)
   default     = ["europe-west3-c"]
 }
+variable "node_disk_size" {
+  type = number
+  default = 300
+}
