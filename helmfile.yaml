@@ -1,0 +1,18 @@
+repositories:
+ - name: rabbitmq-cluster-operator
+   url: https://charts.bitnami.com/bitnami
+ - name: kedacore
+   url: https://kedacore.github.io/charts
+
+releases:
+- name: rabbitmq-cluster-operator
+  namespace: rabbitmq-cluster-operator
+  chart: bitnami/rabbitmq-cluster-operator
+  version: 4.3.6
+- name: keda
+  namespace: keda
+  chart: kedacore/keda
+  version: 2.14.2
+- name: test
+  namespace: zero
+  chart: ./helm
