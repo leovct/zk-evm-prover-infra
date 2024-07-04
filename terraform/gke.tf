@@ -16,6 +16,7 @@ resource "google_container_cluster" "primary" {
 
   network    = google_compute_network.vpc.name
   subnetwork = google_compute_subnetwork.subnet.name
+
 }
 
 # Separately Managed Default Node Pool
@@ -41,6 +42,7 @@ resource "google_container_node_pool" "default_nodes" {
     # preemptible  = true
     machine_type = var.default_node_type
     tags         = ["zero-prover-gke-node", "${var.project_id}-zero-prover-gke"]
+    disk_size_gb = var.node_disk_size
     metadata = {
       disable-legacy-endpoints = "true"
     }
@@ -70,8 +72,14 @@ resource "google_container_node_pool" "highmem_nodes" {
     # preemptible  = true
     machine_type = var.highmem_node_type
     tags         = ["zero-prover-gke-node", "${var.project_id}-zero-prover-gke"]
+    disk_size_gb = var.node_disk_size
     metadata = {
       disable-legacy-endpoints = "true"
+    }
+    taint{
+      key = "highmem"
+      value = true
+      effect = "NO_SCHEDULE"
     }
   }
 }

@@ -29,6 +29,68 @@ With the above instructions, you should have a setup which mimics the below requ
 - A VPC and a subnet
 - GKE cluster and a separately managed node pool
 
+## Generating Witnesses using Jerigon
+
+Clone the Jerigon repo and checkout the below commit hash.
+```!
+git clone git@github.com:0xPolygonZero/erigon.git
+git checkout -b 83e0f2fa8c8f6632370e20fef7bbc8a4991c73c8
+```
+
+Then build Jerigon, and build it again for Docker
+```!
+make all
+docker build -t erigon:local .
+```
+
+Clone the Ethereum Kurtosis repo which we'll use to spin up Jerigon from the built local image.
+```!
+git clone git@github.com:kurtosis-tech/ethereum-package.git
+```
+
+Make sure the `network_params.yml` has been changed as needed:
+```!
+ participants:
+ # EL
+-  - el_type: geth
+-    el_image: ethereum/client-go:latest
++  - el_type: erigon
++    el_image: erigon:local
+...
+ additional_services:
+-  - tx_spammer
+-  - blob_spammer
++  # - tx_spammer
++  # - blob_spammer
+```
+
+Then spin up the Jerigon devnet with Kurtosis
+```!
+kurtosis run --enclave my-testnet github.com/ethpandaops/ethereum-package@4.0.0 --args-file network_params.yml
+```
+The output should look something like:
+![jerigon-kurtosis](./docs/jerigon-kurtosis.png)
+
+To make transactions, refer to the [list](https://github.com/ethpandaops/ethereum-package/blob/main/src/prelaunch_data_generator/genesis_constants/genesis_constants.star) of funded accounts.
+
+Clone the zk_evm repo and checkout the below commit hash.
+```!
+git clone git@github.com:0xPolygonZero/zk_evm.git
+git checkout -b b7cea483f41dffc5bb3f4951ba998f285bed1f96
+```
+
+`cd` into the `zero_bin/rpc` directory and edit the value for `i=<block_number>` and run the below command
+```!
+i=<block_number>
+cargo run --bin rpc fetch --rpc-url $(kurtosis port print my-testnet el-2-erigon-lighthouse ws-rpc) --start-block $i --end-block $i | jq '.'[] > ./witness_$i.json
+```
+
+You can also choose to save the block data which would be useful
+```!
+i=<block_number>
+cast block --rpc-url $(kurtosis port print my-testnet el-2-erigon-lighthouse ws-rpc) --json > ./block_$i.json
+```
+
 ## Usage
 
 To be able to run the type 1 prover infrastructure, you will need:

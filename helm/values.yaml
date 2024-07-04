@@ -21,8 +21,8 @@ worker:
     # Resource limits are enforced by the Kubernetes kubelet to prevent containers from using more resources than specified.
     limits:
       # We set the memory limit to 1Ti. A worker should not need more memory than this under normal circumstances.
-      memory: "1Ti"
-      cpu: "4" # TODO: Update this value based on our requirements.
+      memory: "180G"
+      cpu: "40" # TODO: Update this value based on our requirements.
 
 # RabbitMQ Configuration
 rabbitmq:
