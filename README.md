@@ -6,8 +6,10 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 
 - [Architecture Diagram](#architecture-diagram)
 - [Deploy GKE Cluster with Terraform](#deploy-gke-cluster-with-terraform)
+- [Deploy the Prover Infrastructure in Kubernetes with Helm](#deploy-prover-infrastructure-in-kubernetes-with-helm)
 - [Generate Block Witnesses with Jerrigon](#generate-block-witnesses-with-jerrigon)
-- [Prove Blocks](#block-blocks)
+- [Generate Block Proofs with the Zero Prover](#generate-block-proofs-with-the-zero-prover)
+- [TODOs / Known Issues](#todos--known-issues)
 
 ## Architecture Diagram
 
@@ -45,6 +47,63 @@ With the above instructions, you should have a setup that mimics the below requi
 
 - A VPC and a subnet
 - GKE cluster and a separately managed node pool
+
+## Deploy Prover Infrastructure in Kubernetes with Helm
+
+First, authenticate with your [GCP](https://console.cloud.google.com/) account.
+
+```bash
+gcloud auth application-default login
+```
+
+Make sure you have access to the GKE cluster you just created.
+
+```bash
+kubectl get namespaces
+```
+
+You can now start Lens and monitor the state of the cluster.
+
+![observer-cluster-with-lens](./docs/observer-cluster-with-lens.png)
+
+First, install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernetes/operator/operator-overview).
+
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
+  --version 4.3.6 \
+  --namespace rabbitmq-cluster-operator \
+  --create-namespace
+```
+
+Then, install [KEDA](https://keda.sh/), the Kubernetes Event-Driven Autoscaler containing the [RabbitMQ Queue](https://www.rabbitmq.com/kubernetes/operator/operator-overview) HPA ([Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)).
+
+```bash
+helm repo add kedacore https://kedacore.github.io/charts
+helm repo update
+helm install keda kedacore/keda \
+  --version 2.14.2 \
+  --namespace keda \
+  --create-namespace
+```
+
+To get the latest version of these [Helm](https://helm.sh/) charts, you can use:
+
+```bash
+helm search hub rabbitmq-cluster-operator --output yaml | yq '.[] | select(.repository.url == "https://charts.bitnami.com/bitnami")'
+helm search hub keda --output yaml | yq '.[] | select(.repository.url == "https://kedacore.github.io/charts")'
+```
+
+Finally, deploy the [zero-prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
+
+```bash
+helm install test --namespace zero --create-namespace ./helm
+```
+
+Your cluster should now be ready!
+
+![cluster-is-ready](./docs/cluster-is-ready.png)
 
 ## Generate Block Witnesses with Jerrigon
 
@@ -192,96 +251,7 @@ You can check the block data.
 jq . "block_$i.json"
 ```
 
-## Deploy Prover Infrastructure in Kubernetes with Helm
-
-TODO
-
-First, authenticate with your [GCP](https://console.cloud.google.com/) account.
-
-```bash
-gcloud auth application-default login
-```
-
-Make sure you have access to the GKE cluster you just created.
-
-```bash
-kubectl get namespaces
-```
-
-## Generate Blocks from Witnesses
-
-TODO: Update this version of the docs.
-
-To be able to run the type 1 prover infrastructure, you will need:
-
-- A VPC (see [zero-prover-test-vpc](https://console.cloud.google.com/networking/networks/details/zero-prover-test-vpc?project=prj-polygonlabs-devtools-dev&authuser=2&pageTab=OVERVIEW)).
-- A Kubernetes cluster (e.g. [GKE](https://cloud.google.com/kubernetes-engine/docs)).
-- Two types of [node pools](https://cloud.google.com/kubernetes-engine/docs/concepts/node-pools):
-  - `default-pool`: for standard nodes (e.g. `e2-standard-4`) - with at least 1 node and 300Gb of disk.
-  - `highmem-pool`: for high memory nodes (e.g. `c3d-highmen-180` with 1.4Tb of memory) - with at least 1 node and 300Gb of disk.
-
-  ![gke-node-pools](./docs/gke-node-pools.png)
-
-  - Make sure that you apply the [taint](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) `highmem=true:NoSchedule` to the `highmem-pool` to only allow worker pods to be scheduled on these nodes.
-
-- This is still a PoC so you can keep all the nodes in the same availability zone.
-- A `jerrigon` blockchain RPC URL to create the witnesses.
-- TODO: It would be great to share a Terraform project to spin up the GKE infra.
-
-0. Connect to the GKE cluster.
-
-```bash
-gcloud auth login
-# You might need to run: gcloud components install gke-gcloud-auth-plugin
-gcloud container clusters get-credentials zero-prover-test-01 --zone=europe-west1-c
-kubectl get namespaces
-```
-
-You can now start Lens and monitor the state of the cluster.
-
-![observer-cluster-with-lens](./docs/observer-cluster-with-lens.png)
-
-
-1. Install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernetes/operator/operator-overview).
-
-```bash
-helm repo add bitnami https://charts.bitnami.com/bitnami
-helm repo update
-helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
-  --version 4.3.6 \
-  --namespace rabbitmq-cluster-operator \
-  --create-namespace
-```
-
-2. Install [KEDA](https://keda.sh/), the Kubernetes Event-Driven Autoscaler containing the [RabbitMQ Queue](https://www.rabbitmq.com/kubernetes/operator/operator-overview) HPA ([Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)).
-
-```bash
-helm repo add kedacore https://kedacore.github.io/charts
-helm repo update
-helm install keda kedacore/keda \
-  --version 2.14.2 \
-  --namespace keda \
-  --create-namespace
-```
-
-To get the latest version of these [Helm](https://helm.sh/) charts, you can use:
-
-```bash
-helm search hub rabbitmq-cluster-operator --output yaml | yq '.[] | select(.repository.url == "https://charts.bitnami.com/bitnami")'
-helm search hub keda --output yaml | yq '.[] | select(.repository.url == "https://kedacore.github.io/charts")'
-```
-
-3. Deploy the [zero-prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
-
-```bash
-helm install test --namespace zero --create-namespace ./helm
-```
-
-Your cluster should now be ready!
-
-![cluster-is-ready](./docs/cluster-is-ready.png)
-
-4. Generate a proof! 🥳
+## Generate Block Proofs with the Zero Prover
 
 Get a running shell inside the `jumpbox` container.
 
