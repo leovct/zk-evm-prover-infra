@@ -50,6 +50,8 @@ With the above instructions, you should have a setup that mimics the below requi
 
 Note that it may take some time for the Kubernetes cluster to be ready on GCP!
 
+![gke-cluster](docs/gke-cluster.png)
+
 ## Deploy Prover Infrastructure in Kubernetes with Helm
 
 First, authenticate with your [GCP](https://console.cloud.google.com/) account.
