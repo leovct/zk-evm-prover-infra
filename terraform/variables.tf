@@ -26,7 +26,7 @@ variable "default_node_type" {
 
 variable "highmem_node_type" {
   type    = string
-  default = "t2d-standard-32"
+  default = "t2d-standard-60"
 }
 
 variable "node_locations" {
