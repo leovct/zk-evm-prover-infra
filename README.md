@@ -1,97 +1,213 @@
-# 📦 Polygon Zero Type 1 Prover Helm Chart
+# 📦 Polygon Zero Type 1 Prover Infrastructure
 
-A Helm chart to deploy Polygon Zero's [Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) on [Kubernetes](https://kubernetes.io/).
+Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) on [Kubernetes](https://kubernetes.io/) using our [Terraform](https://www.terraform.io/) script and [Helm](https://helm.sh/) chart.
+
+## Table of Contents
+
+- [Architecture Diagram](#architecture-diagram)
+- [Deploy GKE Cluster with Terraform](#deploy-gke-cluster-with-terraform)
+- [Generate Block Witnesses with Jerrigon](#generate-block-witnesses-with-jerrigon)
+- [Prove Blocks](#block-blocks)
+
+## Architecture Diagram
 
 ![architecture-diagram](./docs/architecture-diagram.png)
 
-## Deploying GKE with Terraform
+## Deploy GKE Cluster with Terraform
 
-The below GKE infrastructure requirement can be automated using the provided terraform scripts under `/terraform` directory.
+The above [GKE](https://cloud.google.com/kubernetes-engine) infrastructure can be deployed using the provided [Terraform](https://www.terraform.io/) scripts under the `terraform` directory.
 
-```!
-# First authenticate with your GCP account
+First, authenticate with your [GCP](https://console.cloud.google.com/) account.
+
+```bash
 gcloud auth application-default login
+```
 
-# Check which project is active and switch as necessary under /terraform/variables.tf
+Before deploying anything, check which project is used. The resources will be deployed inside this specific project.
+
+```bash
 gcloud config get-value project
+```
 
-# Once all the deployment variables have been declared under /terraform/variables.tf start the terraform deployment
+Next, review the `terraform/variables.tf` file and adjust the infrastructure settings to meet your requirements.
+
+Once you're done, initialize the project to download dependencies and deploy the infrastructure. You can use `terraform plan` to check what kind of resources are going to be deployed.
+
+```bash
 terraform init
-
-# Check the predicted deployment outputs
-terraform plan
-
-# Deploy the infrastructure
 terraform apply
 ```
 
-With the above instructions, you should have a setup which mimics the below requirement:
+With the above instructions, you should have a setup that mimics the below requirements:
+
 - A VPC and a subnet
 - GKE cluster and a separately managed node pool
 
-## Generating Witnesses using Jerigon
+## Generate Block Witnesses with Jerrigon
 
-Clone the Jerigon repo and checkout the below commit hash.
-```!
+[Jerrigon](https://github.com/0xPolygonZero/erigon/tree/feat/zero) is a fork of [Erigon](https://github.com/ledgerwatch/erigon) that allows seamless integration of [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin), facilitating the generation of witnesses and the proving of blocks using zero-knowledge proofs.
+
+First, clone the Jerigon repository and check out the below commit hash.
+
+```bash
 git clone git@github.com:0xPolygonZero/erigon.git
-git checkout -b 83e0f2fa8c8f6632370e20fef7bbc8a4991c73c8
+pushd erigon
+git checkout 83e0f2fa8c8f6632370e20fef7bbc8a4991c73c8
 ```
 
-Then build Jerigon, and build it again for Docker
-```!
+Then, build the binary and the docker image.
+
+```bash
 make all
-docker build -t erigon:local .
+docker build --tag erigon:local .
 ```
 
-Clone the Ethereum Kurtosis repo which we'll use to spin up Jerigon from the built local image.
-```!
+In the meantime, clone the [Ethereum / Kurtosis](https://github.com/ethpandaops/ethereum-package) repository.
+
+```bash
 git clone git@github.com:kurtosis-tech/ethereum-package.git
+pushd ethereum-package
 ```
 
-Make sure the `network_params.yml` has been changed as needed:
-```!
+Adjust the `network_params.yml` file to replace the `geth` execution client by `jerrigon`. Also, disable some of the additional services.
+
+```diff
+diff --git a/network_params.yaml b/network_params.yaml
+index 77b25f7..9044280 100644
+--- a/network_params.yaml
++++ b/network_params.yaml
+@@ -1,7 +1,7 @@
  participants:
  # EL
 -  - el_type: geth
 -    el_image: ethereum/client-go:latest
 +  - el_type: erigon
 +    el_image: erigon:local
-...
- additional_services:
--  - tx_spammer
--  - blob_spammer
-+  # - tx_spammer
-+  # - blob_spammer
+     el_log_level: ""
+     el_extra_env_vars: {}
+     el_extra_labels: {}
 ```
 
-Then spin up the Jerigon devnet with Kurtosis
-```!
-kurtosis run --enclave my-testnet github.com/ethpandaops/ethereum-package@4.0.0 --args-file network_params.yml
+Then, spin up a local L1 devnet using [Kurtosis](https://www.kurtosis.com/).
+
+```bash
+kurtosis run --enclave my-testnet --args-file network_params.yaml .
 ```
-The output should look something like:
-![jerigon-kurtosis](./docs/jerigon-kurtosis.png)
 
-To make transactions, refer to the [list](https://github.com/ethpandaops/ethereum-package/blob/main/src/prelaunch_data_generator/genesis_constants/genesis_constants.star) of funded accounts.
+It should deploy two validator nodes using jerrigon as the execution client.
 
-Clone the zk_evm repo and checkout the below commit hash.
-```!
+```bash
+kurtosis enclave inspect my-testnet
+```
+
+```bash
+Name:            my-testnet
+UUID:            520bab80b8cc
+Status:          RUNNING
+Creation Time:   Thu, 11 Jul 2024 12:06:53 CEST
+Flags:
+
+========================================= Files Artifacts =========================================
+UUID           Name
+ea91ccbfe06e   1-lighthouse-erigon-0-63-0
+640f867340cc   2-lighthouse-erigon-64-127-0
+89b481d6aef8   el_cl_genesis_data
+d40b6d404f10   final-genesis-timestamp
+6639aa45c61c   genesis-el-cl-env-file
+f0ac99a6241f   genesis_validators_root
+b3a7ac4b3303   jwt_file
+3f78b4040032   keymanager_file
+9c738ed50303   prysm-password
+8e7b75ac4c19   validator-ranges
+
+========================================== User Services ==========================================
+UUID           Name                                             Ports                                         Status
+9d54c060960c   cl-1-lighthouse-erigon                           http: 4000/tcp -> http://127.0.0.1:51940      RUNNING
+                                                                metrics: 5054/tcp -> http://127.0.0.1:51941
+                                                                tcp-discovery: 9000/tcp -> 127.0.0.1:51942
+                                                                udp-discovery: 9000/udp -> 127.0.0.1:49183
+6ef0845c55bc   cl-2-lighthouse-erigon                           http: 4000/tcp -> http://127.0.0.1:52074      RUNNING
+                                                                metrics: 5054/tcp -> http://127.0.0.1:52075
+                                                                tcp-discovery: 9000/tcp -> 127.0.0.1:52076
+                                                                udp-discovery: 9000/udp -> 127.0.0.1:55230
+4a036788f6d1   el-1-erigon-lighthouse                           engine-rpc: 8551/tcp -> 127.0.0.1:51757       RUNNING
+                                                                metrics: 9001/tcp -> http://127.0.0.1:51758
+                                                                tcp-discovery: 30303/tcp -> 127.0.0.1:51755
+                                                                udp-discovery: 30303/udp -> 127.0.0.1:61732
+                                                                ws-rpc: 8545/tcp -> 127.0.0.1:51756
+160ff02c83c8   el-2-erigon-lighthouse                           engine-rpc: 8551/tcp -> 127.0.0.1:51769       RUNNING
+                                                                metrics: 9001/tcp -> http://127.0.0.1:51767
+                                                                tcp-discovery: 30303/tcp -> 127.0.0.1:51770
+                                                                udp-discovery: 30303/udp -> 127.0.0.1:59846
+                                                                ws-rpc: 8545/tcp -> 127.0.0.1:51768
+a85aed519db4   validator-key-generation-cl-validator-keystore   <none>                                        RUNNING
+d4e829923bc9   vc-1-erigon-lighthouse                           metrics: 8080/tcp -> http://127.0.0.1:52144   RUNNING
+8bdec2ae9d9b   vc-2-erigon-lighthouse                           metrics: 8080/tcp -> http://127.0.0.1:52174   RUNNING
+```
+
+Refer to the list of [pre-funded accounts](https://github.com/ethpandaops/ethereum-package/blob/main/src/prelaunch_data_generator/genesis_constants/genesis_constants.star#L9) to send transactions to the network.
+
+Clone the [zk_evm](https://github.com/0xPolygonZero/zk_evm) repository and check out the below commit hash.
+
+```bash
 git clone git@github.com:0xPolygonZero/zk_evm.git
-git checkout -b b7cea483f41dffc5bb3f4951ba998f285bed1f96
+pushd zk_evm
+git checkout b7cea483f41dffc5bb3f4951ba998f285bed1f96
 ```
 
-`cd` into the `zero_bin/rpc` directory and edit the value for `i=<block_number>` and run the below command
-```!
-i=<block_number>
-cargo run --bin rpc fetch --rpc-url $(kurtosis port print my-testnet el-2-erigon-lighthouse ws-rpc) --start-block $i --end-block $i | jq '.'[] > ./witness_$i.json
+You are now ready to generate witnesses for any block of the L1 local chain using the zero prover.
+
+To get the last block number, you can use the following command using [cast](https://book.getfoundry.sh/cast/).
+
+```bash
+cast block-number --rpc-url $(kurtosis port print my-testnet el-1-erigon-lighthouse ws-rpc)
 ```
 
-You can also choose to save the block data which would be useful
-```!
-i=<block_number>
-cast block --rpc-url $(kurtosis port print my-testnet el-2-erigon-lighthouse ws-rpc) --json > ./block_$i.json
+Generate the witness of the last block number.
+
+```bash
+pushd zero_bin/rpc
+i="$(cast block-number --rpc-url $(kurtosis port print my-testnet el-1-erigon-lighthouse ws-rpc))"
+cargo run --bin rpc fetch --rpc-url "http://$(kurtosis port print my-testnet el-1-erigon-lighthouse ws-rpc)" --start-block "$i" --end-block "$i" | jq '.[]' > "witness_$i.json"
 ```
 
-## Usage
+You can check the generated witness.
+
+```bash
+jq . "witness_$i.json"
+```
+
+You can also choose to save the block data which would be useful.
+
+```bash
+cast block --rpc-url "$(kurtosis port print my-testnet el-1-erigon-lighthouse ws-rpc)" --json | jq > "block_$i.json"
+```
+
+You can check the block data.
+
+```bash
+jq . "block_$i.json"
+```
+
+## Deploy Prover Infrastructure in Kubernetes with Helm
+
+TODO
+
+First, authenticate with your [GCP](https://console.cloud.google.com/) account.
+
+```bash
+gcloud auth application-default login
+```
+
+Make sure you have access to the GKE cluster you just created.
+
+```bash
+kubectl get namespaces
+```
+
+## Generate Blocks from Witnesses
+
+TODO: Update this version of the docs.
 
 To be able to run the type 1 prover infrastructure, you will need:
 
