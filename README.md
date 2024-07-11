@@ -31,9 +31,12 @@ gcloud config get-value project
 
 Next, review the `terraform/variables.tf` file and adjust the infrastructure settings to meet your requirements.
 
+> 🚨 **Make sure to modify the `prefix` variable value to avoid any conflicts with other users!**
+
 Once you're done, initialize the project to download dependencies and deploy the infrastructure. You can use `terraform plan` to check what kind of resources are going to be deployed.
 
 ```bash
+pushd terraform
 terraform init
 terraform apply
 ```
