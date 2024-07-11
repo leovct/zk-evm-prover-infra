@@ -1,6 +1,6 @@
 // Prefix that will be added to resources.
 variable "prefix" {
-  type = string
+  type    = string
   default = "leovct-test-01"
 }
 
@@ -36,6 +36,6 @@ variable "node_locations" {
 }
 
 variable "node_disk_size" {
-  type = number
+  type    = number
   default = 300
 }

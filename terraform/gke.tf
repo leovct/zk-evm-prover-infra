@@ -12,7 +12,7 @@ resource "google_container_cluster" "primary" {
   # separately managed node pools. So we create the smallest possible default
   # node pool and immediately delete it.
   remove_default_node_pool = true
-  initial_node_count = 1
+  initial_node_count       = 1
 
   network    = google_compute_network.vpc.name
   subnetwork = google_compute_subnetwork.subnet.name
@@ -21,9 +21,9 @@ resource "google_container_cluster" "primary" {
 
 # Separately Managed Default Node Pool
 resource "google_container_node_pool" "default_nodes" {
-  name       = "default-nodes-pool"
-  location   = var.region
-  cluster    = google_container_cluster.primary.name
+  name           = "default-nodes-pool"
+  location       = var.region
+  cluster        = google_container_cluster.primary.name
   node_locations = var.node_locations
 
   # version = data.google_container_engine_versions.gke_version.release_channel_latest_version["STABLE"]
@@ -51,9 +51,9 @@ resource "google_container_node_pool" "default_nodes" {
 
 # Separately Managed Highmem Node Pool
 resource "google_container_node_pool" "highmem_nodes" {
-  name       = "highmem-nodes-pool"
-  location   = var.region
-  cluster    = google_container_cluster.primary.name
+  name           = "highmem-nodes-pool"
+  location       = var.region
+  cluster        = google_container_cluster.primary.name
   node_locations = var.node_locations
 
   # version = data.google_container_engine_versions.gke_version.release_channel_latest_version["STABLE"]
@@ -76,9 +76,9 @@ resource "google_container_node_pool" "highmem_nodes" {
     metadata = {
       disable-legacy-endpoints = "true"
     }
-    taint{
-      key = "highmem"
-      value = true
+    taint {
+      key    = "highmem"
+      value  = true
       effect = "NO_SCHEDULE"
     }
   }
