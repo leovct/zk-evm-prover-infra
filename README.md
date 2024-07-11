@@ -22,7 +22,7 @@ The above [GKE](https://cloud.google.com/kubernetes-engine) infrastructure can b
 First, authenticate with your [GCP](https://console.cloud.google.com/) account.
 
 ```bash
-gcloud auth application-default login
+gcloud auth login
 ```
 
 Before deploying anything, check which project is used. The resources will be deployed inside this specific project.
@@ -41,12 +41,13 @@ Once you're done, initialize the project to download dependencies and deploy the
 pushd terraform
 terraform init
 terraform apply
+popd
 ```
 
 With the above instructions, you should have a setup that mimics the below requirements:
 
 - A VPC and a subnet
-- GKE cluster and a separately managed node pool
+- GKE cluster with two node pools
 
 Note that it may take some time for the Kubernetes cluster to be ready on GCP!
 
@@ -57,18 +58,27 @@ Note that it may take some time for the Kubernetes cluster to be ready on GCP!
 First, authenticate with your [GCP](https://console.cloud.google.com/) account.
 
 ```bash
-gcloud auth application-default login
+gcloud auth login
 ```
 
-Make sure you have access to the GKE cluster you just created.
+Get access to the GKE cluster config.
 
 ```bash
-kubectl get namespaces
+# gcloud container clusters get-credentials <gke-cluster-name> --region=<region>
+gcloud container clusters get-credentials leovct-test-01-gke-cluster --region=europe-west3
 ```
 
-You can now start Lens and monitor the state of the cluster.
+Make sure you have access to the GKE cluster you just created. It should list the nodes of the cluster.
 
-![observer-cluster-with-lens](./docs/observer-cluster-with-lens.png)
+```bash
+kubectl get nodes
+```
+
+You can now start to use [Lens](https://k8slens.dev/) to visualize and control the Kubernetes cluster.
+
+![lens-overview](docs/lens-overview.png)
+
+Now, let's deploy the zero infrastructure in GKE.
 
 First, install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernetes/operator/operator-overview).
 
@@ -76,7 +86,7 @@ First, install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernet
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
-  --version 4.3.6 \
+  --version 4.3.13 \
   --namespace rabbitmq-cluster-operator \
   --create-namespace
 ```
@@ -92,7 +102,7 @@ helm install keda kedacore/keda \
   --create-namespace
 ```
 
-To get the latest version of these [Helm](https://helm.sh/) charts, you can use:
+These commands could have been written a while ago so make sure you use "recent" versions.
 
 ```bash
 helm search hub rabbitmq-cluster-operator --output yaml | yq '.[] | select(.repository.url == "https://charts.bitnami.com/bitnami")'
@@ -102,12 +112,12 @@ helm search hub keda --output yaml | yq '.[] | select(.repository.url == "https:
 Finally, deploy the [zero-prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
 
 ```bash
-helm install test --namespace zero --create-namespace ./helm
+helm install test --namespace zero --create-namespace helm
 ```
 
-Your cluster should now be ready!
+Your cluster should now be ready to prove blocks!
 
-![cluster-is-ready](./docs/cluster-is-ready.png)
+![cluster-ready](./docs/cluster-ready.png)
 
 ## Generate Block Witnesses with Jerrigon
 
