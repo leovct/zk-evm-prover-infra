@@ -48,6 +48,8 @@ With the above instructions, you should have a setup that mimics the below requi
 - A VPC and a subnet
 - GKE cluster and a separately managed node pool
 
+Note that it may take some time for the Kubernetes cluster to be ready on GCP!
+
 ## Deploy Prover Infrastructure in Kubernetes with Helm
 
 First, authenticate with your [GCP](https://console.cloud.google.com/) account.
