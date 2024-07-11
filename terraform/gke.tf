@@ -5,7 +5,7 @@ data "google_container_engine_versions" "gke_version" {
 }
 
 resource "google_container_cluster" "primary" {
-  name     = "${prefix}-${var.project_id}-zero-prover-gke-cluster"
+  name     = "${var.prefix}-${var.project_id}-zero-prover-gke-cluster"
   location = var.region
 
   # We can't create a cluster with no node pool defined, but we want to only use
@@ -41,7 +41,7 @@ resource "google_container_node_pool" "default_nodes" {
 
     # preemptible  = true
     machine_type = var.default_node_type
-    tags         = ["zero-prover-gke-node", "${prefix}-${var.project_id}-zero-prover-gke-cluster"]
+    tags         = ["zero-prover-gke-node", "${var.prefix}-${var.project_id}-zero-prover-gke-cluster"]
     disk_size_gb = var.node_disk_size
     metadata = {
       disable-legacy-endpoints = "true"
@@ -71,7 +71,7 @@ resource "google_container_node_pool" "highmem_nodes" {
 
     # preemptible  = true
     machine_type = var.highmem_node_type
-    tags         = ["zero-prover-gke-node", "${prefix}-${var.project_id}-zero-prover-gke-cluster"]
+    tags         = ["zero-prover-gke-node", "${var.prefix}-${var.project_id}-zero-prover-gke-cluster"]
     disk_size_gb = var.node_disk_size
     metadata = {
       disable-legacy-endpoints = "true"
