@@ -21,6 +21,7 @@ jobs:
           # Used by John in his latest tests.
           # https://github.com/0xPolygonZero/zk_evm/commit/b7cea48
           - b7cea48
+      fail-fast: false
     steps:
       - uses: actions/checkout@v4
 
@@ -28,12 +29,8 @@ jobs:
         working-directory: /opt
         run: |
           git clone https://github.com/0xPolygonZero/zk_evm.git
-          cd zk_evm/zero_bin
+          cd zk_evm
           git checkout ${{ matrix.branch }}
-
-      - name: Apply patch
-        working-directory: /opt/zk_evm/zero_bin
-        run: patch -p1 -i ${{ github.workspace }}/docker/worker.Dockerfile.diff worker.Dockerfile
 
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
@@ -47,8 +44,8 @@ jobs:
       - name: Build and push paladin-worker
         uses: docker/build-push-action@v5
         with:
-          context: /opt/zk_evm/zero_bin
-          file: /opt/zk_evm/zero_bin/worker.Dockerfile
+          context: /opt/zk_evm
+          file: /opt/zk_evm/Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/paladin-worker:${{ matrix.branch }}
           platforms: linux/amd64,linux/arm64
           push: true
