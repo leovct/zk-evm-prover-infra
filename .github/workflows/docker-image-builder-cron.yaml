@@ -5,6 +5,12 @@ on:
     - cron: '0 0 * * *'  # Every day at midnight UTC.
   workflow_dispatch:
 
+env:
+  #ZERO_BIN_BRANCH_OR_COMMIT: feat/cancun
+  # Commit used by @jhilliard in his latest tests.
+  # https://github.com/0xPolygonZero/zk_evm/tree/b7cea483f41dffc5bb3f4951ba998f285bed1f96
+  ZERO_BIN_BRANCH_OR_COMMIT: b7cea48
+
 concurrency:
   group: docker-image-builder-cron-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -12,13 +18,6 @@ concurrency:
 jobs:
   build-docker-images:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        branch:
-          # Commit used by @jhilliard in his latest tests.
-          # https://github.com/0xPolygonZero/zk_evm/tree/b7cea483f41dffc5bb3f4951ba998f285bed1f96
-          - b7cea48
-      fail-fast: false
     steps:
       - uses: actions/checkout@v4
 
@@ -27,7 +26,7 @@ jobs:
         run: |
           git clone https://github.com/0xPolygonZero/zk_evm.git
           cd zk_evm
-          git checkout ${{ matrix.branch }}
+          git checkout ${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
 
       - name: Apply patch
         working-directory: /opt/zk_evm/zero_bin
@@ -47,7 +46,7 @@ jobs:
         with:
           context: /opt/zk_evm/zero_bin
           file: /opt/zk_evm/zero_bin/Dockerfile
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/paladin-worker:${{ matrix.branch }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/paladin-worker:${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
           platforms: linux/amd64,linux/arm64
           push: true
 
@@ -57,7 +56,7 @@ jobs:
           context: docker
           file: docker/jumpbox.Dockerfile
           build-args: |
-            ZERO_BIN_BRANCH_OR_COMMIT=${{ matrix.branch }}
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/zero-jumpbox:${{ matrix.branch }}
+            ZERO_BIN_BRANCH_OR_COMMIT=${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/zero-jumpbox:${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
           platforms: linux/amd64,linux/arm64
           push: true
