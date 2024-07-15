@@ -33,7 +33,7 @@ jobs:
 
       - name: Apply patch
         working-directory: /opt/zk_evm/zero_bin
-        run: patch -p1 -i ${{ github.workspace }}/docker/worker.Dockerfile.diff
+        run: patch -p1 -i ${{ github.workspace }}/docker/worker.Dockerfile.diff worker.Dockerfile
 
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
