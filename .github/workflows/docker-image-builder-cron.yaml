@@ -30,6 +30,7 @@ jobs:
           git clone https://github.com/0xPolygonZero/zk_evm.git
           cd zk_evm
           git checkout ${{ matrix.branch }}
+          cd zero_bin
 
       - name: Apply patch
         working-directory: /opt/zk_evm
