@@ -2,13 +2,13 @@ FROM rustlang/rust:nightly-bullseye-slim
 ARG ZERO_BIN_BRANCH_OR_COMMIT
 RUN apt-get update \
   && apt-get install --yes git curl jq vim parallel libjemalloc2 libjemalloc-dev make libssl-dev pkg-config \
-  && git clone https://github.com/0xPolygonZero/zero-bin.git /opt/zero-bin \
-  && cd /opt/zero-bin \
+  && git clone https://github.com/0xPolygonZero/zk_evm.git /opt/zk_evm \
+  && cd /opt/zk_evm \
   && git checkout $ZERO_BIN_BRANCH_OR_COMMIT \
   && cargo build --release \
   && cp \
-    /opt/zero-bin/target/release/leader \
-    /opt/zero-bin/target/release/rpc \
-    /opt/zero-bin/target/release/verifier \
-    /opt/zero-bin/target/release/worker \
+    /opt/zk_evm/target/release/leader \
+    /opt/zk_evm/target/release/rpc \
+    /opt/zk_evm/target/release/verifier \
+    /opt/zk_evm/target/release/worker \
     /usr/local/bin/
