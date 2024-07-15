@@ -28,12 +28,11 @@ jobs:
         working-directory: /opt
         run: |
           git clone https://github.com/0xPolygonZero/zk_evm.git
-          cd zk_evm
+          cd zk_evm/zero_bin
           git checkout ${{ matrix.branch }}
-          cd zero_bin
 
       - name: Apply patch
-        working-directory: /opt/zk_evm
+        working-directory: /opt/zk_evm/zero_bin
         run: patch -p1 -i ${{ github.workspace }}/docker/worker.Dockerfile.diff
 
       - uses: docker/setup-qemu-action@v3
@@ -48,8 +47,8 @@ jobs:
       - name: Build and push paladin-worker
         uses: docker/build-push-action@v5
         with:
-          context: /opt/zk_evm
-          file: /opt/zk_evm/worker.Dockerfile
+          context: /opt/zk_evm/zero_bin
+          file: /opt/zk_evm/zero_bin/worker.Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/paladin-worker:${{ matrix.branch }}
           platforms: linux/amd64,linux/arm64
           push: true
