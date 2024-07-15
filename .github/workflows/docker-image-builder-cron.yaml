@@ -41,11 +41,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build and push paladin-worker
+      - name: Build and push zk_evm
         uses: docker/build-push-action@v5
         with:
           context: /opt/zk_evm
-          file: /opt/zk_evm/zero_bin/Dockerfile
+          file: /opt/zk_evm/zero_bin/worker.Dockerfile
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/zk_evm:${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
           platforms: linux/amd64,linux/arm64
           push: true
