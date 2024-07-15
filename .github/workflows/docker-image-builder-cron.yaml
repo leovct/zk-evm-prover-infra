@@ -44,9 +44,9 @@ jobs:
       - name: Build and push paladin-worker
         uses: docker/build-push-action@v5
         with:
-          context: /opt/zk_evm/zero_bin
+          context: /opt/zk_evm
           file: /opt/zk_evm/zero_bin/Dockerfile
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/paladin-worker:${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/zk_evm:${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
           platforms: linux/amd64,linux/arm64
           push: true
 
