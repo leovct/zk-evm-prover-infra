@@ -1,5 +1,7 @@
---- worker.Dockerfile	2024-07-15 15:20:59
-+++ worker.new.Dockerfile	2024-07-15 15:21:49
+diff --git a/zero_bin/worker.Dockerfile b/zero_bin/worker.Dockerfile
+index 39036aa2..1f1207a4 100644
+--- a/zero_bin/worker.Dockerfile
++++ b/zero_bin/worker.Dockerfile
 @@ -1,6 +1,6 @@
  FROM rustlang/rust:nightly-bullseye-slim as builder
 
@@ -8,7 +10,7 @@
 
  RUN \
    mkdir -p common/src  && touch common/src/lib.rs && \
-@@ -27,7 +27,7 @@
+@@ -27,7 +27,7 @@ RUN \
    touch ops/src/lib.rs && \
    touch worker/src/main.rs
 
