@@ -29,7 +29,7 @@ jobs:
           git checkout ${{ env.ZERO_BIN_BRANCH_OR_COMMIT }}
 
       - name: Apply patch
-        working-directory: /opt/zk_evm/zero_bin
+        working-directory: /opt/zk_evm
         run: patch -p1 -i ${{ github.workspace }}/docker/worker.Dockerfile.diff
 
       - uses: docker/setup-qemu-action@v3
