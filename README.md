@@ -87,7 +87,7 @@ First, install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernet
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
-  --version 4.3.13 \
+  --version 4.3.14 \
   --namespace rabbitmq-cluster-operator \
   --create-namespace
 ```
@@ -103,11 +103,23 @@ helm install keda kedacore/keda \
   --create-namespace
 ```
 
+Finally, install [Prometheus Operator](https://prometheus-operator.dev/).
+
+```bash
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
+helm install prometheus-operator prometheus-community/kube-prometheus-stack \
+  --version 61.3.1 \
+  --namespace kube-prometheus \
+  --create-namespace
+```
+
 These commands could have been written a while ago so make sure you use "recent" versions.
 
 ```bash
 helm search hub rabbitmq-cluster-operator --output yaml | yq '.[] | select(.repository.url == "https://charts.bitnami.com/bitnami")'
 helm search hub keda --output yaml | yq '.[] | select(.repository.url == "https://kedacore.github.io/charts")'
+helm search hub kube-prometheus-stack --output yaml | yq '.[] | select(.repository.url == "https://prometheus-community.github.io/helm-charts")'
 ```
 
 Finally, deploy the [zero-prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
