@@ -285,62 +285,23 @@ Download an archive full of witnesses.
 
 ```bash
 pushd /tmp
-curl -L -0 https://cf-ipfs.com/ipfs/QmTk9TyuFwA7rjPh1u89oEp8shpFUtcdXuKRRySZBfH1Pu
-```
-
-Generate proof using a witness (check `data.tar.gz` for blocks and witnesses files).
-
-```bash
-cd /tmp
-curl -L -O https://raw.githubusercontent.com/leovct/zero-prover-infra/main/data/test-data.tbz2
-mkdir test-data
-tar -xf test-data.tbz2 -C test-data
-```
-
-You should be able to list the files contained in the archive.
-
-```bash
-$ ls -al /tmp/test-data
-total 11548
-drwxr-xr-x 2 root root    4096 Jul 15 12:34 .
-drwxrwxrwt 1 root root    4096 Jul 15 12:34 ..
--rw-rw-r-- 1 1000 1000  352982 Jun 30 12:37 432.erc721.block.json
--rw-rw-r-- 1 1000 1000  690086 Jun 30 12:40 432.erc721.receipts.ndjson
--rw-rw-r-- 1 1000 1000 1327925 Jun 30 12:37 432.erc721.witness.json
--rw-rw-r-- 1 1000 1000     662 Jun 30 14:29 432.erc721.witness.json.2.out
--rw-rw-r-- 1 1000 1000  423627 Jun 30 15:22 432.erc721.witness.json.3.out
--rw-rw-r-- 1 1000 1000  423631 Jul  1 23:02 432.erc721.witness.json.4.out
--rw-rw-r-- 1 1000 1000  423442 Jul  2 00:10 432.erc721.witness.json.5.out
--rw-rw-r-- 1 1000 1000  423647 Jun 30 13:40 432.erc721.witness.json.out
--rw-rw-r-- 1 1000 1000  354093 Jun 30 12:37 512.eoa.block.json
--rw-rw-r-- 1 1000 1000  508092 Jun 30 12:40 512.eoa.receipts.ndjson
--rw-rw-r-- 1 1000 1000  820808 Jun 30 12:37 512.eoa.witness.json
--rw-rw-r-- 1 1000 1000  421941 Jun 30 15:41 512.eoa.witness.json.3.out
--rw-rw-r-- 1 1000 1000  421865 Jul  1 22:47 512.eoa.witness.json.4.out
--rw-rw-r-- 1 1000 1000  421946 Jul  1 23:57 512.eoa.witness.json.5.out
--rw-rw-r-- 1 1000 1000  421979 Jun 30 14:03 512.eoa.witness.json.out
--rw-rw-r-- 1 1000 1000  417058 Jun 30 12:37 512.erc20.block.json
--rw-rw-r-- 1 1000 1000  814288 Jun 30 12:40 512.erc20.receipts.ndjson
--rw-rw-r-- 1 1000 1000 1414156 Jun 30 12:37 512.erc20.witness.json
--rw-rw-r-- 1 1000 1000  421075 Jun 30 15:57 512.erc20.witness.json.3.out
--rw-rw-r-- 1 1000 1000  421016 Jul  1 23:17 512.erc20.witness.json.4.out
--rw-rw-r-- 1 1000 1000  420871 Jul  2 00:25 512.erc20.witness.json.5.out
--rw-rw-r-- 1 1000 1000  421195 Jun 30 13:21 512.erc20.witness.json.out
+curl -L --output witnesses.xz https://cf-ipfs.com/ipfs/QmTk9TyuFwA7rjPh1u89oEp8shpFUtcdXuKRRySZBfH1Pu
+tar --extract --file /tmp/witnesses.xz --directory /tmp/witnesses
+rm /tmp/witnesses.xz
 ```
 
 > Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node! We will skip this part for the moment.
 
-For example, we will attempt to prove `432.erc721.witness.json`.
+For example, we will attempt to prove `20242090.witness.json`.
 
 ```bash
-witness="432.erc721.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=info \
   leader \
   --runtime=amqp \
   --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
   stdio \
-  < "/tmp/test-data/$witness"
+  < "/tmp/witnesses/20242090.witness.json"
 ```
 
 ```bash
