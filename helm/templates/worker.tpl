@@ -74,7 +74,7 @@ spec:
   capacity:
     storage: 100Gi
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   hostPath:
     path: /data/worker-circuits
 
@@ -85,7 +85,7 @@ metadata:
   name: {{ .Release.Name }}-worker-circuits-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 100Gi
