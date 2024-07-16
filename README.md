@@ -314,7 +314,7 @@ rm /tmp/witnesses.xz
 
 > Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node! We will skip this part for the moment.
 
-For example, we will attempt to prove `20241038.witness.json`.
+For example, we will attempt to prove `20242200.witness.json`.
 
 ```bash
 env RUST_BACKTRACE=full \
@@ -323,7 +323,7 @@ env RUST_BACKTRACE=full \
   --runtime=amqp \
   --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
   stdio \
-  < "/tmp/witnesses/20241038.witness.json"
+  < "/tmp/witnesses/20242200.witness.json"
 ```
 
 You can check the content of `/home/data/proof-0001.leader.out` or you can extract the proof and run the `verifier`.
