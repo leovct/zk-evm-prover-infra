@@ -286,13 +286,14 @@ Download an archive full of witnesses.
 ```bash
 pushd /tmp
 curl -L --output witnesses.xz https://cf-ipfs.com/ipfs/QmTk9TyuFwA7rjPh1u89oEp8shpFUtcdXuKRRySZBfH1Pu
-tar --extract --file /tmp/witnesses.xz --directory /tmp/witnesses
+mkdir /tmp/witnesses
+tar --extract --file=/tmp/witnesses.xz --directory=/tmp/witnesses --strip-components=1 --checkpoint=10000 --checkpoint-action=dot
 rm /tmp/witnesses.xz
 ```
 
 > Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node! We will skip this part for the moment.
 
-For example, we will attempt to prove `20242090.witness.json`.
+For example, we will attempt to prove `20241038.witness.json`.
 
 ```bash
 env RUST_BACKTRACE=full \
@@ -301,19 +302,7 @@ env RUST_BACKTRACE=full \
   --runtime=amqp \
   --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
   stdio \
-  < "/tmp/witnesses/20242090.witness.json"
-```
-
-```bash
-2024-06-18T00:56:13.907559Z DEBUG lapin::channels: create channel id=0
-2024-06-18T00:56:13.924859Z DEBUG lapin::channels: create channel
-2024-06-18T00:56:13.924884Z DEBUG lapin::channels: create channel id=1
-2024-06-18T00:56:13.932668Z  INFO prover: Proving block 1
-2024-06-18T00:56:43.925763Z DEBUG lapin::channels: received heartbeat from server
-2024-06-18T00:56:43.938936Z DEBUG lapin::channels: send heartbeat
-2024-06-18T00:57:22.704959Z DEBUG lapin::channels: send heartbeat
-2024-06-18T00:57:39.675806Z  INFO prover: Successfully proved block 1
-# proof content
+  < "/tmp/witnesses/20241038.witness.json"
 ```
 
 You can check the content of `/home/data/proof-0001.leader.out` or you can extract the proof and run the `verifier`.
