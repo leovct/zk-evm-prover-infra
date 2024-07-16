@@ -9,6 +9,7 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 - [Deploy the Prover Infrastructure in Kubernetes with Helm](#deploy-prover-infrastructure-in-kubernetes-with-helm)
 - [Generate Block Witnesses with Jerrigon](#generate-block-witnesses-with-jerrigon)
 - [Generate Block Proofs with the Zero Prover](#generate-block-proofs-with-the-zero-prover)
+- [Build Jumpbox Docker Image](#build-jumpbox-docker-image)
 - [TODOs / Known Issues](#todos--known-issues)
 
 ## Architecture Diagram
@@ -389,6 +390,59 @@ Stack backtrace:
    8: main
    9: __libc_start_main
   10: _start
+```
+
+## Build Jumpbox Docker Image
+
+Provision an Ubuntu/Debian VM with good specs (e.g. `t2d-60`).
+
+Switch to admin.
+
+```bash
+sudo su
+```
+
+Install docker.
+
+```bash
+curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable" |tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt update
+apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
+docker run hello-world
+```
+
+Clone the repository.
+
+```bash
+mkdir /opt/zero-prover-infra
+git clone https://github.com/leovct/zero-prover-infra /opt/zero-prover-infra
+```
+
+Build the jumpbox images.
+
+```bash
+pushd /opt/zero-prover-infra/docker
+docker build --tag leovct/zero-jumpbox:v0.5.0 --build-arg ZERO_BIN_BRANCH_OR_COMMIT=v0.5.0 --file jumpbox.Dockerfile .
+docker build --tag leovct/zero-jumpbox:v0.6.0 --build-arg ZERO_BIN_BRANCH_OR_COMMIT=v0.6.0 --file jumpbox.Dockerfile .
+```
+
+Check that the images are built correctly.
+
+```bash
+docker run --rm -it leovct/zero-jumpbox:v0.5.0 /bin/bash
+rpc --help
+worker --help
+leader --help
+verifier --help
+```
+
+Push the images.
+
+```bash
+docker login
+docker push leovct/zero-jumpbox:v0.5.0
+docker push leovct/zero-jumpbox:v0.6.0
 ```
 
 ## TODOs / Known Issues
