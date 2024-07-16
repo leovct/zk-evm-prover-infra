@@ -9,7 +9,7 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 - [Deploy the Prover Infrastructure in Kubernetes with Helm](#deploy-prover-infrastructure-in-kubernetes-with-helm)
 - [Generate Block Witnesses with Jerrigon](#generate-block-witnesses-with-jerrigon)
 - [Generate Block Proofs with the Zero Prover](#generate-block-proofs-with-the-zero-prover)
-- [Build Jumpbox Docker Image](#build-jumpbox-docker-image)
+- [Build Jumpbox Docker Images](#build-jumpbox-docker-images)
 - [TODOs / Known Issues](#todos--known-issues)
 
 ## Architecture Diagram
@@ -392,7 +392,7 @@ Stack backtrace:
   10: _start
 ```
 
-## Build Jumpbox Docker Image
+## Build Jumpbox Docker Images
 
 Provision an Ubuntu/Debian VM with good specs (e.g. `t2d-60`).
 
