@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: debug-pod
+  namespace: zero
+spec:
+  nodeSelector:
+    cloud.google.com/gke-nodepool: highmem-nodes-pool
+  tolerations:
+  - key: "highmem"
+    operator: "Equal"
+    value: "true"
+    effect: "NoSchedule"
+  containers:
+  - name: debug
+    image: busybox
+    command: ["/bin/sh", "-c", "while true; do sleep infinity; done"]
+    volumeMounts:
+    - name: circuits
+      mountPath: /circuits
+  volumes:
+  - name: circuits
+    persistentVolumeClaim:
+      claimName: test-worker-circuits-pvc
+
+# pod_name="$(kubectl get pods --namespace zero -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep debug-pod)" && kubectl exec --namespace zero --stdin --tty "$pod_name" -- /bin/sh
