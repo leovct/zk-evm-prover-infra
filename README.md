@@ -132,6 +132,15 @@ Your cluster should now be ready to prove blocks!
 
 ![cluster-ready](./docs/cluster-ready.png)
 
+You can observe cluster metrics using [Grafana](https://grafana.com/). To access it, execute two separate commands in different terminal sessions. When prompted for login information, enter `admin` as the username and `prom-operator` as the password.
+
+```bash
+kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operator-grafana 3000:http-web
+open http://localhost:3000/
+```
+
+![cluster-metrics](./docs/cluster-metrics.png)
+
 If you ever need to update the stack, you can use the following command.
 
 ```bash
