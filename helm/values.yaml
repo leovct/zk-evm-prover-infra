@@ -1,7 +1,7 @@
 # Type 1 Prover Configuration
 worker:
   # The Docker image for the worker.
-  image: leovct/paladin-worker:latest
+  image: leovct/zk_evm:v0.5.0
 
   # The minimum number of worker pods to maintain.
   # The Horizontal Pod Autoscaler (HPA) will not scale down below this value.
@@ -50,4 +50,4 @@ rabbitmq:
 # Jumpbox Configuration
 jumpbox:
   # The Docker image for the jumpbox (a secure entrypoint for accessing the cluster).
-  image: leovct/zero-jumpbox:latest
+  image: leovct/zero-jumpbox:v0.5.0
