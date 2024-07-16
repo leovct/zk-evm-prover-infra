@@ -46,6 +46,9 @@ spec:
         volumeMounts:
         - name: circuits
           mountPath: /circuits
+        # TODO: Remove this after testing.
+        securityContext:
+          runAsUser: 0
         resources:
           requests:
             memory: {{ .Values.worker.resources.requests.memory }}
