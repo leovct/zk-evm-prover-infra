@@ -120,6 +120,12 @@ Your cluster should now be ready to prove blocks!
 
 ![cluster-ready](./docs/cluster-ready.png)
 
+If you ever need to update the stack, you can use the following command.
+
+```bash
+helm upgrade test --namespace zero --create-namespace ./helm
+```
+
 ## Generate Block Witnesses with Jerrigon
 
 [Jerrigon](https://github.com/0xPolygonZero/erigon/tree/feat/zero) is a fork of [Erigon](https://github.com/ledgerwatch/erigon) that allows seamless integration of [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin), facilitating the generation of witnesses and the proving of blocks using zero-knowledge proofs.
