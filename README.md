@@ -9,7 +9,7 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 - [Deploy the Prover Infrastructure in Kubernetes with Helm](#deploy-prover-infrastructure-in-kubernetes-with-helm)
 - [Generate Block Witnesses with Jerrigon](#generate-block-witnesses-with-jerrigon)
 - [Generate Block Proofs with the Zero Prover](#generate-block-proofs-with-the-zero-prover)
-- [Build Jumpbox Docker Images](#build-jumpbox-docker-images)
+- [Build Docker Images](#build-docker-images)
 - [TODOs / Known Issues](#todos--known-issues)
 
 ## Architecture Diagram
@@ -275,6 +275,13 @@ jumpbox_pod_name="$(kubectl get pods --namespace zero -o=jsonpath='{range .items
 kubectl exec --namespace zero --stdin --tty "$jumpbox_pod_name" -- /bin/bash
 ```
 
+Download an archive full of witnesses.
+
+```bash
+pushd /tmp
+curl -L -0 https://cf-ipfs.com/ipfs/QmTk9TyuFwA7rjPh1u89oEp8shpFUtcdXuKRRySZBfH1Pu
+```
+
 Generate proof using a witness (check `data.tar.gz` for blocks and witnesses files).
 
 ```bash
@@ -392,7 +399,7 @@ Stack backtrace:
   10: _start
 ```
 
-## Build Jumpbox Docker Images
+## Build Docker Images
 
 Provision an Ubuntu/Debian VM with good specs (e.g. `t2d-60`).
 
@@ -412,7 +419,56 @@ apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-co
 docker run hello-world
 ```
 
-Clone the repository.
+### Build Zk-EVM Image
+
+Install dependencies.
+
+```bash
+apt-get update
+apt-get install --yes build-essential git libjemalloc-dev libjemalloc2 make libssl-dev pkg-config
+```
+
+Install rust.
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+. "$HOME/.cargo/env"
+rustup toolchain install nightly
+rustup default nightly
+```
+
+Clone `0xPolygonZero/zk_evm`.
+
+```bash
+mkdir /opt/zk_evm
+git clone https://github.com/0xPolygonZero/zk_evm.git /opt/zk_evm
+```
+
+Build the `zk_evm` binaries and docker images.
+
+```bash
+pushd /opt/zk_evm
+
+git checkout v0.5.0
+env RUSTFLAGS='-C target-cpu=native -Zlinker-features=-lld' cargo build --release
+docker build --tag leovct/zk_evm:v0.5.0 .
+
+git checkout v0.6.0
+env RUSTFLAGS='-C target-cpu=native -Zlinker-features=-lld' cargo build --release
+docker build --tag leovct/zk_evm:v0.6.0 .
+```
+
+Push the images.
+
+```bash
+docker login
+docker push leovct/zk_evm:v0.5.0
+docker push leovct/zk_evm:v0.6.0
+```
+
+### Build Jumpbox Image
+
+Clone `leovct/zero-prover-infra`.
 
 ```bash
 mkdir /opt/zero-prover-infra
