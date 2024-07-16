@@ -466,6 +466,8 @@ docker push leovct/zk_evm:v0.5.0
 docker push leovct/zk_evm:v0.6.0
 ```
 
+Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovct/zk_evm/general) for the moment.
+
 ### Build Jumpbox Image
 
 Clone `leovct/zero-prover-infra`.
@@ -500,6 +502,8 @@ docker login
 docker push leovct/zero-jumpbox:v0.5.0
 docker push leovct/zero-jumpbox:v0.6.0
 ```
+
+Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovct/zero-jumpbox/general) for the moment.
 
 ## TODOs / Known Issues
 
