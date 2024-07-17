@@ -33,6 +33,12 @@ variable "owner" {
 
 // Kubernetes settings
 
+variable "use_spot_instances" {
+  type        = bool
+  description = "Whether to use spot instances or not for the GKE cluster"
+  default     = true
+}
+
 // Default node pool
 
 variable "default_pool_node_count" {

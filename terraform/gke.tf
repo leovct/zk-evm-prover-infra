@@ -36,6 +36,7 @@ resource "google_container_node_pool" "default_node_pool" {
   node_count = var.default_pool_node_count
   node_config {
     machine_type = var.default_pool_machine_type
+    #spot = var.use_spot_instances
     disk_size_gb = var.default_pool_disk_size_gb
 
     labels          = local.labels // GKE resources
@@ -57,6 +58,7 @@ resource "google_container_node_pool" "highmem_node_pool" {
 
   node_config {
     machine_type = var.highmem_pool_machine_type
+    spot         = var.use_spot_instances
     disk_size_gb = var.highmem_pool_disk_size_gb
     disk_type    = "pd-ssd"
 
