@@ -39,7 +39,7 @@ jobs:
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo update
           helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
-            --version 4.3.6 \
+            --version 4.3.14 \
             --namespace rabbitmq-cluster-operator \
             --create-namespace
 
@@ -50,6 +50,15 @@ jobs:
           helm install keda kedacore/keda \
             --version 2.14.2 \
             --namespace keda \
+            --create-namespace
+
+      - name: Install Prometheus Operator
+        run: |
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo update
+          helm install prometheus-operator prometheus-community/kube-prometheus-stack \
+            --version 61.3.1 \
+            --namespace kube-prometheus \
             --create-namespace
 
       - name: Render helm template
