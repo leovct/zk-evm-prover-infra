@@ -27,7 +27,7 @@ jobs:
           version: ${{ env.HELM_VERSION }}
       - uses: hashicorp/setup-terraform@v3
         with:
-          version: ${{ env.TERRAFORM_VERSION }}
+          terraform_version: ${{ env.TERRAFORM_VERSION }}
 
       - name: Lint helm chart
         run: helm lint ./helm
