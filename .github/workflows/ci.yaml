@@ -1,4 +1,4 @@
-name: Helm
+name: ci
 
 on:
   pull_request:
@@ -7,9 +7,14 @@ on:
 
 env:
   HELM_VERSION: "v3.15.0"
+  TERRAFORM_VERSION: "v1.9.2"
+  # Kubernetes operators
+  RABBITMQ_CLUSTER_OPERATOR_VERSION: "4.3.14"
+  KEDA_OPERATOR_VERSION: "2.14.2"
+  PROMETHEUS_OPERATOR_VERSION: "61.3.1"
 
 concurrency:
-  group: helm-${{ github.event.pull_request.number || github.ref }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -20,10 +25,16 @@ jobs:
       - uses: azure/setup-helm@v4
         with:
           version: ${{ env.HELM_VERSION }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          version: ${{ env.TERRAFORM_VERSION }}
+
       - name: Lint helm chart
         run: helm lint ./helm
+      - name: Lint terraform config
+        run: terraform fmt --check
 
-  deploy:
+  helm-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,7 +50,7 @@ jobs:
           helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo update
           helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
-            --version 4.3.14 \
+            --version ${{ env.RABBITMQ_CLUSTER_OPERATOR_VERSION }} \
             --namespace rabbitmq-cluster-operator \
             --create-namespace
 
@@ -48,7 +59,7 @@ jobs:
           helm repo add kedacore https://kedacore.github.io/charts
           helm repo update
           helm install keda kedacore/keda \
-            --version 2.14.2 \
+            --version ${{ env.KEDA_OPERATOR_VERSION }} \
             --namespace keda \
             --create-namespace
 
@@ -57,7 +68,7 @@ jobs:
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo update
           helm install prometheus-operator prometheus-community/kube-prometheus-stack \
-            --version 61.3.1 \
+            --version ${{ env.PROMETHEUS_OPERATOR_VERSION }} \
             --namespace kube-prometheus \
             --create-namespace
 
