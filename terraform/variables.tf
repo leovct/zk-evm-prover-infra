@@ -58,7 +58,7 @@ variable "default_pool_disk_size_gb" {
 variable "highmem_pool_node_count" {
   type        = number
   description = "Number of nodes in the GKE cluster's highmem node pool"
-  default     = 2
+  default     = 1
 }
 
 variable "highmem_pool_machine_type" {
