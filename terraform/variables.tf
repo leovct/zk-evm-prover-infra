@@ -23,7 +23,7 @@ variable "region" {
 variable "zones" {
   type        = list(string)
   description = "List of availability zones within the region for distributing resources and enhancing fault tolerance"
-  default     = ["europe-west3-c"]
+  default     = ["europe-west3-b"]
 }
 
 variable "owner" {
@@ -70,8 +70,7 @@ variable "highmem_pool_node_count" {
 variable "highmem_pool_machine_type" {
   type        = string
   description = "Machine type for nodes in the highmem node pool, optimized for memory-intensive workloads"
-  default     = "t2d-standard-60"
-  #default = "c3d-highmem-180"
+  default     = "c3d-highmem-180"
 }
 
 variable "highmem_pool_disk_size_gb" {
