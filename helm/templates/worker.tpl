@@ -4,7 +4,7 @@ metadata:
   name: {{ .Release.Name }}-worker
 spec:
   # The number of replicas should be set to zero (or one?) as it is managed by the HPA.
-  replicas: 1
+  replicas: {{ if .Values.worker.autoscaler }}1{{- else }}{{ .Values.worker.minWorkerCount }}{{- end }}
   selector:
     matchLabels:
       app: worker

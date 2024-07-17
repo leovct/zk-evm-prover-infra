@@ -1,3 +1,4 @@
+{{- if .Values.worker.autoscaler }}
 # Define the secret containing the RabbitMQ HTTP URL.
 apiVersion: v1
 kind: Secret
@@ -126,3 +127,4 @@ spec:
     authenticationRef:
       # The name of the TriggerAuthentication object.
       name: {{ .Release.Name }}-keda-trigger-auth-rabbitmq-conn
+{{- end }}
