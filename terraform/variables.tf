@@ -65,6 +65,7 @@ variable "highmem_pool_machine_type" {
   type        = string
   description = "Machine type for nodes in the highmem node pool, optimized for memory-intensive workloads"
   default     = "t2d-standard-60"
+  #default = "c3d-highmem-180"
 }
 
 variable "highmem_pool_disk_size_gb" {
