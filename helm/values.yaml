@@ -9,7 +9,7 @@ worker:
 
   # The minimum number of worker pods to maintain.
   # The Horizontal Pod Autoscaler (HPA) will not scale down below this value.
-  minWorkerCount: 2
+  minWorkerCount: 3
 
   # The maximum number of worker pods to scale up to.
   # We start with 2 nodes, so we limit the maximum workers to 8 (4 per node).
