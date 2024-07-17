@@ -123,7 +123,7 @@ helm search hub kube-prometheus-stack --output yaml | yq '.[] | select(.reposito
 Finally, deploy the [zero-prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
 
 ```bash
-helm install test --namespace zero --create-namespace helm
+helm install test --namespace zero --create-namespace ./helm
 ```
 
 Your cluster should now be ready to prove blocks!
