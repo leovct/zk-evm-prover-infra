@@ -23,7 +23,7 @@ The above [GKE](https://cloud.google.com/kubernetes-engine) infrastructure can b
 First, authenticate with your [GCP](https://console.cloud.google.com/) account.
 
 ```bash
-gcloud auth login
+gcloud auth application-default login
 ```
 
 Before deploying anything, check which project is used. The resources will be deployed inside this specific project.

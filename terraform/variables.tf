@@ -1,41 +1,77 @@
-// Prefix that will be added to resources.
-variable "prefix" {
-  type    = string
-  default = "leovct-test-01"
+variable "deployment_name" {
+  type        = string
+  description = "Unique identifier for this deployment, used as a prefix for all associated resources"
+  default     = "zero-prover-test"
+}
+
+variable "environment" {
+  type        = string
+  description = "Specifies the deployment environment (e.g., development, staging, production) for configuration purposes"
+  default     = "development"
 }
 
 variable "project_id" {
-  type    = string
-  default = "prj-polygonlabs-devtools-dev"
-}
-
-variable "gke_num_nodes" {
-  default     = 1
-  description = "number of gke nodes"
+  type        = string
+  description = "The unique identifier of the Google Cloud Platform project for resource deployment and billing"
+  default     = "prj-polygonlabs-devtools-dev"
 }
 
 variable "region" {
-  type    = string
-  default = "europe-west3"
+  type        = string
+  description = "The Google Cloud Platform region where resources will be created"
+  default     = "europe-west3"
 }
 
-variable "default_node_type" {
-  type    = string
-  default = "e2-standard-16"
-}
-
-variable "highmem_node_type" {
-  type    = string
-  default = "t2d-standard-60"
-}
-
-variable "node_locations" {
-  description = "List of availability zones within the region"
+variable "zones" {
   type        = list(string)
+  description = "List of availability zones within the region for distributing resources and enhancing fault tolerance"
   default     = ["europe-west3-c"]
 }
 
-variable "node_disk_size" {
-  type    = number
-  default = 300
+variable "owner" {
+  type        = string
+  description = "The primary point of contact for this deployment"
+  default     = "devtools"
+}
+
+// Kubernetes settings
+
+// Default node pool
+
+variable "default_pool_node_count" {
+  type        = number
+  description = "Number of nodes in the GKE cluster's default node pool"
+  default     = 1
+}
+
+variable "default_pool_machine_type" {
+  type        = string
+  description = "Machine type for nodes in the default node pool, balancing performance and cost"
+  default     = "e2-standard-16"
+}
+
+variable "default_pool_disk_size_gb" {
+  type        = number
+  description = "The size (in GB) of the disk attached to each node in the default node pool"
+  default     = 300
+}
+
+// Highmem node pool
+
+variable "highmem_pool_node_count" {
+  type        = number
+  description = "Number of nodes in the GKE cluster's highmem node pool"
+  default     = 2
+}
+
+variable "highmem_pool_machine_type" {
+  type        = string
+  description = "Machine type for nodes in the highmem node pool, optimized for memory-intensive workloads"
+  default     = "t2d-standard-60"
+}
+
+variable "highmem_pool_disk_size_gb" {
+  type        = number
+  description = "The size (in GB) of the disk attached to each node in the highmem node pool"
+  default     = 300
 }
