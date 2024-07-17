@@ -1,13 +1,11 @@
 variable "deployment_name" {
   type        = string
   description = "Unique identifier for this deployment, used as a prefix for all associated resources"
-  default     = "zero-prover-test"
 }
 
 variable "environment" {
   type        = string
   description = "Specifies the deployment environment (e.g., development, staging, production) for configuration purposes"
-  default     = "development"
 }
 
 variable "project_id" {
@@ -31,7 +29,6 @@ variable "zones" {
 variable "owner" {
   type        = string
   description = "The primary point of contact for this deployment"
-  default     = "devtools"
 }
 
 // Kubernetes settings
