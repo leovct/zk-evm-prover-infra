@@ -64,7 +64,7 @@ Get access to the GKE cluster config.
 
 ```bash
 # gcloud container clusters get-credentials <gke-cluster-name> --region=<region>
-gcloud container clusters get-credentials leovct-test-01-gke-cluster --region=europe-west3
+gcloud container clusters get-credentials my-gke-cluster --region=europe-west3
 ```
 
 Make sure you have access to the GKE cluster you just created. It should list the nodes of the cluster.
