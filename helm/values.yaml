@@ -3,9 +3,6 @@ zk_evm_image: leovct/zk_evm:v0.6.0
 
 # Type 1 Prover - Worker Configuration
 worker:
-  # The Docker image for the worker.
-  image: leovct/zk_evm:v0.6.0
-
   # Enable or disable the HPA worker autoscaler.
   # If disabled, the number of workers deployed will be set according to `minWorkerCount`.
   autoscaler: false
