@@ -5,18 +5,23 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 ## Table of Contents
 
 - [Architecture Diagram](#architecture-diagram)
-- [Deploy GKE Cluster with Terraform](#deploy-gke-cluster-with-terraform)
-- [Deploy the Prover Infrastructure in Kubernetes with Helm](#deploy-prover-infrastructure-in-kubernetes-with-helm)
-- [Generate Block Witnesses with Jerrigon](#generate-block-witnesses-with-jerrigon)
-- [Generate Block Proofs with the Zero Prover](#generate-block-proofs-with-the-zero-prover)
-- [Build Docker Images](#build-docker-images)
-- [TODOs / Known Issues](#todos--known-issues)
+- [Setup](#setup)
+  - [GKE Cluster](#gke-cluster)
+  - [zkEVM Prover Infrastructure](#zkevm-prover-infrastructure)
+  - [Docker Images](#docker-images)
+- [Monitoring](#monitoring)
+- [Block Proving](#block-proving)
+  - [Witness Generation](#witness-generation)
+  - [Proof Generation](#proof-generation)
+- [TODOs](#todos)
 
 ## Architecture Diagram
 
 ![architecture-diagram](./docs/architecture-diagram.png)
 
-## Deploy GKE Cluster with Terraform
+## Setup
+
+### GKE Cluster
 
 The above [GKE](https://cloud.google.com/kubernetes-engine) infrastructure can be deployed using the provided [Terraform](https://www.terraform.io/) scripts under the `terraform` directory.
 
@@ -52,7 +57,7 @@ Note that it may take some time for the Kubernetes cluster to be ready on GCP!
 
 ![gke-cluster](docs/gke-cluster.png)
 
-## Deploy Prover Infrastructure in Kubernetes with Helm
+### zkEVM Prover Infrastructure
 
 First, authenticate with your [GCP](https://console.cloud.google.com/) account.
 
@@ -130,6 +135,114 @@ Your cluster should now be ready to prove blocks!
 
 ![cluster-ready](./docs/cluster-ready.png)
 
+### Docker Images
+
+Provision an Ubuntu/Debian VM with good specs (e.g. `t2d-60`).
+
+Switch to admin.
+
+```bash
+sudo su
+```
+
+Install docker.
+
+```bash
+curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable" |tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt update
+apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
+docker run hello-world
+```
+
+#### Build Zk-EVM Image
+
+Install dependencies.
+
+```bash
+apt-get update
+apt-get install --yes build-essential git libjemalloc-dev libjemalloc2 make libssl-dev pkg-config
+```
+
+Install rust.
+
+```bash
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+. "$HOME/.cargo/env"
+rustup toolchain install nightly
+rustup default nightly
+```
+
+Clone `0xPolygonZero/zk_evm`.
+
+```bash
+mkdir /opt/zk_evm
+git clone https://github.com/0xPolygonZero/zk_evm.git /opt/zk_evm
+```
+
+Build the `zk_evm` binaries and docker images.
+
+```bash
+pushd /opt/zk_evm
+
+git checkout v0.5.0
+env RUSTFLAGS='-C target-cpu=native -Zlinker-features=-lld' cargo build --release
+docker build --tag leovct/zk_evm:v0.5.0 .
+
+git checkout v0.6.0
+env RUSTFLAGS='-C target-cpu=native -Zlinker-features=-lld' cargo build --release
+docker build --tag leovct/zk_evm:v0.6.0 .
+```
+
+Push the images.
+
+```bash
+docker login
+docker push leovct/zk_evm:v0.5.0
+docker push leovct/zk_evm:v0.6.0
+```
+
+Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovct/zk_evm/general) for the moment.
+
+#### Build Jumpbox Image
+
+Clone `leovct/zero-prover-infra`.
+
+```bash
+mkdir /opt/zero-prover-infra
+git clone https://github.com/leovct/zero-prover-infra /opt/zero-prover-infra
+```
+
+Build the jumpbox images.
+
+```bash
+pushd /opt/zero-prover-infra/docker
+docker build --tag leovct/zero-jumpbox:v0.5.0 --build-arg ZERO_BIN_BRANCH_OR_COMMIT=v0.5.0 --file jumpbox.Dockerfile .
+docker build --tag leovct/zero-jumpbox:v0.6.0 --build-arg ZERO_BIN_BRANCH_OR_COMMIT=v0.6.0 --file jumpbox.Dockerfile .
+```
+
+Check that the images are built correctly.
+
+```bash
+docker run --rm -it leovct/zero-jumpbox:v0.5.0 /bin/bash
+rpc --help
+worker --help
+leader --help
+verifier --help
+```
+
+Push the images.
+
+```bash
+docker login
+docker push leovct/zero-jumpbox:v0.5.0
+docker push leovct/zero-jumpbox:v0.6.0
+```
+
+Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovct/zero-jumpbox/general) for the moment.
+
+## Monitoring
+
 You can observe cluster metrics using [Grafana](https://grafana.com/). To access it, execute two separate commands in different terminal sessions. When prompted for login information, enter `admin` as the username and `prom-operator` as the password.
 
 ```bash
@@ -174,7 +287,9 @@ If you ever need to update the stack, you can use the following command.
 helm upgrade test --namespace zero --create-namespace ./helm
 ```
 
-## Generate Block Witnesses with Jerrigon
+## Block Proving
+
+### Witness Generation
 
 [Jerrigon](https://github.com/0xPolygonZero/erigon/tree/feat/zero) is a fork of [Erigon](https://github.com/ledgerwatch/erigon) that allows seamless integration of [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin), facilitating the generation of witnesses and the proving of blocks using zero-knowledge proofs.
 
@@ -320,7 +435,7 @@ You can check the block data.
 jq . "block_$i.json"
 ```
 
-## Generate Block Proofs with the Zero Prover
+### Proof Generation
 
 Get a running shell inside the `jumpbox` container.
 
@@ -402,113 +517,7 @@ Stack backtrace:
   10: _start
 ```
 
-## Build Docker Images
-
-Provision an Ubuntu/Debian VM with good specs (e.g. `t2d-60`).
-
-Switch to admin.
-
-```bash
-sudo su
-```
-
-Install docker.
-
-```bash
-curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable" |tee /etc/apt/sources.list.d/docker.list > /dev/null
-apt update
-apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin docker-compose
-docker run hello-world
-```
-
-### Build Zk-EVM Image
-
-Install dependencies.
-
-```bash
-apt-get update
-apt-get install --yes build-essential git libjemalloc-dev libjemalloc2 make libssl-dev pkg-config
-```
-
-Install rust.
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-. "$HOME/.cargo/env"
-rustup toolchain install nightly
-rustup default nightly
-```
-
-Clone `0xPolygonZero/zk_evm`.
-
-```bash
-mkdir /opt/zk_evm
-git clone https://github.com/0xPolygonZero/zk_evm.git /opt/zk_evm
-```
-
-Build the `zk_evm` binaries and docker images.
-
-```bash
-pushd /opt/zk_evm
-
-git checkout v0.5.0
-env RUSTFLAGS='-C target-cpu=native -Zlinker-features=-lld' cargo build --release
-docker build --tag leovct/zk_evm:v0.5.0 .
-
-git checkout v0.6.0
-env RUSTFLAGS='-C target-cpu=native -Zlinker-features=-lld' cargo build --release
-docker build --tag leovct/zk_evm:v0.6.0 .
-```
-
-Push the images.
-
-```bash
-docker login
-docker push leovct/zk_evm:v0.5.0
-docker push leovct/zk_evm:v0.6.0
-```
-
-Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovct/zk_evm/general) for the moment.
-
-### Build Jumpbox Image
-
-Clone `leovct/zero-prover-infra`.
-
-```bash
-mkdir /opt/zero-prover-infra
-git clone https://github.com/leovct/zero-prover-infra /opt/zero-prover-infra
-```
-
-Build the jumpbox images.
-
-```bash
-pushd /opt/zero-prover-infra/docker
-docker build --tag leovct/zero-jumpbox:v0.5.0 --build-arg ZERO_BIN_BRANCH_OR_COMMIT=v0.5.0 --file jumpbox.Dockerfile .
-docker build --tag leovct/zero-jumpbox:v0.6.0 --build-arg ZERO_BIN_BRANCH_OR_COMMIT=v0.6.0 --file jumpbox.Dockerfile .
-```
-
-Check that the images are built correctly.
-
-```bash
-docker run --rm -it leovct/zero-jumpbox:v0.5.0 /bin/bash
-rpc --help
-worker --help
-leader --help
-verifier --help
-```
-
-Push the images.
-
-```bash
-docker login
-docker push leovct/zero-jumpbox:v0.5.0
-docker push leovct/zero-jumpbox:v0.6.0
-```
-
-Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovct/zero-jumpbox/general) for the moment.
-
-## TODOs / Known Issues
+## TODOs
 
 - [ ] The leader communicates with the pool of workers through RabbitMQ by creating a queue by proof request. However, [RabbitMQ Queue](https://keda.sh/docs/2.14/scalers/rabbitmq-queue/) can only scale the number of workers based on the size of the message backlog (for a specific queue), or the publish/sec rate. There is no way to scale the number of workers based on the total message backlog across all queues? I asked the [question](https://kubernetes.slack.com/archives/CKZJ36A5D/p1718671628824279) in the Kubernetes Slack.
 
