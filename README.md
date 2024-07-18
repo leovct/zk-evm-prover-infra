@@ -143,7 +143,16 @@ Add this handy [dashboard](https://grafana.com/grafana/dashboards/10991-rabbitmq
 
 ![rabbitmq-metrics](./docs/rabbitmq-metrics.png)
 
-You can also log into the RabbitMQ management interface using `guest` credentials as username and password.
+It's also possible to access Prometheus web interface.
+
+```bash
+kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operated 9090:http-web &
+open http://localhost:9090/
+```
+
+![prometheus-ui](./docs/prometheus-ui.png)
+
+Finally, you can log into the RabbitMQ management interface using `guest` credentials as username and password.
 
 ```bash
 kubectl port-forward --namespace zero --address localhost service/test-rabbitmq-cluster 15672:management &
