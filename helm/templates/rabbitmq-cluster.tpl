@@ -18,3 +18,27 @@ spec:
     additionalConfig: |
       default_user = {{ .Values.rabbitmq.cluster.username }}
       default_pass = {{ .Values.rabbitmq.cluster.password }}
+
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ .Release.Name }}-rabbitmq-cluster
+  namespace: kube-prometheus
+  labels:
+    release: prometheus-operator
+spec:
+  endpoints:
+    - port: prometheus
+      path: /metrics
+      scheme: http
+      scrapeTimeout: 15s
+  jobLabel: rabbitmq-cluster
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: rabbitmq
+      app.kubernetes.io/name: {{ .Release.Name }}-rabbitmq-cluster
+      app.kubernetes.io/part-of: rabbitmq
