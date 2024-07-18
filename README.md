@@ -447,8 +447,7 @@ kubectl exec --namespace zero --stdin --tty "$jumpbox_pod_name" -- /bin/bash
 Download an archive full of witnesses.
 
 ```bash
-pushd /tmp
-curl -L --output witnesses.xz https://cf-ipfs.com/ipfs/QmTk9TyuFwA7rjPh1u89oEp8shpFUtcdXuKRRySZBfH1Pu
+curl -L --output /tmp/witnesses.xz https://cf-ipfs.com/ipfs/QmTk9TyuFwA7rjPh1u89oEp8shpFUtcdXuKRRySZBfH1Pu
 mkdir -p /tmp/witnesses
 tar --extract --file=/tmp/witnesses.xz --directory=/tmp/witnesses --strip-components=1 --checkpoint=10000 --checkpoint-action=dot
 ```
