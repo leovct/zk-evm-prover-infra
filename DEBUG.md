@@ -56,7 +56,7 @@ mkdir -p /tmp/witnesses
 tar --extract --file=/tmp/witnesses.xz --directory=/tmp/witnesses --strip-components=1 --checkpoint=10000 --checkpoint-action=dot
 ```
 
-Sort the witnesses by size.
+Sort the Cancun witnesses by size.
 
 ```bash
 $ ls -lS /tmp/witnesses/*.witness.json | sort -k5,5n | head -n 5
@@ -65,6 +65,22 @@ $ ls -lS /tmp/witnesses/*.witness.json | sort -k5,5n | head -n 5
 -rw-r--r-- 1 root root   838553 Jul  5 17:25 /tmp/witnesses/20241781.witness.json
 -rw-r--r-- 1 root root  1214437 Jul  5 16:33 /tmp/witnesses/20241522.witness.json
 -rw-r--r-- 1 root root  1363052 Jul  5 18:10 /tmp/witnesses/20242010.witness.json
+```
+
+Also download a few Shanghai witnesses, just for the sake of testing.
+
+```bash
+mkdir /tmp/zero-prover-infra
+git clone https://github.com/leovct/zero-prover-infra.git /tmp/zero-prover-infra
+```
+
+Sort the Shanghai witnesses by size.
+
+```bash
+$ ls -lS /tmp/zero-prover-infra/witnesses/shanghai/*.witness.json | sort -k5,5n | head -n 5
+-rw-r--r-- 1 root root  981937 Jul 18 16:18 /tmp/zero-prover-infra/witnesses/shanghai/19240705.witness.json
+-rw-r--r-- 1 root root 4767334 Jul 18 16:18 /tmp/zero-prover-infra/witnesses/shanghai/19240718.witness.json
+-rw-r--r-- 1 root root 5673475 Jul 18 16:18 /tmp/zero-prover-infra/witnesses/shanghai/19240663.witness.json
 ```
 
 ### v0.5.0
@@ -193,6 +209,76 @@ Stack backtrace:
   19: _start
 ```
 
+A last attempt with a small Shanghai witness, `19240705.witness.json`.
+
+```bash
+witness_file="/tmp/zero-prover-infra/witnesses/shanghai/19240705.witness.json"
+env RUST_BACKTRACE=full \
+  RUST_LOG=debug \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
+```
+
+The worker fails immediatly without starting to work on the proof.
+
+```bash
+2024-07-18T16:20:31.513659Z DEBUG lapin::channels: create channel id=0
+2024-07-18T16:20:31.532957Z DEBUG lapin::channels: create channel
+2024-07-18T16:20:31.532971Z DEBUG lapin::channels: create channel id=1
+2024-07-18T16:20:31.541737Z ERROR lapin::io_loop: error doing IO error=IOError(Custom { kind: Other, error: "A Tokio 1.x context was found, but it is being shutdown." })
+2024-07-18T16:20:31.541774Z ERROR lapin::channels: Connection error error=IO error: A Tokio 1.x context was found, but it is being shutdown.
+Error: invalid type: map, expected a sequence at line 1 column 0
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: leader::main::{{closure}}
+   2: tokio::runtime::park::CachedParkThread::block_on
+   3: leader::main
+   4: std::sys::backtrace::__rust_begin_short_backtrace
+   5: std::rt::lang_start::{{closure}}
+   6: std::rt::lang_start_internal
+   7: main
+   8: __libc_start_main
+   9: _start
+```
+
+A very last attempt with another Shanghai witness, `19240718.witness.json`.
+
+```bash
+witness_file="//tmp/zero-prover-infra/witnesses/shanghai/19240718.witness.json"
+env RUST_BACKTRACE=full \
+  RUST_LOG=debug \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
+```
+
+Same error.
+
+```bash
+2024-07-18T16:21:59.760895Z DEBUG lapin::channels: create channel id=0
+2024-07-18T16:21:59.779171Z DEBUG lapin::channels: create channel
+2024-07-18T16:21:59.779186Z DEBUG lapin::channels: create channel id=1
+2024-07-18T16:21:59.792198Z ERROR lapin::io_loop: error doing IO error=IOError(Custom { kind: Other, error: "A Tokio 1.x context was found, but it is being shutdown." })
+2024-07-18T16:21:59.792221Z ERROR lapin::channels: Connection error error=IO error: A Tokio 1.x context was found, but it is being shutdown.
+Error: invalid type: map, expected a sequence at line 1 column 0
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: leader::main::{{closure}}
+   2: tokio::runtime::park::CachedParkThread::block_on
+   3: leader::main
+   4: std::sys::backtrace::__rust_begin_short_backtrace
+   5: std::rt::lang_start::{{closure}}
+   6: std::rt::lang_start_internal
+   7: main
+   8: __libc_start_main
+   9: _start
+```
+
 ### v0.6.0
 
 For these experiments, we use `zk_evm:v0.6.0`.
@@ -312,4 +398,63 @@ Stack backtrace:
   18: main
   19: __libc_start_main
   20: _start
+```
+
+A last attempt with a small Shanghai witness, `19240705.witness.json`.
+
+```bash
+witness_file="/tmp/zero-prover-infra/witnesses/shanghai/19240705.witness.json"
+env RUST_BACKTRACE=full \
+  RUST_LOG=debug \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
+```
+
+The worker fails immediatly without starting to work on the proof.
+
+```bash
+witness_file="/tmp/zero-prover-infra/witnesses/shanghai/19240705.witness.json"
+env RUST_BACKTRACE=full \
+  RUST_LOG=debug \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
+```
+
+A very last attempt with another Shanghai witness, `19240718.witness.json`.
+
+```bash
+witness_file="//tmp/zero-prover-infra/witnesses/shanghai/19240718.witness.json"
+env RUST_BACKTRACE=full \
+  RUST_LOG=debug \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
+```
+
+Same error.
+
+```bash
+2024-07-18T16:25:13.891970Z DEBUG lapin::channels: create channel id=0
+2024-07-18T16:25:13.911392Z DEBUG lapin::channels: create channel
+2024-07-18T16:25:13.911406Z DEBUG lapin::channels: create channel id=1
+2024-07-18T16:25:13.924580Z ERROR lapin::io_loop: error doing IO error=IOError(Custom { kind: Other, error: "A Tokio 1.x context was found, but it is being shutdown." })
+2024-07-18T16:25:13.924601Z ERROR lapin::channels: Connection error error=IO error: A Tokio 1.x context was found, but it is being shutdown.
+Error: invalid type: map, expected a sequence at line 1 column 0
+
+Stack backtrace:
+   0: anyhow::error::<impl core::convert::From<E> for anyhow::Error>::from
+   1: leader::main::{{closure}}
+   2: tokio::runtime::park::CachedParkThread::block_on
+   3: leader::main
+   4: std::sys::backtrace::__rust_begin_short_backtrace
+   5: std::rt::lang_start::{{closure}}
+   6: std::rt::lang_start_internal
+   7: main
+   8: __libc_start_main
+   9: _start
 ```
