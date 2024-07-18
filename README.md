@@ -161,6 +161,13 @@ open http://localhost:15672/
 
 ![rabbitmq-ui](./docs/rabbitmq-ui.png)
 
+Here are some useful links to monitor state of the cluster once ports have been forwarded:
+
+- [Grafana Dashboard to Monitor Kubernetes Cluster Metrics](http://localhost:3000/d/200ac8fdbfbb74b39aff88118e4d1c2c/kubernetes-compute-resources-node-pods?orgId=1&refresh=10s&var-datasource=default&var-cluster=&var-node=gke-leovct-test-02-g-highmem-node-poo-3ab4621a-pnjh)
+- [Grafana Dashboard to Monitor RabbitMQ Metrics](http://localhost:3000/d/Kn5xm-gZk/rabbitmq-overview?orgId=1&refresh=15s)
+- [RabbitMQ Management UI](http://localhost:15672/#/queues)
+- [Prometheus Web UI](http://localhost:9090/graph?g0.expr=kube_pod_container_status_restarts_total%7Bpod%3D~%22.*zk-evm-worker.*%22%7D&g0.tab=1&g0.display_mode=lines&g0.show_exemplars=0&g0.range_input=1h)
+
 If you ever need to update the stack, you can use the following command.
 
 ```bash
