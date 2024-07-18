@@ -1,8 +1,8 @@
-# Type 1 Prover Configuration
-worker:
-  # The Docker image for the worker.
-  image: leovct/zk_evm:v0.6.0
+# The docker image for zk_evm.
+zk_evm_image: leovct/zk_evm:v0.6.0
 
+# Type 1 Prover - Worker Configuration
+worker:
   # Enable or disable the HPA worker autoscaler.
   # If disabled, the number of workers deployed will be set according to `minWorkerCount`.
   autoscaler: false
@@ -18,15 +18,16 @@ worker:
   resources:
     # Resource requests are used by the Kubernetes scheduler to decide which node to place the pod on.
     requests:
-      # We set the memory request to 300Mi so that we can have at least 4 workers on a node with 1.4Ti memory.
-      memory: "300Mi"
-      cpu: "250m" # TODO: Update this value based on our requirements.
+      # We set the memory request to 300M so that we can have at least 4 workers on a node with 1.4T memory.
+      memory: "1G"
+      cpu: "2" # TODO: Update this value based on our requirements.
 
     # Resource limits are enforced by the Kubernetes kubelet to prevent containers from using more resources than specified.
     limits:
-      # We set the memory limit to 1Ti. A worker should not need more memory than this under normal circumstances.
-      memory: "240G"
-      cpu: "40" # TODO: Update this value based on our requirements.
+      # We set the memory limit to 1T. A worker should not need more memory than this under normal circumstances.
+      #memory: "240G"
+      memory: "1T"
+      cpu: "180"
 
 # RabbitMQ Configuration
 rabbitmq:

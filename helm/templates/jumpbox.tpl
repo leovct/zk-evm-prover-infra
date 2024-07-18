@@ -15,6 +15,5 @@ spec:
       containers:
       - name: jumpbox
         image: {{ .Values.jumpbox.image }}
-        imagePullPolicy: Always
         command: [ "sleep" ]
         args: [ "infinity" ]

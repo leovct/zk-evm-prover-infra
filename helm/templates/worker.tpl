@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-worker
+  name: {{ .Release.Name }}-zk-evm-worker
 spec:
   # The number of replicas should be set to zero (or one?) as it is managed by the HPA.
   replicas: {{ if .Values.worker.autoscaler }}1{{- else }}{{ .Values.worker.minWorkerCount }}{{- end }}
@@ -15,8 +15,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: {{ .Values.worker.image }}
-        imagePullPolicy: Always
+        image: {{ .Values.zk_evm_image }}
         command: ["worker"]
         args:
         - "--runtime=amqp"
