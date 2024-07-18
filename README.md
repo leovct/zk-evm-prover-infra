@@ -307,9 +307,8 @@ Download an archive full of witnesses.
 ```bash
 pushd /tmp
 curl -L --output witnesses.xz https://cf-ipfs.com/ipfs/QmTk9TyuFwA7rjPh1u89oEp8shpFUtcdXuKRRySZBfH1Pu
-mkdir /tmp/witnesses
+mkdir -p /tmp/witnesses
 tar --extract --file=/tmp/witnesses.xz --directory=/tmp/witnesses --strip-components=1 --checkpoint=10000 --checkpoint-action=dot
-rm /tmp/witnesses.xz
 ```
 
 > Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node! We will skip this part for the moment.
