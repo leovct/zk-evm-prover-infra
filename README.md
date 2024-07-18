@@ -133,13 +133,24 @@ Your cluster should now be ready to prove blocks!
 You can observe cluster metrics using [Grafana](https://grafana.com/). To access it, execute two separate commands in different terminal sessions. When prompted for login information, enter `admin` as the username and `prom-operator` as the password.
 
 ```bash
-kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operator-grafana 3000:http-web
+kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operator-grafana 3000:http-web &
 open http://localhost:3000/
 ```
 
 ![cluster-metrics](./docs/cluster-metrics.png)
 
 Add this handy [dashboard](https://grafana.com/grafana/dashboards/10991-rabbitmq-overview/) to monitor the state of the RabbitMQ Cluster. You can import the dashboard by specifying the dashboard ID `10991`.
+
+![rabbitmq-metrics](./docs/rabbitmq-metrics.png)
+
+You can also log into the RabbitMQ management interface using `guest` credentials as username and password.
+
+```bash
+kubectl port-forward --namespace zero --address localhost service/test-rabbitmq-cluster 15672:management &
+open http://localhost:15672/
+```
+
+![rabbitmq-ui](./docs/rabbitmq-ui.png)
 
 If you ever need to update the stack, you can use the following command.
 
