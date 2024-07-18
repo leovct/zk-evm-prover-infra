@@ -17,10 +17,10 @@ worker:
 
   resources:
     # Resource requests are used by the Kubernetes scheduler to decide which node to place the pod on.
-    # requests:
-    #   # We set the memory request to 300M so that we can have at least 4 workers on a node with 1.4T memory.
-    #   memory: "1G"
-    #   cpu: "2" # TODO: Update this value based on our requirements.
+    requests:
+      # We set the memory request to 300M so that we can have at least 4 workers on a node with 1.4T memory.
+      memory: "1G"
+      cpu: "2" # TODO: Update this value based on our requirements.
 
     # Resource limits are enforced by the Kubernetes kubelet to prevent containers from using more resources than specified.
     limits:
