@@ -246,7 +246,7 @@ Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovc
 You can observe cluster metrics using [Grafana](https://grafana.com/). To access it, execute two separate commands in different terminal sessions. When prompted for login information, enter `admin` as the username and `prom-operator` as the password.
 
 ```bash
-kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operator-grafana 3000:http-web &
+kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operator-grafana 3000:http-web
 open http://localhost:3000/
 ```
 
@@ -259,7 +259,7 @@ Add this handy [dashboard](https://grafana.com/grafana/dashboards/10991-rabbitmq
 It's also possible to access Prometheus web interface.
 
 ```bash
-kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operated 9090:http-web &
+kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operated 9090:http-web
 open http://localhost:9090/
 ```
 
@@ -268,7 +268,7 @@ open http://localhost:9090/
 Finally, you can log into the RabbitMQ management interface using `guest` credentials as username and password.
 
 ```bash
-kubectl port-forward --namespace zero --address localhost service/test-rabbitmq-cluster 15672:management &
+kubectl port-forward --namespace zero --address localhost service/test-rabbitmq-cluster 15672:management
 open http://localhost:15672/
 ```
 
