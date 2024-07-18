@@ -123,7 +123,7 @@ helm search hub kube-prometheus-stack --output yaml | yq '.[] | select(.reposito
 Finally, deploy the [zero-prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
 
 ```bash
-helm install test --namespace zero --create-namespace helm
+helm install test --namespace zero --create-namespace ./helm
 ```
 
 Your cluster should now be ready to prove blocks!
@@ -133,11 +133,33 @@ Your cluster should now be ready to prove blocks!
 You can observe cluster metrics using [Grafana](https://grafana.com/). To access it, execute two separate commands in different terminal sessions. When prompted for login information, enter `admin` as the username and `prom-operator` as the password.
 
 ```bash
-kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operator-grafana 3000:http-web
+kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operator-grafana 3000:http-web &
 open http://localhost:3000/
 ```
 
 ![cluster-metrics](./docs/cluster-metrics.png)
+
+Add this handy [dashboard](https://grafana.com/grafana/dashboards/10991-rabbitmq-overview/) to monitor the state of the RabbitMQ Cluster. You can import the dashboard by specifying the dashboard ID `10991`.
+
+![rabbitmq-metrics](./docs/rabbitmq-metrics.png)
+
+It's also possible to access Prometheus web interface.
+
+```bash
+kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operated 9090:http-web &
+open http://localhost:9090/
+```
+
+![prometheus-ui](./docs/prometheus-ui.png)
+
+Finally, you can log into the RabbitMQ management interface using `guest` credentials as username and password.
+
+```bash
+kubectl port-forward --namespace zero --address localhost service/test-rabbitmq-cluster 15672:management &
+open http://localhost:15672/
+```
+
+![rabbitmq-ui](./docs/rabbitmq-ui.png)
 
 If you ever need to update the stack, you can use the following command.
 
@@ -305,9 +327,8 @@ Download an archive full of witnesses.
 ```bash
 pushd /tmp
 curl -L --output witnesses.xz https://cf-ipfs.com/ipfs/QmTk9TyuFwA7rjPh1u89oEp8shpFUtcdXuKRRySZBfH1Pu
-mkdir /tmp/witnesses
+mkdir -p /tmp/witnesses
 tar --extract --file=/tmp/witnesses.xz --directory=/tmp/witnesses --strip-components=1 --checkpoint=10000 --checkpoint-action=dot
-rm /tmp/witnesses.xz
 ```
 
 > Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node! We will skip this part for the moment.
@@ -315,13 +336,13 @@ rm /tmp/witnesses.xz
 For example, we will attempt to prove `20242200.witness.json`.
 
 ```bash
+witness_file="/tmp/witnesses/20242200.witness.json"
 env RUST_BACKTRACE=full \
-  RUST_LOG=info \
+  RUST_LOG=debug \
   leader \
   --runtime=amqp \
   --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
-  stdio \
-  < "/tmp/witnesses/20242200.witness.json"
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
 ```
 
 You can check the content of `/home/data/proof-0001.leader.out` or you can extract the proof and run the `verifier`.
