@@ -70,7 +70,11 @@ variable "highmem_pool_node_count" {
 variable "highmem_pool_machine_type" {
   type        = string
   description = "Machine type for nodes in the highmem node pool, optimized for memory-intensive workloads"
-  default     = "c3d-highmem-180" // https://gcloud-compute.com/c3d-highmem-180.html
+  default     = "t2d-standard-32"
+  // https://gcloud-compute.com/instances.html
+  // t2d-standard-60
+  // c3d-highmem-180
+  // c3d-highmem-360
 }
 
 variable "highmem_pool_disk_size_gb" {
