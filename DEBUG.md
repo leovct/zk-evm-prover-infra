@@ -279,6 +279,44 @@ Stack backtrace:
    9: _start
 ```
 
+Other attempts with other witnesses.
+
+```bash
+witness_file="tmp/zero-prover-infra/witnesses/432.erc721.witness.json"
+env RUST_BACKTRACE=full \
+  RUST_LOG=debug \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
+```
+
+TODO
+
+```bash
+witness_file="tmp/zero-prover-infra/witnesses/512.eoa.witness.json"
+env RUST_BACKTRACE=full \
+  RUST_LOG=debug \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
+```
+
+TODO
+
+```bash
+witness_file="tmp/zero-prover-infra/witnesses/512.erc20.witness.json"
+env RUST_BACKTRACE=full \
+  RUST_LOG=debug \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
+```
+
+TODO
+
 ### v0.6.0
 
 For these experiments, we use `zk_evm:v0.6.0`.
@@ -427,7 +465,7 @@ env RUST_BACKTRACE=full \
 A very last attempt with another Shanghai witness, `19240718.witness.json`.
 
 ```bash
-witness_file="//tmp/zero-prover-infra/witnesses/shanghai/19240718.witness.json"
+witness_file="/tmp/zero-prover-infra/witnesses/shanghai/19240718.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \
@@ -458,3 +496,41 @@ Stack backtrace:
    8: __libc_start_main
    9: _start
 ```
+
+Other attempts with other witnesses.
+
+```bash
+witness_file="tmp/zero-prover-infra/witnesses/432.erc721.witness.json"
+env RUST_BACKTRACE=full \
+  RUST_LOG=debug \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
+```
+
+TODO
+
+```bash
+witness_file="tmp/zero-prover-infra/witnesses/512.eoa.witness.json"
+env RUST_BACKTRACE=full \
+  RUST_LOG=debug \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
+```
+
+TODO
+
+```bash
+witness_file="tmp/zero-prover-infra/witnesses/512.erc20.witness.json"
+env RUST_BACKTRACE=full \
+  RUST_LOG=debug \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
+```
+
+TODO
