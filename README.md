@@ -139,6 +139,8 @@ open http://localhost:3000/
 
 ![cluster-metrics](./docs/cluster-metrics.png)
 
+Add this handy [dashboard](https://grafana.com/grafana/dashboards/10991-rabbitmq-overview/) to monitor the state of the RabbitMQ Cluster. You can import the dashboard by specifying the dashboard ID `10991`.
+
 If you ever need to update the stack, you can use the following command.
 
 ```bash
