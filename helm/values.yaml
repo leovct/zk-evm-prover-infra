@@ -1,11 +1,6 @@
 # The docker image for zk_evm.
 zk_evm_image: leovct/zk_evm:v0.6.0
 
-# Type 1 Prover - Leader Configuration
-leader:
-  # The port on which to listen to for proof inputs.
-  http: 8080
-
 # Type 1 Prover - Worker Configuration
 worker:
   # The Docker image for the worker.
