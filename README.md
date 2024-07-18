@@ -336,14 +336,13 @@ tar --extract --file=/tmp/witnesses.xz --directory=/tmp/witnesses --strip-compon
 For example, we will attempt to prove `20242200.witness.json`.
 
 ```bash
+witness_file="/tmp/witnesses/20242200.witness.json"
 env RUST_BACKTRACE=full \
-  RUST_LOG=info \
+  RUST_LOG=debug \
   leader \
   --runtime=amqp \
   --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
-  stdio \
-  < "/tmp/witnesses/20242200.witness.json" \
-  > /tmp/20242200.leader.out
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
 ```
 
 You can check the content of `/home/data/proof-0001.leader.out` or you can extract the proof and run the `verifier`.
