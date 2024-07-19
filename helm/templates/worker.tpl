@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-zk-evm-worker
 spec:
-  # The number of replicas should be set to zero (or one?) as it is managed by the HPA.
+  # The number of replicas should be set to one as it is managed by the HPA.
   replicas: {{ if .Values.worker.autoscaler }}1{{- else }}{{ .Values.worker.minWorkerCount }}{{- end }}
   selector:
     matchLabels:
@@ -29,19 +29,19 @@ spec:
         - name: RUST_MIN_STACK
           value: "33554432"
         - name: ARITHMETIC_CIRCUIT_SIZE
-          value: "15..28"
+          value: "16..21" # "15..28"
         - name: BYTE_PACKING_CIRCUIT_SIZE
-          value: "9..28"
+          value: "9..21" # "9..28"
         - name: CPU_CIRCUIT_SIZE
-          value: "12..28"
+          value: "12..23" # "12..28"
         - name: KECCAK_CIRCUIT_SIZE
-          value: "14..28"
+          value: "14..19" # "14..28"
         - name: KECCAK_SPONGE_CIRCUIT_SIZE
-          value: "9..28"
+          value: "9..15" # "9..28"
         - name: LOGIC_CIRCUIT_SIZE
-          value: "12..28"
+          value: "12..18" # "12..28"
         - name: MEMORY_CIRCUIT_SIZE
-          value: "17..30"
+          value: "17..25" # "17..30"
         volumeMounts:
         - name: circuits
           mountPath: /circuits
