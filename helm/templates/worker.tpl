@@ -55,7 +55,7 @@ data:
     SUCCESS_MESSAGE1="saving preprocessed circuits to disk"
     SUCCESS_MESSAGE2="successfully loaded preprocessed circuits from disk"
     while true; do
-      if grep -qE "$SUCCESS_MESSAGE1\|$SUCCESS_MESSAGE2" /tmp/worker.log; then
+      if grep -q "$SUCCESS_MESSAGE1" /tmp/worker.log || grep -q "$SUCCESS_MESSAGE2" /tmp/worker.log; then
         echo "Circuits initialization complete"
         touch /circuits/.initialized
         exit 0
