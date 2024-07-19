@@ -1,5 +1,6 @@
 # The docker image for zk_evm.
 zk_evm_image: leovct/zk_evm:v0.6.0
+#zk_evm_image: nulyjkdhthz/zk_evm:b7cea483-native
 
 # Type 1 Prover - Worker Configuration
 worker:
@@ -18,22 +19,19 @@ worker:
   resources:
     # Resource requests are used by the Kubernetes scheduler to decide which node to place the pod on.
     requests:
-      # We set the memory request to 300M so that we can have at least 4 workers on a node with 1.4T memory.
-      memory: "1G"
-      cpu: "2" # TODO: Update this value based on our requirements.
+      memory: "24G"
+      cpu: "5"
 
     # Resource limits are enforced by the Kubernetes kubelet to prevent containers from using more resources than specified.
     limits:
-      # We set the memory limit to 1T. A worker should not need more memory than this under normal circumstances.
-      #memory: "240G"
-      memory: "1T"
-      cpu: "180"
+      memory: "220G"
+      cpu: "50"
 
 # RabbitMQ Configuration
 rabbitmq:
   cluster:
     # The Docker image for RabbitMQ.
-    image: rabbitmq:3.13.3
+    image: rabbitmq:3.13
 
     # The number of nodes in the RabbitMQ cluster.
     # It is recommended to use an odd number of nodes for better fault tolerance.
@@ -56,3 +54,4 @@ rabbitmq:
 jumpbox:
   # The Docker image for the jumpbox (a secure entrypoint for accessing the cluster).
   image: leovct/zero-jumpbox:v0.6.0
+  #image: leovct/zero-jumpbox:latest
