@@ -1,3 +1,73 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-init-circuits
+spec:
+  template:
+    spec:
+      containers:
+      - name: init-circuits
+        image: {{ .Values.jumpbox.image }}
+        command: ["/bin/sh", "/scripts/init-circuits.sh"]
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-worker-cm
+        volumeMounts:
+        - name: init-scripts
+          mountPath: /scripts
+        - name: circuits
+          mountPath: /circuits
+      restartPolicy: OnFailure
+      volumes:
+      - name: init-scripts
+        configMap:
+          name: {{ .Release.Name }}-circuits-init-scripts
+      - name: circuits
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-worker-circuits-pvc
+      nodeSelector:
+        cloud.google.com/gke-nodepool: highmem-node-pool
+      tolerations:
+      - key: "highmem"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-circuits-init-scripts
+data:
+  init-circuits.sh: |
+    #!/bin/sh
+
+    # Check if the circuits are already initialized
+    if [ -f /circuits/.initialized ]; then
+      echo "Circuits already initialized"
+      exit 0
+    fi
+
+    # Run the worker command in the background and capture its output
+    worker {{ join " " .Values.worker.flags }} 2>&1 | tee /tmp/worker.log &
+    WORKER_PID=$!
+
+    SUCCESS_MESSAGE="successfully loaded preprocessed circuits from disk"
+    while true; do
+      if grep -q "$SUCCESS_MESSAGE" /tmp/worker.log; then
+        echo "Circuits initialization complete"
+        touch /circuits/.initialized
+        exit 0
+      fi
+      if ! ps -p $WORKER_PID > /dev/null; then
+        echo "Worker process terminated unexpectedly"
+        exit 1
+      fi
+      sleep 10
+    done
+
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -13,40 +83,33 @@ spec:
       labels:
         app: worker
     spec:
+      initContainers:
+      - name: check-initialization
+        image: busybox
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          while [ ! -f /circuits/.initialized ]; do
+            echo "Waiting for circuits initialization to complete..."
+            sleep 10
+          done
+        volumeMounts:
+        - name: circuits
+          mountPath: /circuits
+
       containers:
       - name: worker
         image: {{ .Values.zk_evm_image }}
         command: ["worker"]
         args:
-        - "--serializer=postcard"
-        - "--runtime=amqp"
-        - "--persistence=disk"
-        - "--load-strategy=on-demand"
-        env:
-        - name: AMQP_URI
-          value: {{ printf "amqp://%s:%s@%s-rabbitmq-cluster.%s.svc.cluster.local:5672" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Name .Release.Namespace }}
-        - name: RUST_BACKTRACE
-          value: full
-        - name: RUST_LOG
-          value: info
-        - name: RUST_MIN_STACK
-          value: "33554432"
-        # Recommended circuit sizes by Robin.
-        # https://0xpolygon.slack.com/archives/C0772FWR8D7/p1721390017860929?thread_ts=1721348826.760799&cid=C0772FWR8D7
-        - name: ARITHMETIC_CIRCUIT_SIZE
-          value: "16..25"
-        - name: BYTE_PACKING_CIRCUIT_SIZE
-          value: "8..25"
-        - name: CPU_CIRCUIT_SIZE
-          value: "12..27"
-        - name: KECCAK_CIRCUIT_SIZE
-          value: "14..25"
-        - name: KECCAK_SPONGE_CIRCUIT_SIZE
-          value: "9..20"
-        - name: LOGIC_CIRCUIT_SIZE
-          value: "12..25"
-        - name: MEMORY_CIRCUIT_SIZE
-          value: "17..28"
+        {{- with .Values.worker.flags }}
+        {{- range . }}
+        - {{ . }}
+        {{- end }}
+        {{- end }}
+        envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-worker-cm
         volumeMounts:
         - name: circuits
           mountPath: /circuits
@@ -71,6 +134,18 @@ spec:
         operator: "Equal"
         value: "true"
         effect: "NoSchedule"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-worker-cm
+data:
+  AMQP_URI: {{ printf "amqp://%s:%s@%s-rabbitmq-cluster.%s.svc.cluster.local:5672" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Name .Release.Namespace }}
+  {{- range $key, $value := .Values.worker.env }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}
+
 
 ---
 apiVersion: v1

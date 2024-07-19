@@ -15,16 +15,38 @@ worker:
   # We start with 2 nodes, so we limit the maximum workers to 8 (4 per node).
   maxWorkerCount: 8
 
+  # Worker flags.
+  flags:
+    - --serializer=postcard
+    - --runtime=amqp
+    - --persistence=disk
+    - --load-strategy=on-demand
+
+  # Worker environment variables.
+  env:
+    RUST_BACKTRACE: full
+    RUST_LOG: info
+    RUST_MIN_STACK: 33554432
+    # Recommended circuit sizes by Robin.
+    # https://0xpolygon.slack.com/archives/C0772FWR8D7/p1721390017860929?thread_ts=1721348826.760799&cid=C0772FWR8D7
+    ARITHMETIC_CIRCUIT_SIZE: 16..25
+    BYTE_PACKING_CIRCUIT_SIZE: 8..25
+    CPU_CIRCUIT_SIZE: 12..27
+    KECCAK_CIRCUIT_SIZE: 14..25
+    KECCAK_SPONGE_CIRCUIT_SIZE: 9..20
+    LOGIC_CIRCUIT_SIZE: 12..25
+    MEMORY_CIRCUIT_SIZE: 17..28
+
   resources:
     # Resource requests are used by the Kubernetes scheduler to decide which node to place the pod on.
     requests:
-      memory: "24G"
-      cpu: "5"
+      memory: 24G
+      cpu: 5
 
     # Resource limits are enforced by the Kubernetes kubelet to prevent containers from using more resources than specified.
     limits:
-      memory: "220G"
-      cpu: "50"
+      memory: 220G
+      cpu: 50
 
 # RabbitMQ Configuration
 rabbitmq:
