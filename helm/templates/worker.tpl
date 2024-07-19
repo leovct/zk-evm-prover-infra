@@ -52,7 +52,7 @@ data:
     worker {{ join " " .Values.worker.flags }} 2>&1 | tee /tmp/worker.log &
     WORKER_PID=$!
 
-    SUCCESS_MESSAGE="successfully loaded preprocessed circuits from disk"
+    SUCCESS_MESSAGE="saving preprocessed circuits to disk"
     while true; do
       if grep -q "$SUCCESS_MESSAGE" /tmp/worker.log; then
         echo "Circuits initialization complete"
