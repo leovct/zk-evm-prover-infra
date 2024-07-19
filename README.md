@@ -48,6 +48,8 @@ terraform apply
 popd
 ```
 
+It takes around 10 minutes for the infrastructure to be deployed and fully operational.
+
 With the above instructions, you should have a setup that mimics the below requirements:
 
 - A VPC and a subnet
