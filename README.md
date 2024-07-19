@@ -157,6 +157,8 @@ Finally, deploy the [zero-prover](https://github.com/0xPolygonZero/zk_evm/tree/d
 helm install test --namespace zero --create-namespace ./helm
 ```
 
+It should take a few minutes for the worker pods to be ready. This is because a job called `test-init-circuits` will first start and generate all the zk circuits needed by the workers. Meanwhile, the worker pods do not start, they wait for the circuits to be generated. Once the task has finished and the job has succeeded, the worker pods finally start and load the circuits.
+
 Your cluster should now be ready to prove blocks!
 
 ![cluster-ready](./docs/cluster-ready.png)
