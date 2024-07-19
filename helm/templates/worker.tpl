@@ -28,20 +28,22 @@ spec:
           value: info
         - name: RUST_MIN_STACK
           value: "33554432"
+        # Recommended circuit sizes by Robin.
+        # https://0xpolygon.slack.com/archives/C0772FWR8D7/p1721390017860929?thread_ts=1721348826.760799&cid=C0772FWR8D7
         - name: ARITHMETIC_CIRCUIT_SIZE
-          value: "16..21" # "15..28"
+          value: "16..25"
         - name: BYTE_PACKING_CIRCUIT_SIZE
-          value: "9..21" # "9..28"
+          value: "8..25"
         - name: CPU_CIRCUIT_SIZE
-          value: "12..23" # "12..28"
+          value: "12..27"
         - name: KECCAK_CIRCUIT_SIZE
-          value: "14..19" # "14..28"
+          value: "14..25"
         - name: KECCAK_SPONGE_CIRCUIT_SIZE
-          value: "9..15" # "9..28"
+          value: "9..20"
         - name: LOGIC_CIRCUIT_SIZE
-          value: "12..18" # "12..28"
+          value: "12..25"
         - name: MEMORY_CIRCUIT_SIZE
-          value: "17..25" # "17..30"
+          value: "17..28"
         volumeMounts:
         - name: circuits
           mountPath: /circuits
