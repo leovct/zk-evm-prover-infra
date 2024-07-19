@@ -18,7 +18,10 @@ spec:
         image: {{ .Values.zk_evm_image }}
         command: ["worker"]
         args:
+        - "--serializer=postcard"
         - "--runtime=amqp"
+        - "--persistence=disk"
+        - "--load-strategy=on-demand"
         env:
         - name: AMQP_URI
           value: {{ printf "amqp://%s:%s@%s-rabbitmq-cluster.%s.svc.cluster.local:5672" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Name .Release.Namespace }}
