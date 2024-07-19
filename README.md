@@ -94,6 +94,14 @@ Make sure you have access to the GKE cluster you just created. It should list th
 kubectl get nodes
 ```
 
+You should see at least two nodes. There may be more if you have updated the terraform configuration.
+
+```bash
+NAME                                                  STATUS   ROLES    AGE     VERSION
+gke-leovct-test-01-g-default-node-poo-9faa7f06-b0q6   Ready    <none>   10m     v1.29.6-gke.1038001
+gke-leovct-test-01-g-highmem-node-poo-c5b7d8d5-ms62   Ready    <none>   8m12s   v1.29.6-gke.1038001
+```
+
 You can now start to use [Lens](https://k8slens.dev/) to visualize and control the Kubernetes cluster.
 
 ![lens-overview](docs/lens-overview.png)
