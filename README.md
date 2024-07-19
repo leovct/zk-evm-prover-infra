@@ -459,61 +459,18 @@ For example, we will attempt to prove the first witness of the archive, `2024103
 ```bash
 witness_file="/tmp/witnesses/20241038.witness.json"
 env RUST_BACKTRACE=full \
-  RUST_LOG=debug \
+  RUST_LOG=info \
   leader \
   --runtime=amqp \
   --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
   stdio < "$witness_file" | tee "$witness_file.leader.out"
 ```
 
-You can check the content of `/home/data/proof-0001.leader.out` or you can extract the proof and run the `verifier`.
+You can check the content of `/tmp/witnesses/20241038.witness.json.leader.out` or you can extract the proof and run the `verifier`.
 
 ```bash
-tail -n1 /home/data/proof-0001.leader.out | jq > /home/data/proof-0001.json
-env RUST_LOG=info verifier --file-path /home/data/proof-0001.json
-```
-
-The `verifier` fails in this case, unfortunately.
-
-```bash
-2024-06-18T00:59:59.440487Z  INFO common::prover_state: initializing verifier state...
-2024-06-18T00:59:59.440547Z  INFO common::prover_state: attempting to load preprocessed verifier circuit from disk...
-2024-06-18T00:59:59.440621Z  INFO common::prover_state: failed to load preprocessed verifier circuit from disk. generating it...
-2024-06-18T01:01:50.693251Z  INFO common::prover_state: saving preprocessed verifier circuit to disk
-2024-06-18T01:01:52.809270Z  INFO verifier: Proof verification failed with error: ProofGenError("Condition failed: `vanishing_polys_zeta [i] == z_h_zeta * reduce_with_powers (chunk, zeta_pow_deg)`")
-```
-
-Note that the `leader` might fail to generate proofs for other types of witnesses. Here is an example.
-
-```bash
-env RUST_BACKTRACE=full RUST_LOG=debug leader \
-  --runtime=amqp \
-  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
-  stdio < /home/data/witness-0034.json
-```
-
-```bash
-2024-06-18T01:11:36.217473Z DEBUG lapin::channels: create channel id=0
-2024-06-18T01:11:36.236822Z DEBUG lapin::channels: create channel
-2024-06-18T01:11:36.236842Z DEBUG lapin::channels: create channel id=1
-2024-06-18T01:11:36.245752Z  INFO prover: Proving block 34
-2024-06-18T01:12:06.237640Z DEBUG lapin::channels: received heartbeat from server
-2024-06-18T01:12:06.252661Z DEBUG lapin::channels: send heartbeat
-2024-06-18T01:12:46.964363Z DEBUG lapin::channels: send heartbeat
-Error: Fatal operation error: "Inconsistent pre-state for first block 0x27d9465f649ad19e7e399a0116be7a0ad9225b44d09455c6e2dfa23487a0fb48 with checkpoint state 0x2dab6a1d6d638955507777aecea699e6728825524facbd446bd4e86d44fa5ecd."
-
-Stack backtrace:
-   0: anyhow::kind::Adhoc::new
-   1: <futures_util::stream::stream::map::Map<St,F> as futures_core::stream::Stream>::poll_next
-   2: paladin::directive::literal::functor::<impl paladin::directive::Functor<B> for paladin::directive::literal::Literal<A>>::f_map::{{closure}}
-   3: <paladin::directive::Map<Op,D> as paladin::directive::Directive>::run::{{closure}}
-   4: prover::BlockProverInput::prove::{{closure}}
-   5: leader::main::{{closure}}
-   6: leader::main
-   7: std::sys_common::backtrace::__rust_begin_short_backtrace
-   8: main
-   9: __libc_start_main
-  10: _start
+tail -n1 /tmp/witnesses/20241038.witness.json.leader.out | jq > /tmp/witnesses/20241038.proof.json
+env RUST_LOG=info verifier --file-path /tmp/witnesses/20241038.proof.json
 ```
 
 ## TODOs
