@@ -121,6 +121,8 @@ helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
 
 Then, install [KEDA](https://keda.sh/), the Kubernetes Event-Driven Autoscaler containing the [RabbitMQ Queue](https://www.rabbitmq.com/kubernetes/operator/operator-overview) HPA ([Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)).
 
+> This component is not needed if you don't want to use the worker autoscaler.
+
 ```bash
 helm repo add kedacore https://kedacore.github.io/charts
 helm repo update
