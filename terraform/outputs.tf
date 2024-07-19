@@ -18,17 +18,7 @@ output "kubernetes_cluster_name" {
   description = "The name of the GKE cluster"
 }
 
-output "kubernetes_cluster_host" {
-  value       = google_container_cluster.primary.endpoint
-  description = "The IP address of the GKE cluster's Kubernetes master"
-}
-
 output "kubernetes_version" {
   value       = google_container_cluster.primary.master_version
   description = "The Kubernetes version of the master"
-}
-
-output "node_pools" {
-  value       = google_container_cluster.primary.node_pool[*].name
-  description = "The names of the node pools in the GKE cluster"
 }
