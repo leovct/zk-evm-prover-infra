@@ -454,10 +454,10 @@ tar --extract --file=/tmp/witnesses.xz --directory=/tmp/witnesses --strip-compon
 
 > Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node! We will skip this part for the moment.
 
-For example, we will attempt to prove `20242200.witness.json`.
+For example, we will attempt to prove the first witness of the archive, `20241038.witness.json`.
 
 ```bash
-witness_file="/tmp/witnesses/20242200.witness.json"
+witness_file="/tmp/witnesses/20241038.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \
