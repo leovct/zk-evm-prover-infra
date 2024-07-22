@@ -494,6 +494,14 @@ env RUST_BACKTRACE=full \
   stdio < "$witness_file" | tee "$witness_file.leader.out"
 ```
 
+This is a challenging witness to prove because it contains many transactions (164) and some require a huge amount of memory.
+
+You can check the number of transactions in a witness using this handy command.
+
+```bash
+jq '.[0].block_trace.txn_info | length' /tmp/witnesses/20241038.witness.json
+```
+
 You can check the content of `/tmp/witnesses/20241038.witness.json.leader.out` or you can extract the proof and run the `verifier`.
 
 ```bash
