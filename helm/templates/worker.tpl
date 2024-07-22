@@ -94,6 +94,7 @@ spec:
             echo "Waiting for circuits initialization to complete..."
             sleep 10
           done
+          echo "Circuits initialization complete"
         volumeMounts:
         - name: circuits
           mountPath: /circuits
