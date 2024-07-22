@@ -20,7 +20,7 @@ worker:
     - --serializer=postcard
     - --runtime=amqp
     - --persistence=disk
-    - --load-strategy=on-demand
+    - --load-strategy=monolithic
 
   # Worker environment variables.
   env:
