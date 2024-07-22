@@ -56,7 +56,9 @@ data:
     SUCCESS_MESSAGE2="successfully loaded preprocessed circuits from disk"
     while true; do
       if grep -q "$SUCCESS_MESSAGE1" /tmp/worker.log || grep -q "$SUCCESS_MESSAGE2" /tmp/worker.log; then
-        sleep 20
+        echo Waiting 4 minutes to save circuits to disk...
+        sleep 240
+
         echo "Circuits initialization complete"
         touch /circuits/.initialized
         exit 0
