@@ -1,43 +1,79 @@
 #!/bin/bash
-set -uo pipefail
+set -x # Print each command before executing it.
+set -e # Exit immediately if a command exits with a non-zero status.
 
-# List of witness to process.
-witnesses=(/tmp/test-data/432.erc721.witness.json /tmp/test-data/512.eoa.witness.json /tmp/test-data/512.erc20.witness.json)
+# Prove a range of witnesses.
+prove_witness_range() {
+  local start_id=$1
+  local end_id=$2
 
-total_files=${#witnesses[@]}
-successful_proofs=0
-failed_proofs=0
+  # Prove the first witness.
+  prove_initial_witness $start_id
 
-start_time=$(date +%s)
-echo "Starting script at $(date)"
-
-# Function to run to prove a single block, given a witness.
-run_proof() {
-  local witness="$1"
-  echo -e "\n> Generating proof for $witness..."
-  env RUST_BACKTRACE=full RUST_LOG=debug leader \
-    --runtime=amqp \
-    --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
-    stdio < "$witness"
-
-  if [ $? -eq 0 ]; then
-    echo "> Successfully proved $witness"
-    ((successful_proofs++))
-  else
-    echo "> Failed to prove $witness"
-    ((failed_proofs++))
-  fi
+  # Prove the remaining witnesses.
+  for ((witness_id=start_id+1; witness_id<=end_id; witness_id++)); do
+    previous_proof="$WITNESS_DIR/$((witness_id - 1)).witness.json.proof"
+    prove_subsequent_witness $witness_id $previous_proof
+  done
 }
 
-# Generate the proofs using a for loop.
-for witness in "${witnesses[@]}"; do
-  run_proof "$witness"
-done
+# Prove the initial witness, without any previous proof.
+prove_initial_witness() {
+  local witness_id=$1
+  local witness_file="$WITNESS_DIR/$witness_id.witness.json"
+  local leader_output="$witness_file.leader.out"
 
-end_time=$(date +%s)
-duration=$((end_time - start_time))
+  env RUST_BACKTRACE=full RUST_LOG=info \
+    leader \
+    --runtime=amqp \
+    --amqp-uri=$AMQP_URI \
+    stdio < "$witness_file" | tee "$leader_output"
 
-echo -e "\nScript completed in $duration seconds"
-echo "Total files processed: $total_files"
-echo "Successful runs: $successful_proofs"
-echo "Failed runs: $failed_proofs"
+  format_proof "$leader_output" "$witness_file.proof"
+}
+
+# Prove subsequent witnesses, with previous proof.
+prove_subsequent_witness() {
+  local witness_id=$1
+  local previous_proof=$2
+  local witness_file="$WITNESS_DIR/$witness_id.witness.json"
+  local leader_output="$witness_file.leader.out"
+
+  env RUST_BACKTRACE=full RUST_LOG=info \
+    leader \
+    --runtime=amqp \
+    --amqp-uri=$AMQP_URI \
+    stdio \
+    --previous-proof "$previous_proof" < "$witness_file" | tee "$leader_output"
+
+  format_proof "$leader_output" "$witness_file.proof"
+}
+
+# Check if correct number of arguments is provided.
+if [ "$#" -ne 3 ]; then
+  echo "Usage: $0 <witness_directory> <start_witness_id> <end_witness_id>"
+  exit 1
+fi
+
+# Set variables from command line arguments.
+WITNESS_DIR=$1
+START_WITNESS_ID=$2
+END_WITNESS_ID=$3
+AMQP_URI=$4
+
+# Set AMQP URI.
+AMQP_URI="amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672"
+
+# Validate input.
+if [ ! -d "$WITNESS_DIR" ]; then
+  echo "Error: Directory $WITNESS_DIR does not exist."
+  exit 1
+fi
+
+if [ $START_WITNESS_ID -gt $END_WITNESS_ID ]; then
+  echo "Error: Start witness ID must be less than or equal to end witness ID."
+  exit 1
+fi
+
+# Prove witness range.
+prove_witness_range $START_WITNESS_ID $END_WITNESS_ID
