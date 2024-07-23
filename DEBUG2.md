@@ -73,7 +73,9 @@ env RUST_BACKTRACE=full \
   --previous-proof "$previous_proof" < "$witness_file" | tee "$witness_file.leader.out"
 ```
 
-We confirmed the setup works manually! Now, let's use a script to automate the proving of a range of witnesses.
+TODO: Share if this work or not.
+
+Now, let's use a script to automate the proving of a range of witnesses.
 
 ```bash
 ./tmp/zero-prover-infra/tools/prove-witnesses.sh /tmp/witnesses2 20362226 20362237
@@ -89,9 +91,7 @@ However, it's crucial to consider that workers may require substantial memory de
 
 ![cluster-metrics](./debug2-cluster-metrics.png)
 
-## Errors
-
-Fatal error when trying to prove the second block `b20362227`.
+Unfortunately, we hit a atal error when trying to prove the second block `b20362227` of the range...
 
 ```bash
 2024-07-23T13:27:21.356183Z  INFO prover: Proving block 20362227
