@@ -14,6 +14,7 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
   - [Witness Generation](#witness-generation)
   - [Proof Generation](#proof-generation)
 - [TODOs](#todos)
+- [Feedback](#feedback)
 
 ## Architecture Diagram
 
@@ -520,3 +521,59 @@ env RUST_LOG=info verifier --file-path /tmp/witnesses/20241038.proof.json
 - [ ] The setup does not use any `jerrigon` node to generate the witnesses, instead, we provide the witnesses directly to the leader. This should be changed, especially because we would like to be able to follow the tip of the chain. We would then need to detect the new block (and probably introduce some kind of safety mechanism to make sure the block won't get reorged), generate a witness for the block and prove the block using the witness.
 
 - [ ] Provide at the very least `gcloud` commands to create the GKE cluster or a terraform project.
+
+## Feedback
+
+- **Enhance `leader` logs to be more operator-friendly**.
+
+  Currently, the logs lack detailed progress information during the proving process. It would be beneficial to display the progress of the proof, including metrics like the number of transactions proved, total transactions, and time elapsed.
+
+  We should go from this:
+
+  ```bash
+  $ cat /tmp/witnesses/20362226.witness.json.leader.out
+  2024-07-23T12:20:20.216474Z  INFO prover: Proving block 20362226
+  2024-07-23T12:49:39.228506Z  INFO prover: Successfully proved block 20362226
+  2024-07-23T12:49:39.232793Z  INFO leader::stdio: All proofs have been generated successfully.
+  [{"b_height":20362226,"intern":{"proof":{"wires_cap":[{"elements":[4256508008463016688,1783014170904099315,1260603897523273593,8950237682820889684]},{"elements":[15374648482258556351,3883067792593597294,16855708440532655062,892216457806275301]}
+  ...
+  ```
+
+  To something like this:
+
+  ```bash
+  $ cat /tmp/witnesses/20362226.witness.json.leader.out
+  2024-07-23T12:20:20.216474Z  INFO prover: Proving block 20362226 txs_proved=0 total_txs=166 time_spent=0s
+  2024-07-23T12:20:21.216474Z  INFO prover: Proving block 20362226 txs_proved=9 total_txs=166 time_spent=60s
+  2024-07-23T12:20:22.216474Z  INFO prover: Proving block 20362226 txs_proved=23 total_txs=166 time_spent=120s
+  ...
+  2024-07-23T12:49:39.228506Z  INFO prover: Successfully proved block 20362226 txs=166 time_spent=1203s
+  2024-07-23T12:49:39.232793Z  INFO leader::stdio: All proofs have been generated successfully
+  ```
+
+- **Add Proof File Output Flag to `leader` Subcommand**
+
+  Implement a new flag in the `leader` subcommand to enable storing proofs in files instead of outputting them to stdout. This enhancement will improve log readability and simplify proof management by keeping proof data separate from log output. The flag could be something like `--output-proof-file`, allowing users to easily switch between file output and stdout as needed.
+
+- **Enhance `worker` logs to be more operator-friendly**.
+
+  Instead of reporting `id="b20362227 - 79"`, it should report `block_hash=b20362227` and `tx_id=79`.
+
+  ```bash
+  2024-07-23T14:08:04.372779Z  INFO p_gen: evm_arithmetization::generation: CPU trace padded to 131072 cycles     id="b20362227 - 79"
+  ```
+
+- **Add Prometheus metrics to `zero-bin`**
+  - Each metric should be labeled with `block_hash` and `tx_id`.
+  - Relevant metrics could include `witnesses_proved`, `cpu_halts`, `cpu_trace_pads`, `and` trace_lengths.
+
+- **Add Version Subcommand**
+
+  ```bash
+  $ worker --version
+  $ leader --version
+  ```
+
+- **Manage AMQP Cluster State**
+
+  Develop a tool or command to manage the state of the AMQP cluster. This should include capabilities to clear the state of queues or remove specific block proof tasks.
