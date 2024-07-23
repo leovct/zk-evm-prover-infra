@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x # Print each command before executing it.
 set -e # Exit immediately if a command exits with a non-zero status.
 
 # Analyze a range of witnesses.
