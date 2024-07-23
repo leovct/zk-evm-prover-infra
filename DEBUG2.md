@@ -73,7 +73,7 @@ env RUST_BACKTRACE=full \
   --previous-proof "$previous_proof" < "$witness_file" | tee "$witness_file.leader.out"
 ```
 
-TODO: Share if this work or not.
+Unfortunately, we hit a panic error (detailed below).
 
 Now, let's use a script to automate the proving of a range of witnesses.
 
