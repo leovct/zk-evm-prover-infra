@@ -91,14 +91,54 @@ However, it's crucial to consider that workers may require substantial memory de
 
 ## Errors
 
-Fatal error when trying to prove txn `171` of block `b20362227` (second block).
+Fatal error when trying to prove the second block `b20362227`.
 
 ```bash
-2024-07-23T13:22:04.412079Z  INFO p_gen: zero_bin_common::prover_state: using monolithic circuit ProverStateManager { circuit_config: CircuitConfig { circuits: [16..25, 8..25, 12..27, 14..25, 9..20, 12..25, 17..28] }, persistence: Disk(Monolithic) } id="b20362227 - 171"
-2024-07-23T13:22:06.431044Z  INFO p_gen: evm_arithmetization::generation::state: CPU halted after 514448 cycles     id="b20362227 - 171"
-2024-07-23T13:22:06.435273Z  INFO p_gen: evm_arithmetization::generation: CPU trace padded to 524288 cycles     id="b20362227 - 171"
-2024-07-23T13:22:06.436028Z  INFO p_gen: evm_arithmetization::generation: Trace lengths (before padding): TraceCheckpoint { arithmetic_len: 86735, byte_packing_len: 7438, cpu_len: 524288, keccak_len: 41688, keccak_sponge_len: 1737, logic_len: 17277, memory_len: 1581343 }     id="b20362227 - 171"
-2024-07-23T13:22:54.550658Z  INFO p_gen: ops: txn proof (31a05521e8f8e3045b1626becf5c72307cf0f85222d379dc578b0b345aa7642a) took 50.138580461s id="b20362227 - 171"
+2024-07-23T13:27:21.356183Z  INFO prover: Proving block 20362227
+Error: Fatal operation error: operation BlockProof panicked
+
+Stack backtrace:
+   0: anyhow::kind::Adhoc::new
+   1: paladin::task::AnyTaskResult::into_task_result
+   2: <paladin::channel::coordinated_channel::coordinated_stream::CoordinatedStream<S> as futures_core::stream::Stream>::poll_next
+   3: <futures_util::stream::stream::map::Map<St,F> as futures_core::stream::Stream>::poll_next
+   4: paladin::directive::literal::functor::<impl paladin::directive::Functor<B> for paladin::directive::literal::Literal<A>>::f_map::{{closure}}
+   5: <paladin::directive::Map<Op,D> as paladin::directive::Directive>::run::{{closure}}
+   6: <futures_util::future::future::map::Map<Fut,F> as core::future::future::Future>::poll
+   7: <futures_util::future::future::flatten::Flatten<Fut,<Fut as core::future::future::Future>::Output> as core::future::future::Future>::poll
+   8: <futures_util::future::future::Then<Fut1,Fut2,F> as core::future::future::Future>::poll
+   9: <futures_util::stream::futures_unordered::FuturesUnordered<Fut> as futures_core::stream::Stream>::poll_next
+  10: <futures_util::stream::try_stream::try_collect::TryCollect<St,C> as core::future::future::Future>::poll
+  11: prover::ProverInput::prove::{{closure}}
+  12: leader::main::{{closure}}
+  13: tokio::runtime::park::CachedParkThread::block_on
+  14: leader::main
+  15: std::sys::backtrace::__rust_begin_short_backtrace
+  16: std::rt::lang_start::{{closure}}
+  17: std::rt::lang_start_internal
+  18: main
+  19: __libc_start_main
+  20: _start
+```
+
+The workers were proving transactions.
+
+```bash
+2024-07-23T13:46:48.463216Z  INFO p_gen: zero_bin_common::prover_state: using monolithic circuit ProverStateManager { circuit_config: CircuitConfig { circuits: [16..25, 8..25, 12..27, 14..25, 9..20, 12..25, 17..28] }, persistence: Disk(Monolithic) } id="b20362227 - 163"
+2024-07-23T13:46:51.646014Z  INFO p_gen: evm_arithmetization::generation::state: CPU halted after 552085 cycles     id="b20362227 - 163"
+2024-07-23T13:46:51.806809Z  INFO p_gen: evm_arithmetization::generation: CPU trace padded to 1048576 cycles     id="b20362227 - 163"
+2024-07-23T13:46:51.807365Z  INFO p_gen: evm_arithmetization::generation: Trace lengths (before padding): TraceCheckpoint { arithmetic_len: 90724, byte_packing_len: 7690, cpu_len: 1048576, keccak_len: 66144, keccak_sponge_len: 2756, logic_len: 24783, memory_len: 1782198 }     id="b20362227 - 163"
+2024-07-23T13:47:54.636231Z  INFO p_gen: ops: txn proof (c18823511a1a1c63e6b709be1d5f6550285836311c9bcb662246f8677ce2413a) took 66.173016908s id="b20362227 - 163"
+2024-07-23T13:47:54.640000Z  INFO p_gen: zero_bin_common::prover_state: using monolithic circuit ProverStateManager { circuit_config: CircuitConfig { circuits: [16..25, 8..25, 12..27, 14..25, 9..20, 12..25, 17..28] }, persistence: Disk(Monolithic) } id="b20362227 - 170"
+2024-07-23T13:47:56.061052Z  INFO p_gen: evm_arithmetization::generation::state: CPU halted after 244150 cycles     id="b20362227 - 170"
+2024-07-23T13:47:56.067805Z  INFO p_gen: evm_arithmetization::generation: CPU trace padded to 262144 cycles     id="b20362227 - 170"
+2024-07-23T13:47:56.068066Z  INFO p_gen: evm_arithmetization::generation: Trace lengths (before padding): TraceCheckpoint { arithmetic_len: 41206, byte_packing_len: 3156, cpu_len: 262144, keccak_len: 25848, keccak_sponge_len: 1077, logic_len: 7410, memory_len: 783284 }     id="b20362227 - 170"
+2024-07-23T13:48:19.785067Z  INFO p_gen: ops: txn proof (f400b61f7a6626e99ed528d2a527f50f825d6681c01c4b901cad569767d1fb7f) took 25.145069252s id="b20362227 - 170"
+```
+
+Suddenly, one of the workers stops because of a panic error.
+
+```bash
 thread 'tokio-runtime-worker' panicked at /usr/local/cargo/registry/src/index.crates.io-6f17d22bba15001f/plonky2-0.2.2/src/iop/witness.rs:324:13:
 assertion `left == right` failed: Partition containing VirtualTarget { index: 22763 } was set twice with different values: 9324335365483090500 != 9324335365483090000
   left: 9324335365483090000
@@ -132,7 +172,7 @@ stack backtrace:
   25:     0x7f9df644dea7 - start_thread
   26:     0x7f9df6223a6f - clone
   27:                0x0 - <unknown>
-2024-07-23T13:23:15.685726Z ERROR paladin::runtime: execution error: Fatal { err: operation BlockProof panicked
+2024-07-23T13:49:09.380725Z ERROR paladin::runtime: execution error: Fatal { err: operation BlockProof panicked
 
 Stack backtrace:
    0: anyhow::error::<impl anyhow::Error>::msg
@@ -145,31 +185,7 @@ Stack backtrace:
    7: core::ops::function::FnOnce::call_once{{vtable.shim}}
    8: std::sys::pal::unix::thread::Thread::new::thread_start
    9: start_thread
-  10: clone, strategy: Terminate } routing_key=0dc17348b5ae4424a48c6e17b162fecb
+  10: clone, strategy: Terminate } routing_key=be16a8f22a2747c5b3c6bfabb384f1ee
 ```
 
-It was working well...
-
-```bash
-2024-07-23T13:20:14.533963Z  INFO p_gen: zero_bin_common::prover_state: using monolithic circuit ProverStateManager { circuit_config: CircuitConfig { circuits: [16..25, 8..25, 12..27, 14..25, 9..20, 12..25, 17..28] }, persistence: Disk(Monolithic) } id="b20362227 - 160"
-2024-07-23T13:20:16.659788Z  INFO p_gen: evm_arithmetization::generation::state: CPU halted after 529429 cycles     id="b20362227 - 160"
-2024-07-23T13:20:16.835035Z  INFO p_gen: evm_arithmetization::generation: CPU trace padded to 1048576 cycles     id="b20362227 - 160"
-2024-07-23T13:20:16.835766Z  INFO p_gen: evm_arithmetization::generation: Trace lengths (before padding): TraceCheckpoint { arithmetic_len: 89999, byte_packing_len: 8441, cpu_len: 1048576, keccak_len: 53136, keccak_sponge_len: 2214, logic_len: 25051, memory_len: 1664964 }     id="b20362227 - 160"
-2024-07-23T13:21:09.522932Z  INFO p_gen: ops: txn proof (0f7ed7c37d220a6a3ce8e5aa8731713037263ea4e7f02beec2e772478f5fd785) took 54.988971816s id="b20362227 - 160"
-2024-07-23T13:21:09.527545Z  INFO p_gen: zero_bin_common::prover_state: using monolithic circuit ProverStateManager { circuit_config: CircuitConfig { circuits: [16..25, 8..25, 12..27, 14..25, 9..20, 12..25, 17..28] }, persistence: Disk(Monolithic) } id="b20362227 - 166"
-2024-07-23T13:21:11.469074Z  INFO p_gen: evm_arithmetization::generation::state: CPU halted after 531016 cycles     id="b20362227 - 166"
-2024-07-23T13:21:11.641539Z  INFO p_gen: evm_arithmetization::generation: CPU trace padded to 1048576 cycles     id="b20362227 - 166"
-2024-07-23T13:21:11.642081Z  INFO p_gen: evm_arithmetization::generation: Trace lengths (before padding): TraceCheckpoint { arithmetic_len: 87799, byte_packing_len: 7666, cpu_len: 1048576, keccak_len: 53376, keccak_sponge_len: 2224, logic_len: 22861, memory_len: 1640860 }     id="b20362227 - 166"
-2024-07-23T13:22:04.407550Z  INFO p_gen: ops: txn proof (25f42b640ac9f9e36c47e0ec95cf8c5c52578b519a2189e5267ed5eabd0f26b6) took 54.880005554s id="b20362227 - 166"
-```
-
-Let's investigate!
-
-```bash
-$ cast block --json --rpc-url https://eth.llamarpc.com 20362227 | jq '.transactions[171]'
-0x31a05521e8f8e3045b1626becf5c72307cf0f85222d379dc578b0b345aa7642a
-```
-
-The worker failed to prove this [transaction](https://etherscan.io/tx/0x31a05521e8f8e3045b1626becf5c72307cf0f85222d379dc578b0b345aa7642a) in which the [Taikobeat Proposer](https://etherscan.io/address/0x000000633b68f5d8d3a86593ebb815b4663bcbe0) calls the `proposeBlock(bytes _params,bytes _txList)` function of this [smart contract](https://etherscan.io/address/0x68d30f47f19c07bccef4ac7fae2dc12fca3e0dc9). The transaction only uses 150,000 GAS which is not that much and there was no spike in CPU or memory usage. Everything looks good for me...
-
-I'm attempting to prove this specific block one more time. If the issue is reproducible, we should adopt a better testing strategy. Currently, proving a range of blocks often gets stuck due to an unprovable block. Instead, we should test standalone witnesses to ensure the prover can handle all mainnet blocks without failing.
+I tried to prove the second block one more time and it failed once again... I think we should adopt a better testing strategy. Currently, proving a range of blocks often gets stuck due to an unprovable block. Instead, we should test standalone witnesses to ensure the prover can handle all mainnet blocks without failing.
