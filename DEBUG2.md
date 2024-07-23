@@ -162,3 +162,14 @@ It was working well...
 2024-07-23T13:21:11.642081Z  INFO p_gen: evm_arithmetization::generation: Trace lengths (before padding): TraceCheckpoint { arithmetic_len: 87799, byte_packing_len: 7666, cpu_len: 1048576, keccak_len: 53376, keccak_sponge_len: 2224, logic_len: 22861, memory_len: 1640860 }     id="b20362227 - 166"
 2024-07-23T13:22:04.407550Z  INFO p_gen: ops: txn proof (25f42b640ac9f9e36c47e0ec95cf8c5c52578b519a2189e5267ed5eabd0f26b6) took 54.880005554s id="b20362227 - 166"
 ```
+
+Let's investigate!
+
+```bash
+$ cast block --json --rpc-url https://eth.llamarpc.com 20362227 | jq '.transactions[171]'
+0x31a05521e8f8e3045b1626becf5c72307cf0f85222d379dc578b0b345aa7642a
+```
+
+The worker failed to prove this [transaction](https://etherscan.io/tx/0x31a05521e8f8e3045b1626becf5c72307cf0f85222d379dc578b0b345aa7642a) in which the [Taikobeat Proposer](https://etherscan.io/address/0x000000633b68f5d8d3a86593ebb815b4663bcbe0) calls the `proposeBlock(bytes _params,bytes _txList)` function of this [smart contract](https://etherscan.io/address/0x68d30f47f19c07bccef4ac7fae2dc12fca3e0dc9). The transaction only uses 150,000 GAS which is not that much and there was no spike in CPU or memory usage. Everything looks good for me...
+
+I'm attempting to prove this specific block one more time. If the issue is reproducible, we should adopt a better testing strategy. Currently, proving a range of blocks often gets stuck due to an unprovable block. Instead, we should test standalone witnesses to ensure the prover can handle all mainnet blocks without failing.
