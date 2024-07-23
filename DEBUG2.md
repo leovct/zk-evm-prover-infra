@@ -71,3 +71,9 @@ env RUST_BACKTRACE=full \
   stdio \
   --previous-proof "$previous_proof" < "$witness_file" | tee "$witness_file.leader.out"
 ```
+
+We confirmed the setup works manually! Now, let's use a script to automate the proving of a range of witnesses.
+
+```bash
+./tmp/zero-prover-infra/tools/prove-witnesses.sh /tmp/witnesses2 20362226 20362237
+```
