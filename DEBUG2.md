@@ -74,6 +74,8 @@ env RUST_BACKTRACE=full \
 
 We confirmed the setup works manually! Now, let's use a script to automate the proving of a range of witnesses.
 
+Note that for the purpose of the test, we used `c3d-highmem-180` instances (180 vCPU / 1.44TB of memory) and we deployed 3 workers on the highmem node.
+
 ```bash
 ./tmp/zero-prover-infra/tools/prove-witnesses.sh /tmp/witnesses2 20362226 20362237
 ```
