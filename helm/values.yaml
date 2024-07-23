@@ -9,7 +9,7 @@ worker:
 
   # The minimum number of worker pods to maintain.
   # The Horizontal Pod Autoscaler (HPA) will not scale down below this value.
-  minWorkerCount: 1
+  minWorkerCount: 3
 
   # The maximum number of worker pods to scale up to.
   # We start with 2 nodes, so we limit the maximum workers to 8 (4 per node).
@@ -45,7 +45,7 @@ worker:
 
     # Resource limits are enforced by the Kubernetes kubelet to prevent containers from using more resources than specified.
     limits:
-      memory: 220G
+      memory: 230G
       cpu: 50
 
 # RabbitMQ Configuration
