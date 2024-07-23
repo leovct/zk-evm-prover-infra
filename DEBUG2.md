@@ -8,22 +8,23 @@ mkdir /tmp/witnesses2
 tar --extract --file=/tmp/zero-prover-infra/witnesses/cancun/witnesses-20362226-to-20362237.tar.xz --directory=/tmp/witnesses2 --strip-components=1
 ```
 
-Quick analysis of the number of transactions.
+Quick analysis of the number of witnesses.
 
 ```bash
-$ for file in /tmp/witnesses2/*.json; do echo "$file $(jq '.[0].block_trace.txn_info | length' "$file") txs"; done
-/tmp/witnesses2/20362226.witness.json 166 txs
-/tmp/witnesses2/20362227.witness.json 174 txs
-/tmp/witnesses2/20362228.witness.json 120 txs
-/tmp/witnesses2/20362229.witness.json 279 txs
-/tmp/witnesses2/20362230.witness.json 177 txs
-/tmp/witnesses2/20362231.witness.json 164 txs
-/tmp/witnesses2/20362232.witness.json 167 txs
-/tmp/witnesses2/20362233.witness.json 238 txs
-/tmp/witnesses2/20362234.witness.json 216 txs
-/tmp/witnesses2/20362235.witness.json 200 txs
-/tmp/witnesses2/20362236.witness.json 92 txs
-/tmp/witnesses2/20362237.witness.json 188 txs
+$ ./tmp/zero-prover-infra/tools/analyze-witnesses.sh /tmp/witnesses2 20362226 20362237
+/tmp/witnesses/20362226.witness.json 166 txs
+/tmp/witnesses/20362227.witness.json 174 txs
+/tmp/witnesses/20362228.witness.json 120 txs
+/tmp/witnesses/20362229.witness.json 279 txs
+/tmp/witnesses/20362230.witness.json 177 txs
+/tmp/witnesses/20362231.witness.json 164 txs
+/tmp/witnesses/20362232.witness.json 167 txs
+/tmp/witnesses/20362233.witness.json 238 txs
+/tmp/witnesses/20362234.witness.json 216 txs
+/tmp/witnesses/20362235.witness.json 200 txs
+/tmp/witnesses/20362236.witness.json 92 txs
+/tmp/witnesses/20362237.witness.json 188 txs
+Total transactions: 2181
 ```
 
 Attempt to prove the first witness.
@@ -74,8 +75,16 @@ env RUST_BACKTRACE=full \
 
 We confirmed the setup works manually! Now, let's use a script to automate the proving of a range of witnesses.
 
-Note that for the purpose of the test, we used `c3d-highmem-180` instances (180 vCPU / 1.44TB of memory) and we deployed 3 workers on the highmem node.
-
 ```bash
 ./tmp/zero-prover-infra/tools/prove-witnesses.sh /tmp/witnesses2 20362226 20362237
 ```
+
+Note that for the purpose of the test, we used a `c3d-highmem-180` instance (180 vCPU / 1.44TB of memory) and we deployed 3 workers on the node.
+
+We manage to prove approximately 100 transactions every 20 minutes, equating to a speed of 300 transactions per hour. Given that there are around 2200 transactions to prove, it would take roughly 7 hours and 20 minutes to prove the range of 10 blocks with the given setup.
+
+The experiment demonstrates that a single worker can process approximately 100 transactions per hour. Adding a fourth worker to our current three-worker setup could potentially reduce the total proving time from about 7 hours and 20 minutes to approximately 5 hours and 30 minutes, saving around 1 hour and 50 minutes.
+
+However, it's crucial to consider that workers may require substantial memory depending on the complexity of transactions being proved, which could lead to out-of-memory (OOM) errors... Given the cluster metrics, the first block never requires more than 50GB to prove a transaction. It is safe to deploy two additional workers for now.
+
+![cluster-metrics](./debug2-cluster-metrics.png)
