@@ -84,5 +84,5 @@ variable "highmem_pool_machine_type" {
 variable "highmem_pool_disk_size_gb" {
   type        = number
   description = "The size (in GB) of the disk attached to each node in the highmem node pool"
-  default     = 300
+  default     = 50
 }
