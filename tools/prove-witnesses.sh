@@ -49,6 +49,13 @@ prove_subsequent_witness() {
   format_proof "$leader_output" "$witness_file.proof"
 }
 
+# Format the proof content.
+format_proof() {
+  local leader_output=$1
+  local proof_file=$2
+  tail -n +4 "$leader_output" | jq '.[0]' > "$proof_file"
+}
+
 # Check if correct number of arguments is provided.
 if [ "$#" -ne 3 ]; then
   echo "Usage: $0 <witness_directory> <start_witness_id> <end_witness_id>"
