@@ -4,14 +4,14 @@ Download the new witness archive (`witnesses/cancun/witnesses-20362226-to-203622
 
 ```bash
 git clone https://github.com/leovct/zero-prover-infra.git /tmp/zero-prover-infra
-mkdir /tmp/witnesses2
-tar --extract --file=/tmp/zero-prover-infra/witnesses/cancun/witnesses-20362226-to-20362237.tar.xz --directory=/tmp/witnesses2 --strip-components=1
+mkdir /tmp/witnesses
+tar --extract --file=/tmp/zero-prover-infra/witnesses/cancun/witnesses-20362226-to-20362237.tar.xz --directory=/tmp/witnesses --strip-components=1
 ```
 
 Quick analysis of the number of witnesses.
 
 ```bash
-$ ./tmp/zero-prover-infra/tools/analyze-witnesses.sh /tmp/witnesses2 20362226 20362237
+$ ./tmp/zero-prover-infra/tools/analyze-witnesses.sh /tmp/witnesses 20362226 20362237
 /tmp/witnesses/20362226.witness.json 166 txs
 /tmp/witnesses/20362227.witness.json 174 txs
 /tmp/witnesses/20362228.witness.json 120 txs
@@ -30,7 +30,7 @@ Total transactions: 2181
 Attempt to prove the first witness.
 
 ```bash
-folder="/tmp/witnesses2"
+folder="/tmp/witnesses"
 witness_id=20362226
 witness_file="$folder/$witness_id.witness.json"
 env RUST_BACKTRACE=full \
@@ -60,7 +60,7 @@ tail -n +4 "$witness_file.leader.out" | jq '.[0]' > "$witness_file.proof"
 Attempt to prove the second witness using the first witness proof.
 
 ```bash
-folder="/tmp/witnesses2"
+folder="/tmp/witnesses"
 witness_id=20362227
 witness_file="$folder/$witness_id.witness.json"
 previous_proof="$folder/$(( witness_id - 1 )).witness.json.proof"
@@ -92,7 +92,7 @@ tail -n +4 "$witness_file.leader.out" | jq '.[0]' > "$witness_file.proof"
 Now, let's use a script to automate the proving of a range of witnesses.
 
 ```bash
-./tmp/zero-prover-infra/tools/prove-witnesses.sh /tmp/witnesses2 20362226 20362237
+./tmp/zero-prover-infra/tools/prove-witnesses.sh /tmp/witnesses 20362226 20362237
 ```
 
 Note that for the purpose of the test, we used a `c3d-highmem-180` instance (180 vCPU / 1.44TB of memory) and we deployed 3 workers on the node.
@@ -104,3 +104,11 @@ The experiment demonstrates that a single worker can process approximately 100 t
 However, it's crucial to consider that workers may require substantial memory depending on the complexity of transactions being proved, which could lead to out-of-memory (OOM) errors... Given the cluster metrics, the first block never requires more than 50GB to prove a transaction. It is safe to deploy two additional workers for now.
 
 ![cluster-metrics](./debug2-cluster-metrics.png)
+
+## Handy Commands
+
+Clean the `witnesses` folder. This will delete all leader outputs and proofs, only keeping witnesses.
+
+```bash
+find /tmp/witnesses/ -type f ! -name "*.witness.json" -exec rm -f {} +
+```
