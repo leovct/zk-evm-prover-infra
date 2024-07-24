@@ -5,8 +5,13 @@ metadata:
   labels:
     release: {{ .Release.Name }}
     app: zk-evm
+    component: circuits-initializer
 spec:
   template:
+    metadata:
+      labels:
+        app: zk-evm
+        component: circuits-initializer
     spec:
       containers:
       - name: circuits-initializer

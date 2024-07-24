@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zk-evm-load-tester
+  labels:
+    app: zk-evm
+    component: load-tester
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zk-evm
+      component: load-tester
+  template:
+    metadata:
+      labels:
+        app: zk-evm
+        component: load-tester
+    spec:
+      containers:
+      - name: jumpbox
+        image: leovct/zero-jumpbox:v0.6.0-1
+        command: ["/bin/sh", "/scripts/test.sh"]
+        envFrom:
+        - configMapRef:
+            name: zk-evm-worker-cm
+        volumeMounts:
+        - name: test-scripts
+          mountPath: /scripts
+        - name: test-data
+          mountPath: /data
+      volumes:
+      - name: test-scripts
+        configMap:
+          name: zk-evm-load-tester-cm
+      - name: test-data
+        persistentVolumeClaim:
+          claimName: zk-evm-load-tester-pvc
+      nodeSelector:
+        cloud.google.com/gke-nodepool: highmem-node-pool
+      tolerations:
+      - key: "highmem"
+        operator: "Equal"
+        value: "true"
+        effect: "NoSchedule"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zk-evm-load-tester-cm
+data:
+  test.sh: |
+    #!/bin/sh
+    # Clean the data folder before starting the test.
+    rm -rf /data/*
+
+    # Download the witnesses.
+    git clone https://github.com/leovct/zero-prover-infra.git /data/zero-prover-infra
+    mkdir /data/witnesses
+    tar --extract --file=/data/zero-prover-infra/witnesses/cancun/witnesses-20362226-to-20362237.tar.xz --directory=/data/witnesses --strip-components=1
+
+    # Quick analysis of the witnesses.
+    start_block=20362226
+    end_block=20362237
+    ./data/zero-prover-infra/tools/analyze-witnesses.sh /data/witnesses "$start_block" "$end_block"
+
+    # Attempt to prove the witnessses.
+    ./data/zero-prover-infra/tools/prove-witnesses.sh /data/witnesses "$start_block" "$end_block"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zk-evm-load-tester-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
