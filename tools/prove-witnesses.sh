@@ -61,7 +61,8 @@ prove_subsequent_witness() {
 format_proof() {
   local leader_output=$1
   local proof_file=$2
-  tail -n +4 "$leader_output" | jq '.[0]' > "$proof_file"
+  tail -n1 "$leader_output" | jq empty # validation step
+  tail -n1 "$leader_output" | jq '.[0]' > "$proof_file"
 }
 
 # Check if correct number of arguments is provided.
