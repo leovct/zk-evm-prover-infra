@@ -485,6 +485,8 @@ jq . "block_$i.json"
 
 ### Proof Generation
 
+> Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node. We will skip this part for the moment.
+
 Get a running shell inside the `jumpbox` container.
 
 ```bash
@@ -492,42 +494,42 @@ jumpbox_pod_name="$(kubectl get pods --namespace zero -o=jsonpath='{range .items
 kubectl exec --namespace zero --stdin --tty "$jumpbox_pod_name" -- /bin/bash
 ```
 
-Download an archive full of witnesses.
+Clone the repository and extract test witnesses.
 
 ```bash
-curl -L --output /tmp/witnesses.xz https://cf-ipfs.com/ipfs/QmTk9TyuFwA7rjPh1u89oEp8shpFUtcdXuKRRySZBfH1Pu
-mkdir -p /tmp/witnesses
-tar --extract --file=/tmp/witnesses.xz --directory=/tmp/witnesses --strip-components=1 --checkpoint=10000 --checkpoint-action=dot
+git clone https://github.com/leovct/zero-prover-infra.git /tmp/zero-prover-infra
+mkdir /tmp/witnesses
+tar --extract --file=/tmp/zero-prover-infra/witnesses/cancun/witnesses-20362226-to-20362237.tar.xz --directory=/tmp/witnesses --strip-components=1
 ```
 
-> Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node! We will skip this part for the moment.
-
-For example, we will attempt to prove the first witness of the archive, `20241038.witness.json`.
+In this test scenario, we will prove a set of 10 blocks, which collectively contain 2181 transactions.
 
 ```bash
-witness_file="/tmp/witnesses/20241038.witness.json"
-env RUST_BACKTRACE=full \
-  RUST_LOG=info \
-  leader \
-  --runtime=amqp \
-  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
-  stdio < "$witness_file" | tee "$witness_file.leader.out"
+$ ./tmp/zero-prover-infra/tools/analyze-witnesses.sh /tmp/witnesses 20362226 20362237
+/tmp/witnesses/20362226.witness.json 166 txs
+/tmp/witnesses/20362227.witness.json 174 txs
+/tmp/witnesses/20362228.witness.json 120 txs
+/tmp/witnesses/20362229.witness.json 279 txs
+/tmp/witnesses/20362230.witness.json 177 txs
+/tmp/witnesses/20362231.witness.json 164 txs
+/tmp/witnesses/20362232.witness.json 167 txs
+/tmp/witnesses/20362233.witness.json 238 txs
+/tmp/witnesses/20362234.witness.json 216 txs
+/tmp/witnesses/20362235.witness.json 200 txs
+/tmp/witnesses/20362236.witness.json 92 txs
+/tmp/witnesses/20362237.witness.json 188 txs
+Total transactions: 2181
 ```
 
-This is a challenging witness to prove because it contains many transactions (164) and some require a huge amount of memory.
-
-You can check the number of transactions in a witness using this handy command.
+Run this command to prove the range of witnesses.
 
 ```bash
-jq '.[0].block_trace.txn_info | length' /tmp/witnesses/20241038.witness.json
+./tmp/zero-prover-infra/tools/prove-witnesses.sh /tmp/witnesses 20362226 20362237
 ```
 
-You can check the content of `/tmp/witnesses/20241038.witness.json.leader.out` or you can extract the proof and run the `verifier`.
+TODO: Show the list of proofs.
 
-```bash
-tail -n1 /tmp/witnesses/20241038.witness.json.leader.out | jq > /tmp/witnesses/20241038.proof.json
-env RUST_LOG=info verifier --file-path /tmp/witnesses/20241038.proof.json
-```
+TODO: Show how to use the `verifier`.
 
 ## TODOs
 
