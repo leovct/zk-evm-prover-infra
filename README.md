@@ -22,6 +22,12 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 
 ## Setup
 
+You have two options to set up the infrastructure: follow the step-by-step procedure outlined in the `README`, or use the provided script for a streamlined setup. The script automates the entire process, creating the GKE infrastructure with Terraform and deploying all necessary Kubernetes resources, including RabbitMQ, KEDA, Prometheus, and the zero-prover infrastructure.
+
+```bash
+./tools/setup.sh
+```
+
 ### GKE Cluster
 
 The above [GKE](https://cloud.google.com/kubernetes-engine) infrastructure can be deployed using the provided [Terraform](https://www.terraform.io/) scripts under the `terraform` directory.
