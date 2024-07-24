@@ -54,7 +54,7 @@ variable "default_pool_machine_type" {
   // - e2-standard-16 (16 vCPU / 64GB of memory)
 }
 
-variable "default_pool_disk_size_gb" {
+variable "default_pool_node_disk_size_gb" {
   type        = number
   description = "The size (in GB) of the disk attached to each node in the default node pool"
   default     = 300
@@ -81,8 +81,8 @@ variable "highmem_pool_machine_type" {
   // - c3d-highmem-360 (360 vCPU / 2.88TB of memory)
 }
 
-variable "highmem_pool_disk_size_gb" {
+variable "highmem_pool_node_disk_size_gb" {
   type        = number
   description = "The size (in GB) of the disk attached to each node in the highmem node pool"
-  default     = 20
+  default     = 100
 }
