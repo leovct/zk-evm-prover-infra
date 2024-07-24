@@ -3,7 +3,10 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Release.Name }}-keda-rabbitmq-secret
+  name: keda-rabbitmq-secret
+  labels:
+    release: {{ .Release.Name }}
+    app: rabbitmq
 data:
   # The URL should be encoded using base64.
   # TODO: Implement a more robust secret management system to enhance security.
@@ -14,7 +17,10 @@ data:
 apiVersion: keda.sh/v1alpha1
 kind: TriggerAuthentication
 metadata:
-  name: {{ .Release.Name }}-keda-trigger-auth-rabbitmq-conn
+  name: keda-trigger-auth-rabbitmq-conn
+  labels:
+    release: {{ .Release.Name }}
+    app: rabbitmq
   annotations:
     # The RabbitmqCluster CR will be deployed after all resources are loaded into Kubernetes.
     # This prevent an issue where the RabbitmqCluster CR is installed before the CRD.
@@ -27,7 +33,7 @@ spec:
       parameter: host
       # The name of the secret resource.
       # It should be in the same namespace as the ScaledObject.
-      name: {{ .Release.Name }}-keda-rabbitmq-secret
+      name: keda-rabbitmq-secret
       # The name of the key that contains the HTTP URL.
       key: host
 
@@ -36,7 +42,10 @@ spec:
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
-  name: {{ .Release.Name }}-rabbitmq-scaledobject
+  name: rabbitmq-scaledobject
+  labels:
+    release: {{ .Release.Name }}
+    app: rabbitmq
   annotations:
     # The RabbitmqCluster CR will be deployed after all resources are loaded into Kubernetes.
     # This prevent an issue where the RabbitmqCluster CR is installed before the CRD.
@@ -51,7 +60,7 @@ spec:
     kind: Deployment
     # The name of the application to scale.
     # It must be in the same namespace as the ScaledObject.
-    name: {{ .Release.Name }}-worker
+    name: zk-evm-worker
 
   # The minimum number of replicas KEDA will scale the resource down to.
   # By default, it’s scale to zero, but you can use it with some other value as well.
@@ -126,5 +135,5 @@ spec:
       value: "2"
     authenticationRef:
       # The name of the TriggerAuthentication object.
-      name: {{ .Release.Name }}-keda-trigger-auth-rabbitmq-conn
+      name: keda-trigger-auth-rabbitmq-conn
 {{- end }}

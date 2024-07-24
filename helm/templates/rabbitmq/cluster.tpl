@@ -2,7 +2,10 @@
 apiVersion: rabbitmq.com/v1beta1
 kind: RabbitmqCluster
 metadata:
-  name: {{ .Release.Name }}-rabbitmq-cluster
+  name: rabbitmq-cluster
+  labels:
+    release: {{ .Release.Name }}
+    app: rabbitmq
   annotations:
     # The RabbitmqCluster CR will be deployed after all resources are loaded into Kubernetes.
     # This prevent an issue where the RabbitmqCluster CR is installed before the CRD.
@@ -23,10 +26,11 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ .Release.Name }}-rabbitmq-cluster
+  name: rabbitmq-cluster
   namespace: kube-prometheus
   labels:
-    release: prometheus-operator
+    release: {{ .Release.Name }}
+    app: rabbitmq
 spec:
   endpoints:
     - port: prometheus
@@ -40,5 +44,5 @@ spec:
   selector:
     matchLabels:
       app.kubernetes.io/component: rabbitmq
-      app.kubernetes.io/name: {{ .Release.Name }}-rabbitmq-cluster
+      app.kubernetes.io/name: rabbitmq-cluster
       app.kubernetes.io/part-of: rabbitmq

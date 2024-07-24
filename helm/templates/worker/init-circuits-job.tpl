@@ -1,7 +1,10 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Release.Name }}-init-circuits
+  name: zk-evm-worker-circuits-initializer
+  labels:
+    release: {{ .Release.Name }}
+    app: zk-evm
 spec:
   template:
     spec:
@@ -11,7 +14,7 @@ spec:
         command: ["/bin/sh", "/scripts/init-circuits.sh"]
         envFrom:
         - configMapRef:
-            name: {{ .Release.Name }}-worker-cm
+            name: zk-evm-worker-cm
         volumeMounts:
         - name: init-scripts
           mountPath: /scripts
@@ -21,10 +24,10 @@ spec:
       volumes:
       - name: init-scripts
         configMap:
-          name: {{ .Release.Name }}-circuits-init-scripts
+          name: zk-evm-worker-circuits-initializer-scripts
       - name: circuits
         persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-worker-circuits-pvc
+          claimName: zk-evm-worker-circuits-pvc
       nodeSelector:
         cloud.google.com/gke-nodepool: highmem-node-pool
       tolerations:
@@ -37,7 +40,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-circuits-init-scripts
+  name: zk-evm-worker-circuits-initializer-scripts
 data:
   init-circuits.sh: |
     #!/bin/sh
@@ -74,7 +77,7 @@ data:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-worker-circuits-pvc
+  name: zk-evm-worker-circuits-pvc
 spec:
   accessModes:
     - ReadWriteOnce

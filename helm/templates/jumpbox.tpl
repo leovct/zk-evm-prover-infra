@@ -1,16 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-jumpbox
+  name: zk-evm-jumpbox
+  labels:
+    release: {{ .Release.Name }}
+    app: zk-evm
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: jumpbox
+      app: zk-evm
   template:
     metadata:
       labels:
-        app: jumpbox
+        app: zk-evm
     spec:
       containers:
       - name: jumpbox

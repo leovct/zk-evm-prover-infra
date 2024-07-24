@@ -1,17 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-zk-evm-worker
+  name: zk-evm-worker
+  labels:
+    release: {{ .Release.Name }}
+    app: zk-evm
 spec:
   # The number of replicas should be set to one as it is managed by the HPA.
   replicas: {{ if .Values.worker.autoscaler }}1{{- else }}{{ .Values.worker.minWorkerCount }}{{- end }}
   selector:
     matchLabels:
-      app: worker
+      app: zk-evm
   template:
     metadata:
       labels:
-        app: worker
+        app: zk-evm
     spec:
       initContainers:
       - name: check-initialization
@@ -40,7 +43,7 @@ spec:
         {{- end }}
         envFrom:
         - configMapRef:
-            name: {{ .Release.Name }}-worker-cm
+            name: zk-evm-worker-cm
         volumeMounts:
         - name: circuits
           mountPath: /circuits
@@ -57,7 +60,7 @@ spec:
       volumes:
       - name: circuits
         persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-worker-circuits-pvc
+          claimName: zk-evm-worker-circuits-pvc
       nodeSelector:
         cloud.google.com/gke-nodepool: highmem-node-pool
       tolerations:
@@ -70,7 +73,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-worker-cm
+  name: zk-evm-worker-cm
 data:
   AMQP_URI: {{ printf "amqp://%s:%s@%s-rabbitmq-cluster.%s.svc.cluster.local:5672" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Name .Release.Namespace }}
   {{- range $key, $value := .Values.worker.env }}
