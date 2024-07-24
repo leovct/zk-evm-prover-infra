@@ -17,7 +17,7 @@ spec:
         app: zk-evm
     spec:
       initContainers:
-      - name: check-initialization
+      - name: circuits-checker
         image: busybox
         command: ["/bin/sh", "-c"]
         args:
