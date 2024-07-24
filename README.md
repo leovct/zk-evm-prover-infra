@@ -22,13 +22,16 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 
 ## Setup
 
-You have two options to set up the infrastructure: follow the step-by-step procedure outlined in the `README`, or use the provided script for a streamlined setup. The script automates the entire process, creating the GKE infrastructure with Terraform and deploying all necessary Kubernetes resources, including RabbitMQ, KEDA, Prometheus, and the zero-prover infrastructure.
+You have two options to set up the infrastructure: follow the step-by-step procedure outlined below, or use the provided script for a streamlined setup. The script automates the entire process, creating the GKE infrastructure with Terraform and deploying all necessary Kubernetes resources, including RabbitMQ, KEDA, Prometheus, and the zero-prover infrastructure.
 
 ```bash
 ./tools/setup.sh
 ```
 
 ### GKE Cluster
+
+<details>
+<summary>Click to expand</summary>
 
 The above [GKE](https://cloud.google.com/kubernetes-engine) infrastructure can be deployed using the provided [Terraform](https://www.terraform.io/) scripts under the `terraform` directory.
 
@@ -80,7 +83,12 @@ Note that it may take some time for the Kubernetes cluster to be ready on GCP!
 
 ![gke-cluster](docs/gke-cluster.png)
 
+</details>
+
 ### zkEVM Prover Infrastructure
+
+<details>
+<summary>Click to expand</summary>
 
 First, authenticate with your [GCP](https://console.cloud.google.com/) account.
 
@@ -170,7 +178,12 @@ Your cluster should now be ready to prove blocks!
 
 ![cluster-ready](./docs/cluster-ready.png)
 
+</details>
+
 ### Docker Images
+
+<details>
+<summary>Click to expand</summary>
 
 Provision an Ubuntu/Debian VM with good specs (e.g. `t2d-60`).
 
@@ -276,6 +289,8 @@ docker push leovct/zero-jumpbox:v0.6.0
 ```
 
 Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovct/zero-jumpbox/general) for the moment.
+
+</details>
 
 ## Monitoring
 
