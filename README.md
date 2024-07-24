@@ -269,12 +269,13 @@ docker build --tag leovct/zero-jumpbox:v0.6.0 --build-arg ZERO_BIN_BRANCH_OR_COM
 Check that the images are built correctly.
 
 ```bash
-docker run --rm -it leovct/zero-jumpbox:v0.5.0 /bin/bash
+docker run --rm -it leovct/zero-jumpbox:v0.6.0 /bin/bash
 rpc --help
 worker --help
 leader --help
 verifier --help
 jq --version # jq-1.7.1
+ps --version # ps from procps-ng 3.3.17
 ```
 
 Push the images.
