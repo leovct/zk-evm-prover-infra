@@ -9,7 +9,7 @@ spec:
   template:
     spec:
       containers:
-      - name: init-circuits
+      - name: circuits-initializer
         image: {{ .Values.jumpbox.image }}
         command: ["/bin/sh", "/scripts/init-circuits.sh"]
         envFrom:
