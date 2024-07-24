@@ -6,13 +6,9 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 
 - [Architecture Diagram](#architecture-diagram)
 - [Infrastructure Setup](#infrastructure-setup)
-- [Monitoring](#monitoring)
 - [Block Proving](#block-proving)
-  - [Witness Generation](#witness-generation)
-  - [Proof Generation](#proof-generation)
-  - [Load Tester](#load-tester)
-- [TODOs](#todos)
 - [Feedback](#feedback)
+- [TODOs](#todos)
 
 ## Architecture Diagram
 
@@ -184,6 +180,44 @@ helm upgrade test --namespace zero --create-namespace ./helm
 
 </details>
 
+### Monitoring
+
+<details>
+<summary>Click to expand</summary>
+
+You can observe cluster metrics using [Grafana](https://grafana.com/). To access it, execute two separate commands in different terminal sessions. When prompted for login information, enter `admin` as the username and `prom-operator` as the password.
+
+```bash
+kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operator-grafana 3000:http-web
+open http://localhost:3000/
+```
+
+![cluster-metrics](./docs/cluster-metrics.png)
+
+Add this handy [dashboard](https://grafana.com/grafana/dashboards/10991-rabbitmq-overview/) to monitor the state of the RabbitMQ Cluster. You can import the dashboard by specifying the dashboard ID `10991`.
+
+![rabbitmq-metrics](./docs/rabbitmq-metrics.png)
+
+It's also possible to access Prometheus web interface.
+
+```bash
+kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operated 9090:http-web
+open http://localhost:9090/
+```
+
+![prometheus-ui](./docs/prometheus-ui.png)
+
+Finally, you can log into the RabbitMQ management interface using `guest` credentials as username and password.
+
+```bash
+kubectl port-forward --namespace zero --address localhost service/test-rabbitmq-cluster 15672:management
+open http://localhost:15672/
+```
+
+![rabbitmq-ui](./docs/rabbitmq-ui.png)
+
+</details>
+
 ### Docker Images
 
 <details>
@@ -297,49 +331,12 @@ Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovc
 
 </details>
 
-## Monitoring
-
-You can observe cluster metrics using [Grafana](https://grafana.com/). To access it, execute two separate commands in different terminal sessions. When prompted for login information, enter `admin` as the username and `prom-operator` as the password.
-
-```bash
-kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operator-grafana 3000:http-web
-open http://localhost:3000/
-```
-
-![cluster-metrics](./docs/cluster-metrics.png)
-
-Add this handy [dashboard](https://grafana.com/grafana/dashboards/10991-rabbitmq-overview/) to monitor the state of the RabbitMQ Cluster. You can import the dashboard by specifying the dashboard ID `10991`.
-
-![rabbitmq-metrics](./docs/rabbitmq-metrics.png)
-
-It's also possible to access Prometheus web interface.
-
-```bash
-kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operated 9090:http-web
-open http://localhost:9090/
-```
-
-![prometheus-ui](./docs/prometheus-ui.png)
-
-Finally, you can log into the RabbitMQ management interface using `guest` credentials as username and password.
-
-```bash
-kubectl port-forward --namespace zero --address localhost service/test-rabbitmq-cluster 15672:management
-open http://localhost:15672/
-```
-
-![rabbitmq-ui](./docs/rabbitmq-ui.png)
-
-Here are some useful links to monitor state of the cluster once ports have been forwarded:
-
-- [Grafana Dashboard to Monitor Kubernetes Cluster Metrics](http://localhost:3000/d/85a562078cdf77779eaa1add43ccec1e/kubernetes-compute-resources-namespace-pods?orgId=1&refresh=10s&var-datasource=default&var-cluster=&var-namespace=zero)
-- [Grafana Dashboard to Monitor RabbitMQ Metrics](http://localhost:3000/d/Kn5xm-gZk/rabbitmq-overview?orgId=1&refresh=15s)
-- [RabbitMQ Management UI](http://localhost:15672/#/queues)
-- [Prometheus Web UI](http://localhost:9090/graph?g0.expr=kube_pod_container_status_restarts_total%7Bpod%3D~%22.*zk-evm-worker.*%22%7D&g0.tab=1&g0.display_mode=lines&g0.show_exemplars=0&g0.range_input=1h)
-
 ## Block Proving
 
 ### Witness Generation
+
+<details>
+<summary>Click to expand</summary>
 
 [Jerrigon](https://github.com/0xPolygonZero/erigon/tree/feat/zero) is a fork of [Erigon](https://github.com/ledgerwatch/erigon) that allows seamless integration of [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin), facilitating the generation of witnesses and the proving of blocks using zero-knowledge proofs.
 
@@ -485,7 +482,12 @@ You can check the block data.
 jq . "block_$i.json"
 ```
 
+</details>
+
 ### Proof Generation
+
+<details>
+<summary>Click to expand</summary>
 
 > Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node. We will skip this part for the moment.
 
@@ -533,7 +535,12 @@ TODO: Show the list of proofs.
 
 TODO: Show how to use the `verifier`.
 
+</details>
+
 ### Load Tester
+
+<details>
+<summary>Click to expand</summary>
 
 You can deploy a load-tester tool that will attempt to prove 10 witnesses for a total of 2181 transactions. This is a great way to test that the setup works well.
 
@@ -575,17 +582,7 @@ drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
 -rw-r--r-- 1 root root 10678725 Jul 22 13:01 20362237.witness.json
 ```
 
-## TODOs
-
-- [ ] The leader communicates with the pool of workers through RabbitMQ by creating a queue by proof request. However, [RabbitMQ Queue](https://keda.sh/docs/2.14/scalers/rabbitmq-queue/) can only scale the number of workers based on the size of the message backlog (for a specific queue), or the publish/sec rate. There is no way to scale the number of workers based on the total message backlog across all queues? I asked the [question](https://kubernetes.slack.com/archives/CKZJ36A5D/p1718671628824279) in the Kubernetes Slack.
-
-  => I started to work on that in `helm/templates/rabbitmq-hpa.tpl`.
-
-- [ ] Collect metrics using `atop` while proving blocks.
-
-- [ ] The setup does not use any `jerrigon` node to generate the witnesses, instead, we provide the witnesses directly to the leader. This should be changed, especially because we would like to be able to follow the tip of the chain. We would then need to detect the new block (and probably introduce some kind of safety mechanism to make sure the block won't get reorged), generate a witness for the block and prove the block using the witness.
-
-- [ ] Provide at the very least `gcloud` commands to create the GKE cluster or a terraform project.
+</details>
 
 ## Feedback
 
@@ -642,3 +639,15 @@ drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
 - **Manage AMQP Cluster State**
 
   Develop a tool or command to manage the state of the AMQP cluster. This should include capabilities to clear the state of queues or remove specific block proof tasks.
+
+## TODOs
+
+- [ ] The leader communicates with the pool of workers through RabbitMQ by creating a queue by proof request. However, [RabbitMQ Queue](https://keda.sh/docs/2.14/scalers/rabbitmq-queue/) can only scale the number of workers based on the size of the message backlog (for a specific queue), or the publish/sec rate. There is no way to scale the number of workers based on the total message backlog across all queues? I asked the [question](https://kubernetes.slack.com/archives/CKZJ36A5D/p1718671628824279) in the Kubernetes Slack.
+
+  => I started to work on that in `helm/templates/rabbitmq-hpa.tpl`.
+
+- [ ] Collect metrics using `atop` while proving blocks.
+
+- [ ] The setup does not use any `jerrigon` node to generate the witnesses, instead, we provide the witnesses directly to the leader. This should be changed, especially because we would like to be able to follow the tip of the chain. We would then need to detect the new block (and probably introduce some kind of safety mechanism to make sure the block won't get reorged), generate a witness for the block and prove the block using the witness.
+
+- [ ] Provide at the very least `gcloud` commands to create the GKE cluster or a terraform project.
