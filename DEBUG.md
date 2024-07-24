@@ -38,7 +38,7 @@ test-zk-evm-worker-86d5b5f46b-vwswr   1/1     Running   0          2m36s   10.23
 Connect to the jumpbox.
 
 ```bash
-jumpbox_pod_name="$(kubectl get pods --namespace zero -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep jumpbox)"
+jumpbox_pod_name="$(kubectl get pods --namespace zero -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep zk-evm-jumpbox)"
 kubectl exec --namespace zero --stdin --tty "$jumpbox_pod_name" -- /bin/bash
 ```
 
