@@ -75,7 +75,7 @@ kind: ConfigMap
 metadata:
   name: zk-evm-worker-cm
 data:
-  AMQP_URI: {{ printf "amqp://%s:%s@%s-rabbitmq-cluster.%s.svc.cluster.local:5672" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Name .Release.Namespace }}
+  AMQP_URI: {{ printf "amqp://%s:%s@rabbitmq-cluster.%s.svc.cluster.local:5672" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Namespace }}
   {{- range $key, $value := .Values.worker.env }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
