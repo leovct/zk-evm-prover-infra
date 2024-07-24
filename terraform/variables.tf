@@ -1,6 +1,14 @@
+// Mandatory parameters.
+
 variable "deployment_name" {
   type        = string
   description = "Unique identifier for this deployment, used as a prefix for all associated resources"
+}
+
+variable "project_id" {
+  type        = string
+  description = "The unique identifier of the Google Cloud Platform project for resource deployment and billing"
+  default     = "prj-polygonlabs-devtools-dev"
 }
 
 variable "environment" {
@@ -8,10 +16,9 @@ variable "environment" {
   description = "Specifies the deployment environment (e.g., development, staging, production) for configuration purposes"
 }
 
-variable "project_id" {
+variable "owner" {
   type        = string
-  description = "The unique identifier of the Google Cloud Platform project for resource deployment and billing"
-  default     = "prj-polygonlabs-devtools-dev"
+  description = "The primary point of contact for this deployment"
 }
 
 variable "region" {
@@ -24,11 +31,6 @@ variable "zones" {
   type        = list(string)
   description = "List of availability zones within the region for distributing resources and enhancing fault tolerance"
   default     = ["europe-west3-b"]
-}
-
-variable "owner" {
-  type        = string
-  description = "The primary point of contact for this deployment"
 }
 
 // Kubernetes settings
