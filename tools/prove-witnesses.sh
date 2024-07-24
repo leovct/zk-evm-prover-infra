@@ -75,7 +75,6 @@ fi
 WITNESS_DIR=$1
 START_WITNESS_ID=$2
 END_WITNESS_ID=$3
-AMQP_URI=$4
 
 # Set AMQP URI.
 AMQP_URI="amqp://guest:guest@rabbitmq-cluster.zero.svc.cluster.local:5672"
