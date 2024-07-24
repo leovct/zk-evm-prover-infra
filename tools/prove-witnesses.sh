@@ -78,7 +78,7 @@ END_WITNESS_ID=$3
 AMQP_URI=$4
 
 # Set AMQP URI.
-AMQP_URI="amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672"
+AMQP_URI="amqp://guest:guest@rabbitmq-cluster.zero.svc.cluster.local:5672"
 
 # Validate input.
 if [ ! -d "$WITNESS_DIR" ]; then
