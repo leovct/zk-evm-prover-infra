@@ -258,6 +258,7 @@ rpc --help
 worker --help
 leader --help
 verifier --help
+jq --version # jq-1.7.1
 ```
 
 Push the images.
