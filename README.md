@@ -506,7 +506,7 @@ mkdir /tmp/witnesses
 tar --extract --file=/tmp/zero-prover-infra/witnesses/cancun/witnesses-20362226-to-20362237.tar.xz --directory=/tmp/witnesses --strip-components=1
 ```
 
-In this test scenario, we will prove a set of 10 blocks, which collectively contain 2181 transactions.
+In this test scenario, we will prove the two first blocks of a set of 10 blocks, which collectively contain 2181 transactions. In the next section, you can use the load tester tool to prove the 10 blocks in a row.
 
 ```bash
 $ ./tmp/zero-prover-infra/tools/analyze-witnesses.sh /tmp/witnesses 20362226 20362237
@@ -525,13 +525,67 @@ $ ./tmp/zero-prover-infra/tools/analyze-witnesses.sh /tmp/witnesses 20362226 203
 Total transactions: 2181
 ```
 
-Run this command to prove the range of witnesses.
+Let's attempt to prove the first witness.
 
 ```bash
-./tmp/zero-prover-infra/tools/prove-witnesses.sh /tmp/witnesses 20362226 20362237
+folder="/tmp/witnesses"
+witness_id=20362226
+witness_file="$folder/$witness_id.witness.json"
+env RUST_BACKTRACE=full \
+  RUST_LOG=info \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio < "$witness_file" | tee "$witness_file.leader.out"
 ```
 
-TODO: Show the list of proofs.
+Check the leader output.
+
+```bash
+2024-07-22T13:40:06.933510Z  INFO prover: Proving block 20362226
+2024-07-22T14:57:35.314259Z  INFO prover: Successfully proved block 20362226
+2024-07-22T14:57:35.319041Z  INFO leader::stdio: All proofs have been generated successfully.
+// proof content
+```
+
+Format the proof content.
+
+```bash
+tail -n1 "$witness_file.leader.out" | jq empty # validation step
+tail -n1 "$witness_file.leader.out" | jq '.[0]' > "$witness_file.proof"
+```
+
+Now, let's attempt to prove the second witness using the first witness proof.
+
+```bash
+folder="/tmp/witnesses"
+witness_id=20362227
+witness_file="$folder/$witness_id.witness.json"
+previous_proof="$folder/$(( witness_id - 1 )).witness.json.proof"
+env RUST_BACKTRACE=full \
+  RUST_LOG=info \
+  leader \
+  --runtime=amqp \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zero.svc.cluster.local:5672 \
+  stdio \
+  --previous-proof "$previous_proof" < "$witness_file" | tee "$witness_file.leader.out"
+```
+
+Check the leader output.
+
+```bash
+2024-07-24T08:12:13.855305Z  INFO prover: Proving block 20362227
+2024-07-24T08:43:46.450954Z  INFO prover: Successfully proved block 20362227
+2024-07-24T08:43:46.455782Z  INFO leader::stdio: All proofs have been generated successfully.
+// proof content
+```
+
+Format the proof content.
+
+```bash
+tail -n1 "$witness_file.leader.out" | jq empty
+tail -n1 "$witness_file.leader.out" | jq '.[0]' > "$witness_file.proof"
+```
 
 TODO: Show how to use the `verifier`.
 
@@ -561,6 +615,8 @@ kubectl exec deployment/zk-evm-load-tester --namespace zero --container jumpbox 
 ```
 
 From there, you can list the witnesses, the leader outputs and the proofs.
+
+TODO: Update the list of witnesses and proofs.
 
 ```bash
 $ ls -al /data/witnesses/
