@@ -705,5 +705,3 @@ drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
 - [ ] Collect metrics using `atop` while proving blocks.
 
 - [ ] The setup does not use any `jerrigon` node to generate the witnesses, instead, we provide the witnesses directly to the leader. This should be changed, especially because we would like to be able to follow the tip of the chain. We would then need to detect the new block (and probably introduce some kind of safety mechanism to make sure the block won't get reorged), generate a witness for the block and prove the block using the witness.
-
-- [ ] Provide at the very least `gcloud` commands to create the GKE cluster or a terraform project.
