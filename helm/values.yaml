@@ -1,5 +1,5 @@
 # The docker image for zk_evm.
-zk_evm_image: leovct/zk_evm:v0.6.0-1
+zk_evm_image: leovct/zk_evm:v0.6.0
 
 # Type 1 Prover - Worker Configuration
 worker:
@@ -74,4 +74,4 @@ rabbitmq:
 # Jumpbox Configuration
 jumpbox:
   # The Docker image for the jumpbox (a secure entrypoint for accessing the cluster).
-  image: leovct/zero-jumpbox:v0.6.0
+  image: leovct/zero-jumpbox:v0.6.0-1
