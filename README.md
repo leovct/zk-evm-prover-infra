@@ -10,6 +10,7 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 - [Block Proving](#block-proving)
   - [Witness Generation](#witness-generation)
   - [Proof Generation](#proof-generation)
+  - [Load Tester](#load-tester)
 - [TODOs](#todos)
 - [Feedback](#feedback)
 
@@ -531,6 +532,48 @@ Run this command to prove the range of witnesses.
 TODO: Show the list of proofs.
 
 TODO: Show how to use the `verifier`.
+
+### Load Tester
+
+You can deploy a load-tester tool that will attempt to prove 10 witnesses for a total of 2181 transactions. This is a great way to test that the setup works well.
+
+```bash
+kubectl apply --filename tools/zk-evm-load-tester.yaml --namespace zero
+```
+
+To get the logs of the container, you can use:
+
+```bash
+kubectl logs deployment/zk-evm-load-tester --namespace zero --container jumpbox --follow
+```
+
+Access a shell inside the load-tester pod.
+
+```bash
+kubectl exec deployment/zk-evm-load-tester --namespace zero --container jumpbox -it -- bash
+```
+
+From there, you can list the witnesses, the leader outputs and the proofs.
+
+```bash
+$ ls -al /data/witnesses/
+total 102184
+drwxr-xr-x 2 root root     4096 Jul 24 16:38 .
+drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
+-rw-r--r-- 1 root root  8351244 Jul 22 12:59 20362226.witness.json
+-rw-r--r-- 1 root root       65 Jul 24 16:38 20362226.witness.json.leader.out
+-rw-r--r-- 1 root root  8815832 Jul 22 12:59 20362227.witness.json
+-rw-r--r-- 1 root root  7507010 Jul 22 13:00 20362228.witness.json
+-rw-r--r-- 1 root root 11453230 Jul 22 13:00 20362229.witness.json
+-rw-r--r-- 1 root root  8249897 Jul 22 13:00 20362230.witness.json
+-rw-r--r-- 1 root root  7027307 Jul 22 13:00 20362231.witness.json
+-rw-r--r-- 1 root root  5301822 Jul 22 13:00 20362232.witness.json
+-rw-r--r-- 1 root root 12801427 Jul 22 13:01 20362233.witness.json
+-rw-r--r-- 1 root root 10542021 Jul 22 13:01 20362234.witness.json
+-rw-r--r-- 1 root root 10635944 Jul 22 13:01 20362235.witness.json
+-rw-r--r-- 1 root root  3232495 Jul 22 13:01 20362236.witness.json
+-rw-r--r-- 1 root root 10678725 Jul 22 13:01 20362237.witness.json
+```
 
 ## TODOs
 
