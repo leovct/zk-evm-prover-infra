@@ -12,7 +12,7 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 
 ## Architecture Diagram
 
-![architecture-diagram](./docs/architecture-diagram.png)
+![architecture-diagram](./docs/architecture-diagram-v2.png)
 
 ## Infrastructure Setup
 
