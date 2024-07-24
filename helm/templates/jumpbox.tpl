@@ -5,15 +5,18 @@ metadata:
   labels:
     release: {{ .Release.Name }}
     app: zk-evm
+    component: jumpbox
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: zk-evm
+      component: jumpbox
   template:
     metadata:
       labels:
         app: zk-evm
+        component: jumpbox
     spec:
       containers:
       - name: jumpbox

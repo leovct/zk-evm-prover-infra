@@ -5,16 +5,19 @@ metadata:
   labels:
     release: {{ .Release.Name }}
     app: zk-evm
+    component: worker
 spec:
   # The number of replicas should be set to one as it is managed by the HPA.
   replicas: {{ if .Values.worker.autoscaler }}1{{- else }}{{ .Values.worker.minWorkerCount }}{{- end }}
   selector:
     matchLabels:
       app: zk-evm
+      component: worker
   template:
     metadata:
       labels:
         app: zk-evm
+        component: worker
     spec:
       initContainers:
       - name: circuits-checker
