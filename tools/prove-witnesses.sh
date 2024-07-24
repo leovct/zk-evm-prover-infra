@@ -7,10 +7,22 @@ prove_witness_range() {
   local start_id=$1
   local end_id=$2
 
+  # Prove the first witness.
   if ! prove_initial_witness $start_id; then
     echo "Error: Failed to prove initial witness $start_id"
     return 1
   fi
+
+  # Prove the remaining witnesses.
+  for ((witness_id=start_id+1; witness_id<=end_id; witness_id++)); do
+    previous_proof="$WITNESS_DIR/$((witness_id - 1)).witness.json.proof"
+    if ! prove_subsequent_witness $witness_id $previous_proof; then
+      echo "Error: Failed to prove witness $witness_id"
+      return 1
+    fi
+  done
+
+  echo "Successfully proved all witnesses from $start_id to $end_id!"
 }
 
 # Prove the initial witness, without any previous proof.
