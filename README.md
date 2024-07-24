@@ -232,11 +232,11 @@ pushd /opt/zk_evm
 
 git checkout v0.5.0
 env RUSTFLAGS='-C target-cpu=native -Zlinker-features=-lld' cargo build --release
-docker build --tag leovct/zk_evm:v0.5.0 .
+docker build --no-cache --tag leovct/zk_evm:v0.5.0 .
 
 git checkout v0.6.0
 env RUSTFLAGS='-C target-cpu=native -Zlinker-features=-lld' cargo build --release
-docker build --tag leovct/zk_evm:v0.6.0 .
+docker build --no-cache --tag leovct/zk_evm:v0.6.0 .
 ```
 
 Push the images.
@@ -262,8 +262,8 @@ Build the jumpbox images.
 
 ```bash
 pushd /opt/zero-prover-infra/docker
-docker build --tag leovct/zero-jumpbox:v0.5.0 --build-arg ZERO_BIN_BRANCH_OR_COMMIT=v0.5.0 --file jumpbox.Dockerfile .
-docker build --tag leovct/zero-jumpbox:v0.6.0 --build-arg ZERO_BIN_BRANCH_OR_COMMIT=v0.6.0 --file jumpbox.Dockerfile .
+docker build --no-cache --tag leovct/zero-jumpbox:v0.5.0 --build-arg ZERO_BIN_BRANCH_OR_COMMIT=v0.5.0 --file jumpbox.Dockerfile .
+docker build --no-cache --tag leovct/zero-jumpbox:v0.6.0 --build-arg ZERO_BIN_BRANCH_OR_COMMIT=v0.6.0 --file jumpbox.Dockerfile .
 ```
 
 Check that the images are built correctly.
