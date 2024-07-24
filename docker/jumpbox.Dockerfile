@@ -1,7 +1,7 @@
 FROM rustlang/rust:nightly-bullseye-slim
 ARG ZERO_BIN_BRANCH_OR_COMMIT
 RUN apt-get update \
-  && apt-get install --yes build-essential git libjemalloc-dev libjemalloc2 make libssl-dev pkg-config \
+  && apt-get install --yes build-essential curl git libjemalloc-dev libjemalloc2 make libssl-dev pkg-config \
   && curl --location --output /usr/bin/jq https://github.com/jqlang/jq/releases/download/jq-1.7.1/jq-linux-amd64 \
   && git clone https://github.com/0xPolygonZero/zk_evm.git /opt/zk_evm \
   && cd /opt/zk_evm \
