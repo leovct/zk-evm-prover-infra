@@ -21,9 +21,6 @@ spec:
       - name: jumpbox
         image: leovct/zero-jumpbox:v0.6.0-1
         command: ["/bin/sh", "/scripts/test.sh"]
-        envFrom:
-        - configMapRef:
-            name: zk-evm-worker-cm
         volumeMounts:
         - name: test-scripts
           mountPath: /scripts
@@ -36,13 +33,6 @@ spec:
       - name: test-data
         persistentVolumeClaim:
           claimName: zk-evm-load-tester-pvc
-      nodeSelector:
-        cloud.google.com/gke-nodepool: highmem-node-pool
-      tolerations:
-      - key: "highmem"
-        operator: "Equal"
-        value: "true"
-        effect: "NoSchedule"
 
 ---
 apiVersion: v1
