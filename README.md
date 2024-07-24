@@ -5,10 +5,7 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 ## Table of Contents
 
 - [Architecture Diagram](#architecture-diagram)
-- [Setup](#setup)
-  - [GKE Cluster](#gke-cluster)
-  - [zkEVM Prover Infrastructure](#zkevm-prover-infrastructure)
-  - [Docker Images](#docker-images)
+- [Infrastructure Setup](#infrastructure-setup)
 - [Monitoring](#monitoring)
 - [Block Proving](#block-proving)
   - [Witness Generation](#witness-generation)
@@ -20,7 +17,7 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 
 ![architecture-diagram](./docs/architecture-diagram.png)
 
-## Setup
+## Infrastructure Setup
 
 You have two options to set up the infrastructure: follow the step-by-step procedure outlined below, or use the provided script for a streamlined setup. The script automates the entire process, creating the GKE infrastructure with Terraform and deploying all necessary Kubernetes resources, including RabbitMQ, KEDA, Prometheus, and the zero-prover infrastructure.
 
