@@ -175,6 +175,12 @@ Your cluster should now be ready to prove blocks!
 
 ![cluster-ready](./docs/cluster-ready.png)
 
+If you ever need to update the stack, you can use the following command.
+
+```bash
+helm upgrade test --namespace zero --create-namespace ./helm
+```
+
 </details>
 
 ### Docker Images
@@ -329,12 +335,6 @@ Here are some useful links to monitor state of the cluster once ports have been 
 - [Grafana Dashboard to Monitor RabbitMQ Metrics](http://localhost:3000/d/Kn5xm-gZk/rabbitmq-overview?orgId=1&refresh=15s)
 - [RabbitMQ Management UI](http://localhost:15672/#/queues)
 - [Prometheus Web UI](http://localhost:9090/graph?g0.expr=kube_pod_container_status_restarts_total%7Bpod%3D~%22.*zk-evm-worker.*%22%7D&g0.tab=1&g0.display_mode=lines&g0.show_exemplars=0&g0.range_input=1h)
-
-If you ever need to update the stack, you can use the following command.
-
-```bash
-helm upgrade test --namespace zero --create-namespace ./helm
-```
 
 ## Block Proving
 
