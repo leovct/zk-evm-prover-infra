@@ -175,7 +175,7 @@ Your cluster should now be ready to prove blocks!
 If you ever need to update the stack, you can use the following command.
 
 ```bash
-helm upgrade test --namespace zk-evm --create-namespace ./helm
+helm upgrade test --namespace zk-evm ./helm
 ```
 
 </details>
