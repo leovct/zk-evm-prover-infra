@@ -45,21 +45,21 @@ gcloud config get-value project
 
 Configure your infrastructure by reviewing `terraform/variables.tf`.
 
-| Option | Description | Default Value |
-|--------|-------------|---------------|
-| `deployment_name` | Unique identifier for this deployment, used as a prefix for all associated resources | N/A (Mandatory) |
-| `project_id` | The unique identifier of the Google Cloud Platform project for resource deployment and billing | N/A (Mandatory) |
-| `environment` | Specifies the deployment environment (e.g., development, staging, production) for configuration purposes | N/A (Mandatory) |
-| `owner` | The primary point of contact for this deployment | N/A (Mandatory) |
-| `region` | The Google Cloud Platform region where resources will be created | `"europe-west3"` |
-| `zones` | List of availability zones within the region for distributing resources and enhancing fault tolerance | `["europe-west3-b"]` |
-| `use_spot_instances` | Whether to use spot instances or not for the GKE cluster | `true` |
-| `default_pool_node_count` | Number of nodes in the GKE cluster's default node pool | `1` |
-| `default_pool_machine_type` | Machine type for nodes in the default node pool, balancing performance and cost | `"e2-standard-16"` |
-| `default_pool_node_disk_size_gb` | The size (in GB) of the disk attached to each node in the default node pool | `300` |
-| `highmem_pool_node_count` | Number of nodes in the GKE cluster's highmem node pool | `2` |
-| `highmem_pool_machine_type` | Machine type for nodes in the highmem node pool, optimized for memory-intensive workloads | `"t2d-standard-60"` |
-| `highmem_pool_node_disk_size_gb` | The size (in GB) of the disk attached to each node in the highmem node pool | `100` |
+| Option                           | Description                                                                                              | Default Value        |
+|----------------------------------|----------------------------------------------------------------------------------------------------------|----------------------|
+| `deployment_name`                | Unique identifier for this deployment, used as a prefix for all associated resources                     | N/A (Mandatory)      |
+| `project_id`                     | The unique identifier of the Google Cloud Platform project for resource deployment and billing           | N/A (Mandatory)      |
+| `environment`                    | Specifies the deployment environment (e.g., development, staging, production) for configuration purposes | N/A (Mandatory)      |
+| `owner`                          | The primary point of contact for this deployment                                                         | N/A (Mandatory)      |
+| `region`                         | The Google Cloud Platform region where resources will be created                                         | `"europe-west3"`     |
+| `zones`                          | List of availability zones within the region for distributing resources and enhancing fault tolerance    | `["europe-west3-b"]` |
+| `use_spot_instances`             | Whether to use spot instances or not for the GKE cluster                                                 | `true`               |
+| `default_pool_node_count`        | Number of nodes in the GKE cluster's default node pool                                                   | `1`                  |
+| `default_pool_machine_type`      | Machine type for nodes in the default node pool, balancing performance and cost                          | `"e2-standard-16"`   |
+| `default_pool_node_disk_size_gb` | The size (in GB) of the disk attached to each node in the default node pool                              | `300`                |
+| `highmem_pool_node_count`        | Number of nodes in the GKE cluster's highmem node pool                                                   | `2`                  |
+| `highmem_pool_machine_type`      | Machine type for nodes in the highmem node pool, optimized for memory-intensive workloads                | `"t2d-standard-60"`  |
+| `highmem_pool_node_disk_size_gb` | The size (in GB) of the disk attached to each node in the highmem node pool                              | `100`                |
 
 Once you're done, initialize the project to download dependencies and deploy the infrastructure. You can use `terraform plan` to check what kind of resources are going to be deployed.
 
@@ -178,7 +178,50 @@ helm search hub kube-prometheus-stack --output yaml | yq '.[] | select(.reposito
 
 #### Zk EVM Prover
 
-Finally, deploy the [zk_evm prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
+Finally, review and adjust the parameters in `helm/values.yaml`.
+
+## Jumpbox
+
+| Parameter                        | Description                                                                                              | Default Value                  |
+|----------------------------------|----------------------------------------------------------------------------------------------------------|--------------------------------|
+| `image`                          | Docker image for the jumpbox                                                                             | `leovct/zk_evm_jumpbox:v0.6.0` |
+
+## Worker
+
+| Parameter                        | Description                                                                                              | Default Value                |
+|----------------------------------|----------------------------------------------------------------------------------------------------------|------------------------------|
+| `image`                          | Docker image for the worker                                                                              | `leovct/zk_evm:v0.6.0`       |
+| `workerCount`                    | Number of worker pods when autoscaler is disabled                                                        | `4`                          |
+| `autoscaler.enabled`             | Enable or disable the worker autoscaler (HPA)                                                            | `false`                      |
+| `autoscaler.minWorkerCount`      | Minimum number of worker pods to maintain                                                                | `4`                          |
+| `autoscaler.maxWorkerCount`      | Maximum number of worker pods to maintain                                                                | `8`                          |
+| `autoscaler.pollingInterval`     | Interval (in seconds) for KEDA to check RabbitMQ's queue length and scale worker deployment              | `10`                         |
+| `flags`                          | Worker flags                                                                                             | `[--serializer=postcard, --runtime=amqp, --persistence=disk, --load-strategy=monolithic]` |
+| `env.RUST_LOG`                   | Verbosity level                                                                                          | `info`                       |
+| `env.RUST_BACKTRACE`             | Capture Rust's full backtrace                                                                            | `full`                       |
+| `env.RUST_MIN_STACK`             | Set Rust's thread stack size                                                                             | `33554432`                   |
+| `env.ARITHMETIC_CIRCUIT_SIZE`    | The min/max size for the arithmetic table circuit                                                        | `16..25`                     |
+| `env.BYTE_PACKING_CIRCUIT_SIZE`  | The min/max size for the byte packing table circuit                                                      | `8..25`                      |
+| `env.CPU_CIRCUIT_SIZE`           | The min/max size for the cpu table circuit                                                               | `12..27`                     |
+| `env.KECCAK_CIRCUIT_SIZE`        | The min/max size for the keccak table circuit                                                            | `14..25`                     |
+| `env.KECCAK_SPONGE_CIRCUIT_SIZE` | The min/max size for the keccak sponge table circuit                                                     | `9..20`                      |
+| `env.LOGIC_CIRCUIT_SIZE`         | The min/max size for the logic table circuit                                                             | `12..25`                     |
+| `env.MEMORY_CIRCUIT_SIZE`        | The min/max size for the memory table circuit                                                            | `17..28`                     |
+| `resources.requests.memory`      | Memory request for worker                                                                                | `24G`                        |
+| `resources.requests.cpu`         | CPU request for worker                                                                                   | `5`                          |
+| `resources.limits.memory`        | Memory limit for worker                                                                                  | `230G`                       |
+| `resources.limits.cpu`           | CPU limit for worker                                                                                     | `50`                         |
+
+## RabbitMQ
+
+| Parameter                        | Description                                                                                              | Default Value                |
+|----------------------------------|----------------------------------------------------------------------------------------------------------|------------------------------|
+| `cluster.image`                  | Docker image for RabbitMQ                                                                                | `rabbitmq:3.13`              |
+| `cluster.nodeCount`              | Number of nodes in the RabbitMQ cluster                                                                  | `1`                          |
+| `cluster.credentials.username`   | RabbitMQ username                                                                                        | `guest`                      |
+| `cluster.credentials.password`   | RabbitMQ password                                                                                        | `guest`                      |
+
+Deploy the [zk_evm prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
 
 ```bash
 helm install test --namespace zk-evm --create-namespace ./helm
