@@ -8,7 +8,6 @@ variable "deployment_name" {
 variable "project_id" {
   type        = string
   description = "The unique identifier of the Google Cloud Platform project for resource deployment and billing"
-  default     = "prj-polygonlabs-devtools-dev"
 }
 
 variable "environment" {
@@ -68,7 +67,7 @@ variable "default_pool_node_disk_size_gb" {
 variable "highmem_pool_node_count" {
   type        = number
   description = "Number of nodes in the GKE cluster's highmem node pool"
-  default     = 1
+  default     = 2
 }
 
 variable "highmem_pool_machine_type" {
