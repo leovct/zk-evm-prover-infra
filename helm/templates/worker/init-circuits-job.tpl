@@ -86,6 +86,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
+  storageClassName: standard-rwx
   resources:
     requests:
       storage: 100Gi
