@@ -1,5 +1,8 @@
 # ZK EVM Configuration
 
+jumpbox:
+  image: leovct/zk_evm_jumpbox:v0.6.0
+
 worker:
   image: leovct/zk_evm:v0.6.0
 
@@ -67,6 +70,3 @@ rabbitmq:
     credentials:
       username: guest
       password: guest
-
-jumpbox:
-  image: leovct/zk_evm_jumpbox:v0.6.0-1
