@@ -84,7 +84,7 @@ kind: StorageClass
 metadata:
   name: custom-rwx
 provisioner: filestore.csi.storage.gke.io
-volumeBindingMode: Immediate
+volumeBindingMode: WaitForFirstConsumer
 allowVolumeExpansion: true
 parameters:
   tier: standard
