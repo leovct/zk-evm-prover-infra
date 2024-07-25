@@ -210,7 +210,7 @@ open http://localhost:9090/
 Finally, you can log into the RabbitMQ management interface using `guest` credentials as username and password.
 
 ```bash
-kubectl port-forward --namespace zk-evm --address localhost service/test-rabbitmq-cluster 15672:management
+kubectl port-forward --namespace zk-evm --address localhost service/rabbitmq-cluster 15672:management
 open http://localhost:15672/
 ```
 
@@ -534,7 +534,7 @@ env RUST_BACKTRACE=full \
   RUST_LOG=info \
   leader \
   --runtime=amqp \
-  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zk-evm.svc.cluster.local:5672 \
+  --amqp-uri=amqp://guest:guest@rabbitmq-cluster.zk-evm.svc.cluster.local:5672 \
   stdio < "$witness_file" | tee "$witness_file.leader.out"
 ```
 
@@ -568,7 +568,7 @@ env RUST_BACKTRACE=full \
   RUST_LOG=info \
   leader \
   --runtime=amqp \
-  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zk-evm.svc.cluster.local:5672 \
+  --amqp-uri=amqp://guest:guest@rabbitmq-cluster.zk-evm.svc.cluster.local:5672 \
   stdio \
   --previous-proof "$previous_proof" < "$witness_file" | tee "$witness_file.leader.out"
 ```
