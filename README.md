@@ -323,12 +323,12 @@ Check that the images are built correctly.
 
 ```bash
 docker run --rm -it leovct/zk_evm_jumpbox:v0.6.0 /bin/bash
-rpc --help
-worker --help
-leader --help
-verifier --help
-jq --version # jq-1.7.1
-ps --version # ps from procps-ng 3.3.17
+$ rpc --help
+$ worker --help
+$ leader --help
+$ verifier --help
+$ jq --version # jq-1.7.1
+$ ps --version # ps from procps-ng 3.3.17
 ```
 
 Push the images.
