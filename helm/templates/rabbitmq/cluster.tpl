@@ -19,8 +19,8 @@ spec:
   rabbitmq:
     # Config added to rabbitmq.conf in addition to the default configurations set by the operator.
     additionalConfig: |
-      default_user = {{ .Values.rabbitmq.cluster.username }}
-      default_pass = {{ .Values.rabbitmq.cluster.password }}
+      default_user = {{ .Values.rabbitmq.cluster.credentials.username }}
+      default_pass = {{ .Values.rabbitmq.cluster.credentials.password }}
 
 ---
 apiVersion: monitoring.coreos.com/v1

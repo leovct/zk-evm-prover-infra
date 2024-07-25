@@ -1,4 +1,4 @@
-{{- if .Values.worker.autoscaler }}
+{{- if .Values.worker.autoscaler.enabled }}
 # Define the secret containing the RabbitMQ HTTP URL.
 apiVersion: v1
 kind: Secret
@@ -10,7 +10,7 @@ metadata:
 data:
   # The URL should be encoded using base64.
   # TODO: Implement a more robust secret management system to enhance security.
-  host: {{ printf "http://%s:%s@%s-rabbitmq-cluster.%s.svc.cluster.local:15672/" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Name .Release.Namespace | b64enc }}
+  host: {{ printf "http://%s:%s@%s-rabbitmq-cluster.%s.svc.cluster.local:15672/" .Values.rabbitmq.cluster.credentials.username .Values.rabbitmq.cluster.credentials.password .Release.Name .Release.Namespace | b64enc }}
 
 ---
 # Describe which secret the ScaledObject will use.
@@ -64,15 +64,15 @@ spec:
 
   # The minimum number of replicas KEDA will scale the resource down to.
   # By default, it’s scale to zero, but you can use it with some other value as well.
-  minReplicaCount: {{ .Values.worker.minWorkerCount }}
+  minReplicaCount: {{ .Values.worker.autoscaler.minWorkerCount }}
 
   # This setting is passed to the HPA definition that KEDA will create for a given resource and
   # holds the maximum number of replicas of the target resource.
-  maxReplicaCount: {{ .Values.worker.maxWorkerCount }}
+  maxReplicaCount: {{ .Values.worker.autoscaler.maxWorkerCount }}
 
   # The interval to check each trigger on. In a queue scenario, KEDA will check the `queueLength`
   # every `pollingInterval`, and scale the deployment up or down accordingly.
-  pollingInterval: {{ .Values.rabbitmq.hpa.pollingInterval }}
+  pollingInterval: {{ .Values.worker.autoscaler.pollingInterval }}
 
   # HPA configuration.
   advanced:

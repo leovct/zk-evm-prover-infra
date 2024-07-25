@@ -1,6 +1,0 @@
-2024-06-30T14:23:27.800676Z  INFO prover: Proving block 38
-2024-06-30T14:29:39.348324Z ERROR lapin::io_loop: Socket was readable but we read 0. This usually means that the connection is half closed this mark it as broken
-2024-06-30T14:29:39.348341Z ERROR lapin::io_loop: error doing IO error=IOError(Kind(ConnectionAborted))
-2024-06-30T14:29:39.348347Z ERROR lapin::channels: Connection error error=IO error: connection aborted
-2024-06-30T14:29:39.348536Z ERROR paladin::queue::amqp: Error receiving message, error: IO error: connection aborted
-2024-06-30T14:29:39.348560Z ERROR paladin::queue::amqp: Error receiving message, error: IO error: connection aborted

@@ -16,7 +16,7 @@ locals {
     owner       = var.owner
     environment = var.environment
   }
-  tags = ["zero-prover-gke-node", "${var.deployment_name}-gke-cluster"]
+  tags = ["zk-evm-prover-gke-node", "${var.deployment_name}-gke-cluster"]
   oauth_scopes = [
     "https://www.googleapis.com/auth/logging.write",
     "https://www.googleapis.com/auth/monitoring",

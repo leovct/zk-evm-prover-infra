@@ -8,7 +8,7 @@ metadata:
     component: worker
 spec:
   # The number of replicas should be set to one as it is managed by the HPA.
-  replicas: {{ if .Values.worker.autoscaler }}1{{- else }}{{ .Values.worker.minWorkerCount }}{{- end }}
+  replicas: {{ if .Values.worker.autoscaler.enabled }}1{{- else }}{{ .Values.worker.workerCount }}{{- end }}
   selector:
     matchLabels:
       app: zk-evm
@@ -36,7 +36,7 @@ spec:
 
       containers:
       - name: worker
-        image: {{ .Values.zk_evm_image }}
+        image: {{ .Values.worker.image }}
         command: ["worker"]
         args:
         {{- with .Values.worker.flags }}
@@ -78,7 +78,7 @@ kind: ConfigMap
 metadata:
   name: zk-evm-worker-cm
 data:
-  AMQP_URI: {{ printf "amqp://%s:%s@rabbitmq-cluster.%s.svc.cluster.local:5672" .Values.rabbitmq.cluster.username .Values.rabbitmq.cluster.password .Release.Namespace }}
+  AMQP_URI: {{ printf "amqp://%s:%s@rabbitmq-cluster.%s.svc.cluster.local:5672" .Values.rabbitmq.cluster.credentials.username .Values.rabbitmq.cluster.credentials.password .Release.Namespace }}
   {{- range $key, $value := .Values.worker.env }}
   {{ $key }}: {{ $value | quote }}
   {{- end }}
