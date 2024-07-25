@@ -9,6 +9,14 @@ resource "google_container_cluster" "primary" {
   // Since we want to manage node pools separately, we create the smallest possible default node pool before deleting it.
   initial_node_count       = 1
   remove_default_node_pool = true
+
+  addons_config {
+    // Enable the Filestore CSI drive addon to enable ReadWriteMany PVs.
+    // https://cloud.google.com/filestore/docs/csi-driver#create
+    gcp_filestore_csi_driver_config {
+      enabled = true
+    }
+  }
 }
 
 locals {

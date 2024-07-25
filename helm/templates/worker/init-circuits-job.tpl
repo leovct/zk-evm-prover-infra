@@ -85,7 +85,7 @@ metadata:
   name: zk-evm-worker-circuits-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 100Gi
