@@ -236,11 +236,32 @@ Deploy the [zk_evm prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/
 helm install test --namespace zk-evm --create-namespace ./helm
 ```
 
-It should take a few minutes for the worker pods to be ready. This is because a job called `test-init-circuits` will first start and generate all the zk circuits needed by the workers. Meanwhile, the worker pods do not start, they wait for the circuits to be generated. Once the task has finished and the job has succeeded, the worker pods finally start and load the circuits.
-
 Note that you may need to enable the [Cloud Filestore API](https://cloud.google.com/firestore/docs/reference/rest) in your GCP project. It is used to create volumes (e.g. `circuits-volume`) that can be mounted as read-write by many nodes.
 
+It should take a few minutes for the worker pods to be ready. Initially, the storage provisioner creates a `ReadWriteMany` PV and binds it to the `zk-evm-worker-circuits-pvc` PVC, which may take a few minutes. Then, a job called `zk-evm-worker-circuits-initializer` starts to generate all necessary zk circuits for the workers, during which time the `zk-evm-worker` pods remain idle. Only after this job completes do the worker pods begin their startup process and load the newly generated circuits. The entire sequence ensures proper resource and data preparation before the worker pods become operational, typically taking several minutes to complete.
+
+```bash
+kubectl get pods --namespace zk-evm -o wide
+```
+
 Your cluster should now be ready to prove blocks!
+
+```bash
+NAME                                       READY   STATUS      RESTARTS   AGE     IP           NODE                                                  NOMINATED NODE   READINESS GATES
+rabbitmq-cluster-server-0                  1/1     Running     0          73m     10.20.0.26   gke-leovct-test-01-g-default-node-poo-f93cbb06-bsd4   <none>           <none>
+zk-evm-jumpbox-5d957ffb74-7zhnf            1/1     Running     0          73m     10.20.0.25   gke-leovct-test-01-g-default-node-poo-f93cbb06-bsd4   <none>           <none>
+zk-evm-worker-7dc966b84c-6tctw             1/1     Running     0          9m40s   10.20.2.30   gke-leovct-test-01-g-highmem-node-poo-1eb6e01a-jk26   <none>           <none>
+zk-evm-worker-7dc966b84c-6zlg9             1/1     Running     0          9m40s   10.20.1.30   gke-leovct-test-01-g-highmem-node-poo-1eb6e01a-020d   <none>           <none>
+zk-evm-worker-7dc966b84c-bbsh7             1/1     Running     0          9m40s   10.20.1.31   gke-leovct-test-01-g-highmem-node-poo-1eb6e01a-020d   <none>           <none>
+zk-evm-worker-7dc966b84c-dz8px             1/1     Running     0          9m40s   10.20.1.27   gke-leovct-test-01-g-highmem-node-poo-1eb6e01a-020d   <none>           <none>
+zk-evm-worker-7dc966b84c-f77pf             1/1     Running     0          9m40s   10.20.1.25   gke-leovct-test-01-g-highmem-node-poo-1eb6e01a-020d   <none>           <none>
+zk-evm-worker-7dc966b84c-flndw             1/1     Running     0          9m40s   10.20.1.33   gke-leovct-test-01-g-highmem-node-poo-1eb6e01a-020d   <none>           <none>
+zk-evm-worker-7dc966b84c-fmwbx             1/1     Running     0          9m40s   10.20.1.28   gke-leovct-test-01-g-highmem-node-poo-1eb6e01a-020d   <none>           <none>
+zk-evm-worker-7dc966b84c-g8szg             1/1     Running     0          9m40s   10.20.1.32   gke-leovct-test-01-g-highmem-node-poo-1eb6e01a-020d   <none>           <none>
+zk-evm-worker-7dc966b84c-lgzr8             1/1     Running     0          9m40s   10.20.2.29   gke-leovct-test-01-g-highmem-node-poo-1eb6e01a-jk26   <none>           <none>
+zk-evm-worker-7dc966b84c-rvg7s             1/1     Running     0          9m40s   10.20.1.26   gke-leovct-test-01-g-highmem-node-poo-1eb6e01a-020d   <none>           <none>
+zk-evm-worker-circuits-initializer-bgv6c   0/1     Completed   0          9m40s   10.20.1.29   gke-leovct-test-01-g-highmem-node-poo-1eb6e01a-020d   <none>           <none>
+```
 
 If you ever need to update the stack, you can use the following command.
 
