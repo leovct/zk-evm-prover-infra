@@ -8,7 +8,7 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 - [Prover Infrastructure Setup](#prover-infrastructure-setup)
 - [Proving Blocks](#proving-blocks)
 - [Feedback](#feedback)
-- [TODOs](#todos)
+- [Next Steps](#next-steps)
 
 ## Architecture Diagram
 
@@ -746,7 +746,7 @@ After a few seconds, the verification output will appear.
 
   For example, right now, there is no way to stop the provers once it has been fed a range of witnesses via the AMQP cluster. If many complicated witnesses pile up for proving, it is very difficult for the system to catch up unless we have some AMQP state management tooling for local testing and development.
 
-## TODOs
+## Next Steps
 
 - [ ] The leader communicates with the pool of workers through RabbitMQ by creating a queue by proof request. However, [RabbitMQ Queue](https://keda.sh/docs/2.14/scalers/rabbitmq-queue/) can only scale the number of workers based on the size of the message backlog (for a specific queue), or the publish/sec rate. It looks like there is no way to scale the number of workers based on the total message backlog across all queues!? I asked the [question](https://kubernetes.slack.com/archives/CKZJ36A5D/p1718671628824279) in the Kubernetes Slack. We'll maybe need to switch to another way of scaling, maybe measuring CPU/MEM usage.
 
