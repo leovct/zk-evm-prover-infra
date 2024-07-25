@@ -606,13 +606,25 @@ tail -n1 "$witness_file.leader.out" | jq > "$witness_file.proof.sequence"
 tail -n1 "$witness_file.leader.out" | jq '.[0]' > "$witness_file.proof"
 ```
 
-Now let's attempt to verify one of the generated proofs.
+Verify one of the generated proofs.
+
+```bash
+verifier --file-path 20362226.witness.json.proof.sequence
+```
 
 When running the command for the first time, the `verifier` will attempt to generate the circuits. This can take a few minutes.
 
 ```bash
-env RUST_LOG=info RUST_BACKTRACE=full \
-  verifier --file-path 20362226.witness.json.proof.sequence
+2024-07-25T07:38:15.667883Z  INFO zero_bin_common::prover_state: initializing verifier state...
+2024-07-25T07:38:15.667929Z  INFO zero_bin_common::prover_state: attempting to load preprocessed verifier circuit from disk...
+2024-07-25T07:38:15.667975Z  INFO zero_bin_common::prover_state: failed to load preprocessed verifier circuit from disk. generating it...
+2024-07-25T07:40:57.056064Z  INFO zero_bin_common::prover_state: saving preprocessed verifier circuit to disk
+```
+
+After a few seconds, the verification output will appear.
+
+```bash
+2024-07-25T07:41:02.600742Z  INFO verifier: All proofs verified successfully!
 ```
 
 </details>
@@ -658,6 +670,18 @@ drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
 -rw-r--r-- 1 root root  1146387 Jul 24 18:47 20362227.witness.json.proof
 -rw-r--r-- 1 root root  1213437 Jul 25 07:25 20362227.witness.json.proof.sequence
 ...
+```
+
+Verify one of the generated proofs.
+
+```bash
+verifier --file-path 20362226.witness.json.proof.sequence
+```
+
+After a few seconds, the verification output will appear.
+
+```bash
+2024-07-25T07:41:02.600742Z  INFO verifier: All proofs verified successfully!
 ```
 
 </details>
