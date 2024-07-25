@@ -21,6 +21,9 @@ spec:
       - name: jumpbox
         image: leovct/zero-jumpbox:v0.6.0-1
         command: ["/bin/sh", "/scripts/test.sh"]
+        envFrom:
+        - configMapRef:
+            name: zk-evm-worker-cm
         volumeMounts:
         - name: test-scripts
           mountPath: /scripts
