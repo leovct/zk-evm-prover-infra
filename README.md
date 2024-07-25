@@ -74,10 +74,8 @@ zones = tolist([
 
 With the above instructions, you should have a topology like the following:
 
-- A VPC and a subnet
-- GKE cluster with two node pools
-
-![gke-cluster](docs/gke-cluster.png)
+- A VPC and a subnet.
+- GKE cluster with two node pools.
 
 </details>
 
