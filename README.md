@@ -115,9 +115,7 @@ gke-leovct-test-01-g-default-node-poo-9faa7f06-b0q6   Ready    <none>   10m     
 gke-leovct-test-01-g-highmem-node-poo-c5b7d8d5-ms62   Ready    <none>   8m12s   v1.29.6-gke.1038001
 ```
 
-You can now start to use [Lens](https://k8slens.dev/) to visualize and control the Kubernetes cluster.
-
-![lens-overview](docs/lens-overview.png)
+You can now start to use [Lens](https://k8slens.dev/) to visualize and interact with the Kubernetes cluster.
 
 #### RabbitMQ Operator
 
@@ -179,8 +177,6 @@ helm install test --namespace zk-evm --create-namespace ./helm
 It should take a few minutes for the worker pods to be ready. This is because a job called `test-init-circuits` will first start and generate all the zk circuits needed by the workers. Meanwhile, the worker pods do not start, they wait for the circuits to be generated. Once the task has finished and the job has succeeded, the worker pods finally start and load the circuits.
 
 Your cluster should now be ready to prove blocks!
-
-![cluster-ready](./docs/cluster-ready.png)
 
 #### Perform update on Zk EVM Prover stack
 
