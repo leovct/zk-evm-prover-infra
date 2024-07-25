@@ -49,17 +49,17 @@ data:
     rm -rf /data/*
 
     # Download the witnesses.
-    git clone https://github.com/leovct/zero-prover-infra.git /data/zero-prover-infra
+    git clone https://github.com/leovct/zk-evm-prover-infra.git /data/zk-evm-prover-infra
     mkdir /data/witnesses
-    tar --extract --file=/data/zero-prover-infra/witnesses/cancun/witnesses-20362226-to-20362237.tar.xz --directory=/data/witnesses --strip-components=1
+    tar --extract --file=/data/zk-evm-prover-infra/witnesses/cancun/witnesses-20362226-to-20362237.tar.xz --directory=/data/witnesses --strip-components=1
 
     # Quick analysis of the witnesses.
     start_block=20362226
     end_block=20362237
-    ./data/zero-prover-infra/tools/analyze-witnesses.sh /data/witnesses "$start_block" "$end_block"
+    ./data/zk-evm-prover-infra/tools/analyze-witnesses.sh /data/witnesses "$start_block" "$end_block"
 
     # Attempt to prove the witnessses.
-    ./data/zero-prover-infra/tools/prove-witnesses.sh /data/witnesses "$start_block" "$end_block"
+    ./data/zk-evm-prover-infra/tools/prove-witnesses.sh /data/witnesses "$start_block" "$end_block"
 
     # Sleep forever.
     echo "Sleeping..."

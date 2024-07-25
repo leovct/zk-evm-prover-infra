@@ -1,10 +1,10 @@
 # DEBUG
 
-The goal of this experiment is to be able to prove a thousand [Cancun](https://ethereum.org/en/roadmap/dencun/) blocks using the [GKE setup](https://github.com/leovct/zero-prover-infra).
+The goal of this experiment is to be able to prove a thousand [Cancun](https://ethereum.org/en/roadmap/dencun/) blocks using the [GKE setup](https://github.com/leovct/zk-evm-prover-infra).
 
 John created an [archive](https://cf-ipfs.com/ipfs/QmTk9TyuFwA7rjPh1u89oEp8shpFUtcdXuKRRySZBfH1Pu) of witnesses for this purpose.
 
-We built new docker images of [zk_evm](https://github.com/0xPolygonZero/zk_evm) and of the [zero-jumpbox](https://github.com/leovct/zero-prover-infra/blob/main/docker/jumpbox.Dockerfile) using this [procedure](https://github.com/leovct/zero-prover-infra/tree/main?tab=readme-ov-file#docker-images):
+We built new docker images of [zk_evm](https://github.com/0xPolygonZero/zk_evm) and of the [zero-jumpbox](https://github.com/leovct/zk-evm-prover-infra/blob/main/docker/jumpbox.Dockerfile) using this [procedure](https://github.com/leovct/zk-evm-prover-infra/tree/main?tab=readme-ov-file#docker-images):
 
 - [leovct/zk_evm:v0.5.0](https://hub.docker.com/layers/leovct/zk_evm/v0.5.0/images/sha256-09fbcbc36d48f5773f55e2219f7427a5d19a4802a0b22ac29b0f3a1841b064df?context=repo)
 - [leovct/zero-jumpbox:v0.5.0](https://hub.docker.com/layers/leovct/zero-jumpbox/v0.5.0/images/sha256-b519eca11a3e0bbef5949f2dca2d918dac88bdd56c23e19d81b0d63e734a39a1?context=repo)
@@ -15,12 +15,12 @@ We then attempted to prove some of these witnesses, especially the smallest ones
 
 ## t2d-standard-32
 
-Clone the [zero-prover-infra](https://github.com/leovct/zero-prover-infra) repository.
+Clone the [zk-evm-prover-infra](https://github.com/leovct/zk-evm-prover-infra) repository.
 
 Make a few modifications to the config:
 
-- Modify the [highmem_pool_machine_type](https://github.com/leovct/zero-prover-infra/blob/main/terraform/variables.tf#L73) to `t2d-standard-32`.
-- Modify the [worker pod limits](https://github.com/leovct/zero-prover-infra/blob/main/helm/values.yaml#L29) to `2T`.
+- Modify the [highmem_pool_machine_type](https://github.com/leovct/zk-evm-prover-infra/blob/main/terraform/variables.tf#L73) to `t2d-standard-32`.
+- Modify the [worker pod limits](https://github.com/leovct/zk-evm-prover-infra/blob/main/helm/values.yaml#L29) to `2T`.
 
 Deploy the GKE cluster and the zkevm Prover infrastructure on top of it.
 
@@ -70,24 +70,24 @@ $ ls -lS /tmp/witnesses/*.witness.json | sort -k5,5n | head -n 5
 Also download a few Shanghai witnesses, just for the sake of testing.
 
 ```bash
-mkdir /tmp/zero-prover-infra
-git clone https://github.com/leovct/zero-prover-infra.git /tmp/zero-prover-infra
+mkdir /tmp/zk-evm-prover-infra
+git clone https://github.com/leovct/zk-evm-prover-infra.git /tmp/zk-evm-prover-infra
 ```
 
 Sort the Shanghai witnesses by size.
 
 ```bash
-$ ls -lS /tmp/zero-prover-infra/witnesses/shanghai/*.witness.json | sort -k5,5n | head -n 5
--rw-r--r-- 1 root root  981937 Jul 18 16:18 /tmp/zero-prover-infra/witnesses/shanghai/19240705.witness.json
--rw-r--r-- 1 root root 4767334 Jul 18 16:18 /tmp/zero-prover-infra/witnesses/shanghai/19240718.witness.json
--rw-r--r-- 1 root root 5673475 Jul 18 16:18 /tmp/zero-prover-infra/witnesses/shanghai/19240663.witness.json
+$ ls -lS /tmp/zk-evm-prover-infra/witnesses/shanghai/*.witness.json | sort -k5,5n | head -n 5
+-rw-r--r-- 1 root root  981937 Jul 18 16:18 /tmp/zk-evm-prover-infra/witnesses/shanghai/19240705.witness.json
+-rw-r--r-- 1 root root 4767334 Jul 18 16:18 /tmp/zk-evm-prover-infra/witnesses/shanghai/19240718.witness.json
+-rw-r--r-- 1 root root 5673475 Jul 18 16:18 /tmp/zk-evm-prover-infra/witnesses/shanghai/19240663.witness.json
 ```
 
 ### v0.5.0
 
 For these experiments, we use `zk_evm:v0.5.0`.
 
-Modify the [zk_evm_image](https://github.com/leovct/zero-prover-infra/blob/main/helm/values.yaml#L2) parameter in the configuration to `leovct:v0.5.0` and re-apply the Helm chart.
+Modify the [zk_evm_image](https://github.com/leovct/zk-evm-prover-infra/blob/main/helm/values.yaml#L2) parameter in the configuration to `leovct:v0.5.0` and re-apply the Helm chart.
 
 ```bash
 helm upgrade test --namespace zero --create-namespace ./helm
@@ -212,7 +212,7 @@ Stack backtrace:
 A last attempt with a small Shanghai witness, `19240705.witness.json`.
 
 ```bash
-witness_file="/tmp/zero-prover-infra/witnesses/shanghai/19240705.witness.json"
+witness_file="/tmp/zk-evm-prover-infra/witnesses/shanghai/19240705.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \
@@ -247,7 +247,7 @@ Stack backtrace:
 A very last attempt with another Shanghai witness, `19240718.witness.json`.
 
 ```bash
-witness_file="//tmp/zero-prover-infra/witnesses/shanghai/19240718.witness.json"
+witness_file="//tmp/zk-evm-prover-infra/witnesses/shanghai/19240718.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \
@@ -282,7 +282,7 @@ Stack backtrace:
 Other attempts with other witnesses.
 
 ```bash
-witness_file="tmp/zero-prover-infra/witnesses/432.erc721.witness.json"
+witness_file="tmp/zk-evm-prover-infra/witnesses/432.erc721.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \
@@ -294,7 +294,7 @@ env RUST_BACKTRACE=full \
 TODO
 
 ```bash
-witness_file="tmp/zero-prover-infra/witnesses/512.eoa.witness.json"
+witness_file="tmp/zk-evm-prover-infra/witnesses/512.eoa.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \
@@ -306,7 +306,7 @@ env RUST_BACKTRACE=full \
 TODO
 
 ```bash
-witness_file="tmp/zero-prover-infra/witnesses/512.erc20.witness.json"
+witness_file="tmp/zk-evm-prover-infra/witnesses/512.erc20.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \
@@ -321,7 +321,7 @@ TODO
 
 For these experiments, we use `zk_evm:v0.6.0`.
 
-Modify the [zk_evm_image](https://github.com/leovct/zero-prover-infra/blob/main/helm/values.yaml#L2) parameter in the configuration to `leovct:v0.6.0` and re-apply the Helm chart.
+Modify the [zk_evm_image](https://github.com/leovct/zk-evm-prover-infra/blob/main/helm/values.yaml#L2) parameter in the configuration to `leovct:v0.6.0` and re-apply the Helm chart.
 
 ```bash
 helm upgrade test --namespace zero --create-namespace ./helm
@@ -441,7 +441,7 @@ Stack backtrace:
 A last attempt with a small Shanghai witness, `19240705.witness.json`.
 
 ```bash
-witness_file="/tmp/zero-prover-infra/witnesses/shanghai/19240705.witness.json"
+witness_file="/tmp/zk-evm-prover-infra/witnesses/shanghai/19240705.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \
@@ -453,7 +453,7 @@ env RUST_BACKTRACE=full \
 The worker fails immediatly without starting to work on the proof.
 
 ```bash
-witness_file="/tmp/zero-prover-infra/witnesses/shanghai/19240705.witness.json"
+witness_file="/tmp/zk-evm-prover-infra/witnesses/shanghai/19240705.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \
@@ -465,7 +465,7 @@ env RUST_BACKTRACE=full \
 A very last attempt with another Shanghai witness, `19240718.witness.json`.
 
 ```bash
-witness_file="/tmp/zero-prover-infra/witnesses/shanghai/19240718.witness.json"
+witness_file="/tmp/zk-evm-prover-infra/witnesses/shanghai/19240718.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \
@@ -500,7 +500,7 @@ Stack backtrace:
 Other attempts with other witnesses.
 
 ```bash
-witness_file="tmp/zero-prover-infra/witnesses/432.erc721.witness.json"
+witness_file="tmp/zk-evm-prover-infra/witnesses/432.erc721.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \
@@ -512,7 +512,7 @@ env RUST_BACKTRACE=full \
 TODO
 
 ```bash
-witness_file="tmp/zero-prover-infra/witnesses/512.eoa.witness.json"
+witness_file="tmp/zk-evm-prover-infra/witnesses/512.eoa.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \
@@ -524,7 +524,7 @@ env RUST_BACKTRACE=full \
 TODO
 
 ```bash
-witness_file="tmp/zero-prover-infra/witnesses/512.erc20.witness.json"
+witness_file="tmp/zk-evm-prover-infra/witnesses/512.erc20.witness.json"
 env RUST_BACKTRACE=full \
   RUST_LOG=debug \
   leader \

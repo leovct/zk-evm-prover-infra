@@ -305,18 +305,17 @@ Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovc
 
 This image contains the zk_evm binaries `leader`, `worker`, `rpc` and `verifier` as well as other dependencies and tools for proving and processing witnesses and proofs.
 
-Clone `leovct/zero-prover-infra`.
+Clone `leovct/zk-evm-prover-infra`.
 
 ```bash
-mkdir /opt/zero-prover-infra
-git clone https://github.com/leovct/zero-prover-infra /opt/zero-prover-infra
+mkdir /opt/zk-evm-prover-infra
+git clone https://github.com/leovct/zk-evm-prover-infra /opt/zk-evm-prover-infra
 ```
 
 Build the jumpbox images.
 
 ```bash
-pushd /opt/zero-prover-infra/docker
-docker build --no-cache --tag leovct/zero-jumpbox:v0.5.0 --build-arg ZERO_BIN_BRANCH_OR_COMMIT=v0.5.0 --file jumpbox.Dockerfile .
+pushd /opt/zk-evm-prover-infra/docker
 docker build --no-cache --tag leovct/zero-jumpbox:v0.6.0 --build-arg ZERO_BIN_BRANCH_OR_COMMIT=v0.6.0 --file jumpbox.Dockerfile .
 ```
 
@@ -336,7 +335,6 @@ Push the images.
 
 ```bash
 docker login
-docker push leovct/zero-jumpbox:v0.5.0
 docker push leovct/zero-jumpbox:v0.6.0
 ```
 
@@ -514,9 +512,9 @@ kubectl exec --namespace zero --stdin --tty "$jumpbox_pod_name" -- /bin/bash
 Clone the repository and extract test witnesses.
 
 ```bash
-git clone https://github.com/leovct/zero-prover-infra.git /tmp/zero-prover-infra
+git clone https://github.com/leovct/zk-evm-prover-infra.git /tmp/zk-evm-prover-infra
 mkdir /tmp/witnesses
-tar --extract --file=/tmp/zero-prover-infra/witnesses/cancun/witnesses-20362226-to-20362237.tar.xz --directory=/tmp/witnesses --strip-components=1
+tar --extract --file=/tmp/zk-evm-prover-infra/witnesses/cancun/witnesses-20362226-to-20362237.tar.xz --directory=/tmp/witnesses --strip-components=1
 ```
 
 In this test scenario, we will prove the two first blocks of a set of 10 blocks, which collectively contain 2181 transactions. In the next section, you can use the load tester tool to prove the 10 blocks in a row.
@@ -524,7 +522,7 @@ In this test scenario, we will prove the two first blocks of a set of 10 blocks,
 Get quick transaction data about each witness.
 
 ```bash
-$ ./tmp/zero-prover-infra/tools/analyze-witnesses.sh /tmp/witnesses 20362226 20362237
+$ ./tmp/zk-evm-prover-infra/tools/analyze-witnesses.sh /tmp/witnesses 20362226 20362237
 /tmp/witnesses/20362226.witness.json 166 txs
 /tmp/witnesses/20362227.witness.json 174 txs
 /tmp/witnesses/20362228.witness.json 120 txs

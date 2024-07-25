@@ -3,15 +3,15 @@
 Download the new witness archive (`witnesses/cancun/witnesses-20362226-to-20362237.tar`) created by John.
 
 ```bash
-git clone https://github.com/leovct/zero-prover-infra.git /tmp/zero-prover-infra
+git clone https://github.com/leovct/zk-evm-prover-infra.git /tmp/zk-evm-prover-infra
 mkdir /tmp/witnesses
-tar --extract --file=/tmp/zero-prover-infra/witnesses/cancun/witnesses-20362226-to-20362237.tar.xz --directory=/tmp/witnesses --strip-components=1
+tar --extract --file=/tmp/zk-evm-prover-infra/witnesses/cancun/witnesses-20362226-to-20362237.tar.xz --directory=/tmp/witnesses --strip-components=1
 ```
 
 Quick analysis of the number of witnesses.
 
 ```bash
-$ /tmp/zero-prover-infra/tools/analyze-witnesses.sh /tmp/witnesses 20362226 20362237
+$ /tmp/zk-evm-prover-infra/tools/analyze-witnesses.sh /tmp/witnesses 20362226 20362237
 /tmp/witnesses/20362226.witness.json 166 txs
 /tmp/witnesses/20362227.witness.json 174 txs
 /tmp/witnesses/20362228.witness.json 120 txs
@@ -92,7 +92,7 @@ tail -n +4 "$witness_file.leader.out" | jq '.[0]' > "$witness_file.proof"
 Now, let's use a script to automate the proving of a range of witnesses.
 
 ```bash
-/tmp/zero-prover-infra/tools/prove-witnesses.sh /tmp/witnesses 20362226 20362237
+/tmp/zk-evm-prover-infra/tools/prove-witnesses.sh /tmp/witnesses 20362226 20362237
 ```
 
 Note that for the purpose of the test, we used a `c3d-highmem-180` instance (180 vCPU / 1.44TB of memory) and we deployed 3 workers on the node.
