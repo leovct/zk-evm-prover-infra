@@ -43,7 +43,23 @@ Before deploying anything, check which project is used. The resources will be de
 gcloud config get-value project
 ```
 
-Next, review the `terraform/variables.tf` file and adjust the infrastructure settings to meet your requirements.
+Configure your infrastructure by reviewing `terraform/variables.tf`.
+
+| Option | Description | Default Value |
+|--------|-------------|---------------|
+| `deployment_name` | Unique identifier for this deployment, used as a prefix for all associated resources | N/A (Mandatory) |
+| `project_id` | The unique identifier of the Google Cloud Platform project for resource deployment and billing | N/A (Mandatory) |
+| `environment` | Specifies the deployment environment (e.g., development, staging, production) for configuration purposes | N/A (Mandatory) |
+| `owner` | The primary point of contact for this deployment | N/A (Mandatory) |
+| `region` | The Google Cloud Platform region where resources will be created | `"europe-west3"` |
+| `zones` | List of availability zones within the region for distributing resources and enhancing fault tolerance | `["europe-west3-b"]` |
+| `use_spot_instances` | Whether to use spot instances or not for the GKE cluster | `true` |
+| `default_pool_node_count` | Number of nodes in the GKE cluster's default node pool | `1` |
+| `default_pool_machine_type` | Machine type for nodes in the default node pool, balancing performance and cost | `"e2-standard-16"` |
+| `default_pool_node_disk_size_gb` | The size (in GB) of the disk attached to each node in the default node pool | `300` |
+| `highmem_pool_node_count` | Number of nodes in the GKE cluster's highmem node pool | `2` |
+| `highmem_pool_machine_type` | Machine type for nodes in the highmem node pool, optimized for memory-intensive workloads | `"t2d-standard-60"` |
+| `highmem_pool_node_disk_size_gb` | The size (in GB) of the disk attached to each node in the highmem node pool | `100` |
 
 Once you're done, initialize the project to download dependencies and deploy the infrastructure. You can use `terraform plan` to check what kind of resources are going to be deployed.
 
