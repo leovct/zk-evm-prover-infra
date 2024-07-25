@@ -5,8 +5,8 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 ## Table of Contents
 
 - [Architecture Diagram](#architecture-diagram)
-- [Infrastructure Setup](#infrastructure-setup)
-- [Block Proving](#block-proving)
+- [Prover Infrastructure Setup](#prover-infrastructure-setup)
+- [Proving Blocks](#proving-blocks)
 - [Feedback](#feedback)
 - [TODOs](#todos)
 
@@ -18,7 +18,7 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 
 You have two options to set up the infrastructure: follow the step-by-step procedure outlined below, or use the provided script for a streamlined setup. The script automates the entire process, creating the GKE infrastructure with Terraform and deploying all necessary Kubernetes resources, including RabbitMQ, KEDA, Prometheus, and the zero-prover infrastructure.
 
-# One-Line Getting Started Command
+### One-Line Getting Started Command
 
 ```bash
 ./tools/setup.sh
@@ -55,7 +55,8 @@ popd
 ```
 
 It takes around 10 minutes for the infrastructure to be deployed and fully operational.
-Deploying the GKE cluster is the main bottleneck while provisioning. 
+
+Deploying the GKE cluster is the main bottleneck while provisioning.
 
 ```bash
 Apply complete! Resources: 5 added, 0 changed, 0 destroyed.
@@ -87,15 +88,16 @@ With the above instructions, you should have a topology like the following:
 
 First, authenticate with your [GCP](https://console.cloud.google.com/) account.
 
-Note: the authenticated user is no longer 'application-default', that was only
-required for provisioning our GKE cluster at the terraform stage
+Note: the authenticated user is no longer 'application-default', which was only required for provisioning our GKE cluster at the terraform stage.
+
 ```bash
 gcloud auth login
 ```
 
 Get access to the GKE cluster config.
 
-Adjust your cluster name accordingly
+Adjust your cluster name accordingly.
+
 ```bash
 # gcloud container clusters get-credentials <gke-cluster-name> --region=<region>
 gcloud container clusters get-credentials leovct-test-01-gke-cluster --region=europe-west3
@@ -119,10 +121,7 @@ You can now start to use [Lens](https://k8slens.dev/) to visualize and control t
 
 ![lens-overview](docs/lens-overview.png)
 
-
-## Deploy Zero Prover Infra on GKE
-
-# RabbitMQ Operator
+#### RabbitMQ Operator
 
 First, install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernetes/operator/operator-overview).
 
@@ -135,11 +134,11 @@ helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
   --create-namespace
 ```
 
-# KEDA Operator
+#### KEDA Operator
 
 Then, install [KEDA](https://keda.sh/), the Kubernetes Event-Driven Autoscaler containing the [RabbitMQ Queue](https://www.rabbitmq.com/kubernetes/operator/operator-overview) HPA ([Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)).
 
-> This component is not needed if you don't want to use the worker autoscaler.
+This component is not needed if you don't want to use the worker autoscaler.
 
 ```bash
 helm repo add kedacore https://kedacore.github.io/charts
@@ -150,7 +149,7 @@ helm install keda kedacore/keda \
   --create-namespace
 ```
 
-# Prometheus Operator
+#### Prometheus Operator
 
 Finally, install [Prometheus Operator](https://prometheus-operator.dev/).
 
@@ -171,7 +170,9 @@ helm search hub keda --output yaml | yq '.[] | select(.repository.url == "https:
 helm search hub kube-prometheus-stack --output yaml | yq '.[] | select(.repository.url == "https://prometheus-community.github.io/helm-charts")'
 ```
 
-Finally, deploy the [zero-prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
+#### Zk EVM Prover
+
+Finally, deploy the [zk_evm prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
 
 ```bash
 helm install test --namespace zero --create-namespace ./helm
@@ -183,7 +184,7 @@ Your cluster should now be ready to prove blocks!
 
 ![cluster-ready](./docs/cluster-ready.png)
 
-## Perform update on Zero Prover stack
+#### Perform update on Zk EVM Prover stack
 
 If you ever need to update the stack, you can use the following command.
 
@@ -192,7 +193,6 @@ helm upgrade test --namespace zero --create-namespace ./helm
 ```
 
 </details>
-
 
 ### Monitoring
 
@@ -232,12 +232,12 @@ open http://localhost:15672/
 
 </details>
 
-### Custom Prover Docker Images
+### Custom Docker Images
 
 <details>
 <summary>Click to expand</summary>
 
-Provision an Ubuntu/Debian VM with good specs (e.g. `t2d-60`).
+Provision an Ubuntu/Debian VM with good specs (e.g. `t2d-standard-60`).
 
 Switch to admin.
 
@@ -255,7 +255,9 @@ apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-co
 docker run hello-world
 ```
 
-#### Build Zk-EVM Image
+#### Build Zk EVM Image
+
+This image contains the zk_evm binaries `leader`, `worker`, `rpc` and `verifier`
 
 Install dependencies.
 
@@ -299,8 +301,9 @@ docker push leovct/zk_evm:v0.6.0
 
 Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovct/zk_evm/general) for the moment.
 
-
 #### Build Jumpbox Image
+
+This image contains the zk_evm binaries `leader`, `worker`, `rpc` and `verifier` as well as other dependencies and tools for proving and processing witnesses and proofs.
 
 Clone `leovct/zero-prover-infra`.
 
@@ -355,7 +358,7 @@ First, clone the Jerigon repository and check out the below commit hash.
 ```bash
 git clone git@github.com:0xPolygonZero/erigon.git
 pushd erigon
-git checkout 83e0f2fa8c8f6632370e20fef7bbc8a4991c73c8
+git checkout 83e0f2fa8c8f6632370e20fef7bbc8a4991c73c8 # TODO: Explain why we use this particular hash
 ```
 
 Then, build the binary and the docker image.
@@ -403,7 +406,8 @@ It should deploy two validator nodes using `jerrigon` as the execution client.
 kurtosis enclave inspect my-testnet
 ```
 
-Kurtosis enclave inspection should yield parity with the belwo:
+Kurtosis enclave inspection should yield parity with the below.
+
 ```bash
 Name:            my-testnet
 UUID:            520bab80b8cc
@@ -453,14 +457,13 @@ Refer to the list of [pre-funded accounts](https://github.com/ethpandaops/ethere
 
 Clone the [zk_evm](https://github.com/0xPolygonZero/zk_evm) repository and check out the below commit hash.
 
-*why this hash in particular ?
 ```bash
 git clone git@github.com:0xPolygonZero/zk_evm.git
 pushd zk_evm
-git checkout b7cea483f41dffc5bb3f4951ba998f285bed1f96
+git checkout v0.6.0
 ```
 
-You are now ready to generate witnesses for any block of the L1 local chain using the zero prover.
+You are now ready to generate witnesses for any block of the L1 local chain using the zk_evm prover.
 
 To get the last block number, you can use the following command using [cast](https://book.getfoundry.sh/cast/).
 
@@ -518,7 +521,8 @@ tar --extract --file=/tmp/zero-prover-infra/witnesses/cancun/witnesses-20362226-
 
 In this test scenario, we will prove the two first blocks of a set of 10 blocks, which collectively contain 2181 transactions. In the next section, you can use the load tester tool to prove the 10 blocks in a row.
 
-Get quick transaction data about each witness
+Get quick transaction data about each witness.
+
 ```bash
 $ ./tmp/zero-prover-infra/tools/analyze-witnesses.sh /tmp/witnesses 20362226 20362237
 /tmp/witnesses/20362226.witness.json 166 txs
@@ -559,7 +563,7 @@ Check the leader output.
 // proof content
 ```
 
-Format the proof content.
+Format the proof content by extracting the proof out of the leader logs.
 
 ```bash
 tail -n1 "$witness_file.leader.out" | jq empty # validation step
@@ -568,7 +572,8 @@ tail -n1 "$witness_file.leader.out" | jq '.[0]' > "$witness_file.proof"
 
 Now, let's attempt to prove the second witness using the first witness proof.
 
-Notice how we add the 'previous-proof' argument when proving a range of witnesses
+Notice how we specify the `--previous-proof` flag when proving a range of witnesses. Only the first witness in the range does not need this flag.
+
 ```bash
 folder="/tmp/witnesses"
 witness_id=20362227
@@ -592,7 +597,7 @@ Check the leader output
 // proof content
 ```
 
-Isolate the cleaned proof as leader.out contains both logs and the final proof
+Format the proof content by extracting the proof out of the leader logs.
 
 ```bash
 tail -n1 "$witness_file.leader.out" | jq empty
@@ -669,7 +674,7 @@ drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
   ...
   ```
 
-  To something like this, where we don't log the proof, only export cleaned proof to disk
+  To something like this, where we don't log the proof.
 
   ```bash
   $ cat /tmp/witnesses/20362226.witness.json.leader.out
@@ -687,9 +692,10 @@ drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
 
 - **Enhance `worker` logs to be more operator-friendly**.
 
-  Instead of reporting `id="b20362227 - 79"`, the Zero application should report `block_hash=b20362227` and `tx_id=79`.
+  Instead of reporting `id="b20362227 - 79"`, the application should report `block_hash=b20362227` and `tx_id=79`.
 
-  Example of unclear id values currently in prover logs
+  Example of unclear values currently appearing in the zk_evm prover logs:
+
   ```bash
   2024-07-23T14:08:04.372779Z  INFO p_gen: evm_arithmetization::generation: CPU trace padded to 131072 cycles     id="b20362227 - 79"
   ```
@@ -702,24 +708,20 @@ drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
 - **Add Version Subcommand**
 
   ```bash
-  $ worker --version
-  $ leader --version
+  leader --version
   ```
 
 - **Manage AMQP Cluster State**
 
-  Develop a tool or command to manage the state of the AMQP cluster. This should include capabilities to clear the state of queues or remove specific block proof tasks. For example, right now, there is no way to stop the
-  prover application once it has been fed a range of witnesses; If many complicated witnesses pile up for proving,
-  it is very difficult for the system to catchup unless we have some AMQP state management tooling for local
-  testing and development.
+  Develop a tool or command to manage the state of the AMQP cluster. This should include capabilities to clear the state of queues or remove specific block proof tasks.
+
+  For example, right now, there is no way to stop the provers once it has been fed a range of witnesses via the AMQP cluster. If many complicated witnesses pile up for proving, it is very difficult for the system to catch up unless we have some AMQP state management tooling for local testing and development.
 
 ## TODOs
 
-- [ ] The leader communicates with the pool of workers through RabbitMQ by creating a queue by proof request. However, [RabbitMQ Queue](https://keda.sh/docs/2.14/scalers/rabbitmq-queue/) this can only scale the number of workers based on the size of the message backlog (for a specific queue), or the publish/sec rate. There is no way to scale the number of workers based on the total message backlog across all queues? I asked the [question](https://kubernetes.slack.com/archives/CKZJ36A5D/p1718671628824279) in the Kubernetes Slack.
+- [ ] The leader communicates with the pool of workers through RabbitMQ by creating a queue by proof request. However, [RabbitMQ Queue](https://keda.sh/docs/2.14/scalers/rabbitmq-queue/) can only scale the number of workers based on the size of the message backlog (for a specific queue), or the publish/sec rate. It looks like there is no way to scale the number of workers based on the total message backlog across all queues!? I asked the [question](https://kubernetes.slack.com/archives/CKZJ36A5D/p1718671628824279) in the Kubernetes Slack. We'll maybe need to switch to another way of scaling, maybe measuring CPU/MEM usage.
 
-  => I started to work on that in `helm/templates/rabbitmq-hpa.tpl`.
-
-- [ ] Collect metrics using `atop` while proving blocks
+- [ ] Collect metrics using `atop` while proving blocks.
 
 - [ ] The setup does not use any `jerrigon` node to generate the witnesses, instead, we provide the witnesses directly to the leader. This should be changed, especially because we would like to be able to follow the tip of the chain. We would then need to detect the new block (and probably introduce some kind of safety mechanism to make sure the block won't get reorged), generate a witness for the block and prove the block using the witness.
 
