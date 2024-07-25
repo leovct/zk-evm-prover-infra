@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: debug-pod
-  namespace: zkevm
+  namespace: zk-evm
 spec:
   nodeSelector:
     cloud.google.com/gke-nodepool: highmem-nodes-pool
@@ -23,4 +23,4 @@ spec:
     persistentVolumeClaim:
       claimName: test-worker-circuits-pvc
 
-# pod_name="$(kubectl get pods --namespace zkevm -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep debug-pod)" && kubectl exec --namespace zkevm --stdin --tty "$pod_name" -- /bin/sh
+# pod_name="$(kubectl get pods --namespace zk-evm -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep debug-pod)" && kubectl exec --namespace zk-evm --stdin --tty "$pod_name" -- /bin/sh

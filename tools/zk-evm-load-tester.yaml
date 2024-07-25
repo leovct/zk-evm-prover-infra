@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: jumpbox
-        image: leovct/zkevm-jumpbox:v0.6.0-1
+        image: leovct/zk_evm_jumpbox:v0.6.0-1
         command: ["/bin/sh", "/scripts/test.sh"]
         envFrom:
         - configMapRef:

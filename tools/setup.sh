@@ -26,7 +26,7 @@ popd
 CLUSTER_NAME=$(terraform -chdir=terraform output -raw kubernetes_cluster_name)
 REGION=$(terraform -chdir=terraform output -raw region)
 
-# zkEVM Prover Infrastructure Setup.
+# Zk EVM Prover Infrastructure Setup.
 echo "Authenticating with GCP account for kubectl..."
 gcloud auth login
 
@@ -61,7 +61,7 @@ helm install prometheus-operator prometheus-community/kube-prometheus-stack \
   --create-namespace
 
 echo "Deploying zk_evm prover infrastructure..."
-helm install test --namespace zkevm --create-namespace ./helm
+helm install test --namespace zk-evm --create-namespace ./helm
 
 echo "Setup completed successfully!"
 echo "It may take a few minutes for all pods to be ready."

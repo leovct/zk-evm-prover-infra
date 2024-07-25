@@ -81,7 +81,7 @@ With the above instructions, you should have a topology like the following:
 
 </details>
 
-### zkEVM Prover Infrastructure
+### Zk EVM Prover Infrastructure
 
 <details>
 <summary>Click to expand</summary>
@@ -175,7 +175,7 @@ helm search hub kube-prometheus-stack --output yaml | yq '.[] | select(.reposito
 Finally, deploy the [zk_evm prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
 
 ```bash
-helm install test --namespace zkevm --create-namespace ./helm
+helm install test --namespace zk-evm --create-namespace ./helm
 ```
 
 It should take a few minutes for the worker pods to be ready. This is because a job called `test-init-circuits` will first start and generate all the zk circuits needed by the workers. Meanwhile, the worker pods do not start, they wait for the circuits to be generated. Once the task has finished and the job has succeeded, the worker pods finally start and load the circuits.
@@ -189,7 +189,7 @@ Your cluster should now be ready to prove blocks!
 If you ever need to update the stack, you can use the following command.
 
 ```bash
-helm upgrade test --namespace zkevm --create-namespace ./helm
+helm upgrade test --namespace zk-evm --create-namespace ./helm
 ```
 
 </details>
@@ -224,7 +224,7 @@ open http://localhost:9090/
 Finally, you can log into the RabbitMQ management interface using `guest` credentials as username and password.
 
 ```bash
-kubectl port-forward --namespace zkevm --address localhost service/test-rabbitmq-cluster 15672:management
+kubectl port-forward --namespace zk-evm --address localhost service/test-rabbitmq-cluster 15672:management
 open http://localhost:15672/
 ```
 
@@ -505,8 +505,8 @@ jq . "block_$i.json"
 Get a running shell inside the `jumpbox` container.
 
 ```bash
-jumpbox_pod_name="$(kubectl get pods --namespace zkevm -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep zk-evm-jumpbox)"
-kubectl exec --namespace zkevm --stdin --tty "$jumpbox_pod_name" -- /bin/bash
+jumpbox_pod_name="$(kubectl get pods --namespace zk-evm -o=jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' | grep zk-evm-jumpbox)"
+kubectl exec --namespace zk-evm --stdin --tty "$jumpbox_pod_name" -- /bin/bash
 ```
 
 Clone the repository and extract test witnesses.
@@ -548,7 +548,7 @@ env RUST_BACKTRACE=full \
   RUST_LOG=info \
   leader \
   --runtime=amqp \
-  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zkevm.svc.cluster.local:5672 \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zk-evm.svc.cluster.local:5672 \
   stdio < "$witness_file" | tee "$witness_file.leader.out"
 ```
 
@@ -582,7 +582,7 @@ env RUST_BACKTRACE=full \
   RUST_LOG=info \
   leader \
   --runtime=amqp \
-  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zkevm.svc.cluster.local:5672 \
+  --amqp-uri=amqp://guest:guest@test-rabbitmq-cluster.zk-evm.svc.cluster.local:5672 \
   stdio \
   --previous-proof "$previous_proof" < "$witness_file" | tee "$witness_file.leader.out"
 ```
@@ -635,19 +635,19 @@ After a few seconds, the verification output will appear.
 You can deploy a load-tester tool that will attempt to prove 10 witnesses for a total of 2181 transactions. This is a great way to test that the setup works well.
 
 ```bash
-kubectl apply --filename tools/zk-evm-load-tester.yaml --namespace zkevm
+kubectl apply --filename tools/zk-evm-load-tester.yaml --namespace zk-evm
 ```
 
 To get the logs of the container, you can use:
 
 ```bash
-kubectl logs deployment/zk-evm-load-tester --namespace zkevm --container jumpbox --follow
+kubectl logs deployment/zk-evm-load-tester --namespace zk-evm --container jumpbox --follow
 ```
 
 Access a shell inside the load-tester pod.
 
 ```bash
-kubectl exec deployment/zk-evm-load-tester --namespace zkevm --container jumpbox -it -- bash
+kubectl exec deployment/zk-evm-load-tester --namespace zk-evm --container jumpbox -it -- bash
 ```
 
 From there, you can list the witnesses, the leader outputs and the proofs.
