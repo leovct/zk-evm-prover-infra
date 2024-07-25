@@ -1,6 +1,6 @@
-# 📦 Polygon Zero Type 1 Prover Infrastructure
+# 📦 Polygon's Zk EVM Type 1 Prover Infrastructure
 
-Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) on [Kubernetes](https://kubernetes.io/) using our [Terraform](https://www.terraform.io/) script and [Helm](https://helm.sh/) chart.
+Deploy [Polygon's Zk EVM Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) on [Kubernetes](https://kubernetes.io/) using our [Terraform](https://www.terraform.io/) script and [Helm](https://helm.sh/) chart.
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 
 ## Prover Infrastructure Setup
 
-You have two options to set up the infrastructure: follow the step-by-step procedure outlined below, or use the provided script for a streamlined setup. The script automates the entire process, creating the GKE infrastructure with Terraform and deploying all necessary Kubernetes resources, including RabbitMQ, KEDA, Prometheus, and the zero-prover infrastructure.
+You have two options to set up the infrastructure: follow the step-by-step procedure outlined below, or use the provided script for a streamlined setup. The script automates the entire process, creating the GKE infrastructure with Terraform and deploying all necessary Kubernetes resources, including RabbitMQ, KEDA, Prometheus, and the zk_evm prover infrastructure.
 
 ### One-Line Getting Started Command
 
