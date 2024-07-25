@@ -61,6 +61,10 @@ data:
     # Attempt to prove the witnessses.
     ./data/zero-prover-infra/tools/prove-witnesses.sh /data/witnesses "$start_block" "$end_block"
 
+    # Sleep forever.
+    echo "Sleeping..."
+    sleep infinity
+
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
