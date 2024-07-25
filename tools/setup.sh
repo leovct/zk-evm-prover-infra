@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x # Print each command before executing it.
 set -e # Exit immediately if a command exits with a non-zero status.
 
 # Check if required commands are available.
@@ -12,11 +11,11 @@ command -v helm >/dev/null 2>&1 || { echo "helm is required but not installed.";
 echo "Authenticating with GCP account..."
 gcloud auth application-default login
 
-echo "Checking current GCP project..."
+echo; echo "Checking current GCP project..."
 gcloud config get-value project
 
-echo "Deploying GKE infrastructure with Terraform..."
-echo "It may take approximately 10 minutes."
+echo; echo "Deploying GKE infrastructure with Terraform..."
+echo; echo "It may take approximately 10 minutes."
 pushd terraform
 terraform init
 terraform apply
@@ -27,16 +26,16 @@ CLUSTER_NAME=$(terraform -chdir=terraform output -raw kubernetes_cluster_name)
 REGION=$(terraform -chdir=terraform output -raw region)
 
 # Zk EVM Prover Infrastructure Setup.
-echo "Authenticating with GCP account for kubectl..."
+echo; echo "Authenticating with GCP account for kubectl..."
 gcloud auth login
 
-echo "Getting access to the GKE cluster config..."
+echo; echo "Getting access to the GKE cluster config..."
 gcloud container clusters get-credentials "$CLUSTER_NAME" --region="$REGION"
 
-echo "Verifying access to the GKE cluster..."
+echo; echo "Verifying access to the GKE cluster..."
 kubectl get nodes
 
-echo "Installing RabbitMQ Cluster Operator..."
+echo; echo "Installing RabbitMQ Cluster Operator..."
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
@@ -44,7 +43,7 @@ helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
   --namespace rabbitmq-cluster-operator \
   --create-namespace
 
-echo "Installing KEDA..."
+echo; echo "Installing KEDA..."
 helm repo add kedacore https://kedacore.github.io/charts
 helm repo update
 helm install keda kedacore/keda \
@@ -52,7 +51,7 @@ helm install keda kedacore/keda \
   --namespace keda \
   --create-namespace
 
-echo "Installing Prometheus Operator..."
+echo; echo "Installing Prometheus Operator..."
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 helm install prometheus-operator prometheus-community/kube-prometheus-stack \
@@ -60,8 +59,8 @@ helm install prometheus-operator prometheus-community/kube-prometheus-stack \
   --namespace kube-prometheus \
   --create-namespace
 
-echo "Deploying zk_evm prover infrastructure..."
+echo; echo "Deploying zk_evm prover infrastructure..."
 helm install test --namespace zk-evm --create-namespace ./helm
 
-echo "Setup completed successfully!"
-echo "It may take a few minutes for all pods to be ready."
+echo; echo "Setup completed successfully!"
+echo; echo "It may take a few minutes for all pods to be ready."
