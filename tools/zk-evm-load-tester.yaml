@@ -21,6 +21,9 @@ spec:
       - name: jumpbox
         image: leovct/zero-jumpbox:v0.6.0-1
         command: ["/bin/sh", "/scripts/test.sh"]
+        envFrom:
+        - configMapRef:
+            name: zk-evm-worker-cm
         volumeMounts:
         - name: test-scripts
           mountPath: /scripts
@@ -57,6 +60,10 @@ data:
 
     # Attempt to prove the witnessses.
     ./data/zero-prover-infra/tools/prove-witnesses.sh /data/witnesses "$start_block" "$end_block"
+
+    # Sleep forever.
+    echo "Sleeping..."
+    sleep infinity
 
 ---
 apiVersion: v1

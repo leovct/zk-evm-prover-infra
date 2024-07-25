@@ -5,8 +5,8 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 ## Table of Contents
 
 - [Architecture Diagram](#architecture-diagram)
-- [Infrastructure Setup](#infrastructure-setup)
-- [Block Proving](#block-proving)
+- [Prover Infrastructure Setup](#prover-infrastructure-setup)
+- [Proving Blocks](#proving-blocks)
 - [Feedback](#feedback)
 - [TODOs](#todos)
 
@@ -14,9 +14,11 @@ Deploy [Polygon Zero's Type 1 Prover](https://github.com/0xPolygonZero/zk_evm/tr
 
 ![architecture-diagram](./docs/architecture-diagram-v2.png)
 
-## Infrastructure Setup
+## Prover Infrastructure Setup
 
 You have two options to set up the infrastructure: follow the step-by-step procedure outlined below, or use the provided script for a streamlined setup. The script automates the entire process, creating the GKE infrastructure with Terraform and deploying all necessary Kubernetes resources, including RabbitMQ, KEDA, Prometheus, and the zero-prover infrastructure.
+
+### One-Line Getting Started Command
 
 ```bash
 ./tools/setup.sh
@@ -54,10 +56,12 @@ popd
 
 It takes around 10 minutes for the infrastructure to be deployed and fully operational.
 
+Deploying the GKE cluster is the main bottleneck while provisioning.
+
 ```bash
 Apply complete! Resources: 5 added, 0 changed, 0 destroyed.
 
-Outputs:
+Outputs (sample):
 
 kubernetes_cluster_name = "leovct-test-01-gke-cluster"
 kubernetes_version = "1.29.6-gke.1038001"
@@ -68,12 +72,10 @@ zones = tolist([
 ])
 ```
 
-With the above instructions, you should have a setup that mimics the below requirements:
+With the above instructions, you should have a topology like the following:
 
 - A VPC and a subnet
 - GKE cluster with two node pools
-
-Note that it may take some time for the Kubernetes cluster to be ready on GCP!
 
 ![gke-cluster](docs/gke-cluster.png)
 
@@ -86,11 +88,15 @@ Note that it may take some time for the Kubernetes cluster to be ready on GCP!
 
 First, authenticate with your [GCP](https://console.cloud.google.com/) account.
 
+Note: the authenticated user is no longer 'application-default', which was only required for provisioning our GKE cluster at the terraform stage.
+
 ```bash
 gcloud auth login
 ```
 
 Get access to the GKE cluster config.
+
+Adjust your cluster name accordingly.
 
 ```bash
 # gcloud container clusters get-credentials <gke-cluster-name> --region=<region>
@@ -115,7 +121,7 @@ You can now start to use [Lens](https://k8slens.dev/) to visualize and control t
 
 ![lens-overview](docs/lens-overview.png)
 
-Now, let's deploy the zero infrastructure in GKE.
+#### RabbitMQ Operator
 
 First, install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernetes/operator/operator-overview).
 
@@ -128,9 +134,11 @@ helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
   --create-namespace
 ```
 
+#### KEDA Operator
+
 Then, install [KEDA](https://keda.sh/), the Kubernetes Event-Driven Autoscaler containing the [RabbitMQ Queue](https://www.rabbitmq.com/kubernetes/operator/operator-overview) HPA ([Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)).
 
-> This component is not needed if you don't want to use the worker autoscaler.
+This component is not needed if you don't want to use the worker autoscaler.
 
 ```bash
 helm repo add kedacore https://kedacore.github.io/charts
@@ -140,6 +148,8 @@ helm install keda kedacore/keda \
   --namespace keda \
   --create-namespace
 ```
+
+#### Prometheus Operator
 
 Finally, install [Prometheus Operator](https://prometheus-operator.dev/).
 
@@ -160,7 +170,9 @@ helm search hub keda --output yaml | yq '.[] | select(.repository.url == "https:
 helm search hub kube-prometheus-stack --output yaml | yq '.[] | select(.repository.url == "https://prometheus-community.github.io/helm-charts")'
 ```
 
-Finally, deploy the [zero-prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
+#### Zk EVM Prover
+
+Finally, deploy the [zk_evm prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
 
 ```bash
 helm install test --namespace zero --create-namespace ./helm
@@ -171,6 +183,8 @@ It should take a few minutes for the worker pods to be ready. This is because a 
 Your cluster should now be ready to prove blocks!
 
 ![cluster-ready](./docs/cluster-ready.png)
+
+#### Perform update on Zk EVM Prover stack
 
 If you ever need to update the stack, you can use the following command.
 
@@ -218,12 +232,12 @@ open http://localhost:15672/
 
 </details>
 
-### Docker Images
+### Custom Docker Images
 
 <details>
 <summary>Click to expand</summary>
 
-Provision an Ubuntu/Debian VM with good specs (e.g. `t2d-60`).
+Provision an Ubuntu/Debian VM with good specs (e.g. `t2d-standard-60`).
 
 Switch to admin.
 
@@ -241,7 +255,9 @@ apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-co
 docker run hello-world
 ```
 
-#### Build Zk-EVM Image
+#### Build Zk EVM Image
+
+This image contains the zk_evm binaries `leader`, `worker`, `rpc` and `verifier`
 
 Install dependencies.
 
@@ -271,10 +287,6 @@ Build the `zk_evm` binaries and docker images.
 ```bash
 pushd /opt/zk_evm
 
-git checkout v0.5.0
-env RUSTFLAGS='-C target-cpu=native -Zlinker-features=-lld' cargo build --release
-docker build --no-cache --tag leovct/zk_evm:v0.5.0 .
-
 git checkout v0.6.0
 env RUSTFLAGS='-C target-cpu=native -Zlinker-features=-lld' cargo build --release
 docker build --no-cache --tag leovct/zk_evm:v0.6.0 .
@@ -284,13 +296,14 @@ Push the images.
 
 ```bash
 docker login
-docker push leovct/zk_evm:v0.5.0
 docker push leovct/zk_evm:v0.6.0
 ```
 
 Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovct/zk_evm/general) for the moment.
 
 #### Build Jumpbox Image
+
+This image contains the zk_evm binaries `leader`, `worker`, `rpc` and `verifier` as well as other dependencies and tools for proving and processing witnesses and proofs.
 
 Clone `leovct/zero-prover-infra`.
 
@@ -331,9 +344,9 @@ Images are hosted on [Docker Hub](https://hub.docker.com/repository/docker/leovc
 
 </details>
 
-## Block Proving
+## Proving Blocks
 
-### Witness Generation
+### Witness Generation Using Jerigon
 
 <details>
 <summary>Click to expand</summary>
@@ -345,7 +358,7 @@ First, clone the Jerigon repository and check out the below commit hash.
 ```bash
 git clone git@github.com:0xPolygonZero/erigon.git
 pushd erigon
-git checkout 83e0f2fa8c8f6632370e20fef7bbc8a4991c73c8
+git checkout 83e0f2fa8c8f6632370e20fef7bbc8a4991c73c8 # TODO: Explain why we use this particular hash
 ```
 
 Then, build the binary and the docker image.
@@ -392,6 +405,8 @@ It should deploy two validator nodes using `jerrigon` as the execution client.
 ```bash
 kurtosis enclave inspect my-testnet
 ```
+
+Kurtosis enclave inspection should yield parity with the below.
 
 ```bash
 Name:            my-testnet
@@ -445,10 +460,10 @@ Clone the [zk_evm](https://github.com/0xPolygonZero/zk_evm) repository and check
 ```bash
 git clone git@github.com:0xPolygonZero/zk_evm.git
 pushd zk_evm
-git checkout b7cea483f41dffc5bb3f4951ba998f285bed1f96
+git checkout v0.6.0
 ```
 
-You are now ready to generate witnesses for any block of the L1 local chain using the zero prover.
+You are now ready to generate witnesses for any block of the L1 local chain using the zk_evm prover.
 
 To get the last block number, you can use the following command using [cast](https://book.getfoundry.sh/cast/).
 
@@ -489,8 +504,6 @@ jq . "block_$i.json"
 <details>
 <summary>Click to expand</summary>
 
-> Note that we would like to be able to generate witnesses on the fly but it requires to have a `jerrigon` node. We will skip this part for the moment.
-
 Get a running shell inside the `jumpbox` container.
 
 ```bash
@@ -507,6 +520,8 @@ tar --extract --file=/tmp/zero-prover-infra/witnesses/cancun/witnesses-20362226-
 ```
 
 In this test scenario, we will prove the two first blocks of a set of 10 blocks, which collectively contain 2181 transactions. In the next section, you can use the load tester tool to prove the 10 blocks in a row.
+
+Get quick transaction data about each witness.
 
 ```bash
 $ ./tmp/zero-prover-infra/tools/analyze-witnesses.sh /tmp/witnesses 20362226 20362237
@@ -548,14 +563,17 @@ Check the leader output.
 // proof content
 ```
 
-Format the proof content.
+Format the proof content by extracting the proof out of the leader logs.
 
 ```bash
 tail -n1 "$witness_file.leader.out" | jq empty # validation step
+tail -n1 "$witness_file.leader.out" | jq > "$witness_file.proof.sequence"
 tail -n1 "$witness_file.leader.out" | jq '.[0]' > "$witness_file.proof"
 ```
 
 Now, let's attempt to prove the second witness using the first witness proof.
+
+Notice how we specify the `--previous-proof` flag when proving a range of witnesses. Only the first witness in the range does not need this flag.
 
 ```bash
 folder="/tmp/witnesses"
@@ -571,7 +589,7 @@ env RUST_BACKTRACE=full \
   --previous-proof "$previous_proof" < "$witness_file" | tee "$witness_file.leader.out"
 ```
 
-Check the leader output.
+Check the leader output
 
 ```bash
 2024-07-24T08:12:13.855305Z  INFO prover: Proving block 20362227
@@ -580,14 +598,34 @@ Check the leader output.
 // proof content
 ```
 
-Format the proof content.
+Format the proof content by extracting the proof out of the leader logs.
 
 ```bash
-tail -n1 "$witness_file.leader.out" | jq empty
+tail -n1 "$witness_file.leader.out" | jq empty # validation step
+tail -n1 "$witness_file.leader.out" | jq > "$witness_file.proof.sequence"
 tail -n1 "$witness_file.leader.out" | jq '.[0]' > "$witness_file.proof"
 ```
 
-TODO: Show how to use the `verifier`.
+Verify one of the generated proofs.
+
+```bash
+verifier --file-path 20362226.witness.json.proof.sequence
+```
+
+When running the command for the first time, the `verifier` will attempt to generate the circuits. This can take a few minutes.
+
+```bash
+2024-07-25T07:38:15.667883Z  INFO zero_bin_common::prover_state: initializing verifier state...
+2024-07-25T07:38:15.667929Z  INFO zero_bin_common::prover_state: attempting to load preprocessed verifier circuit from disk...
+2024-07-25T07:38:15.667975Z  INFO zero_bin_common::prover_state: failed to load preprocessed verifier circuit from disk. generating it...
+2024-07-25T07:40:57.056064Z  INFO zero_bin_common::prover_state: saving preprocessed verifier circuit to disk
+```
+
+After a few seconds, the verification output will appear.
+
+```bash
+2024-07-25T07:41:02.600742Z  INFO verifier: All proofs verified successfully!
+```
 
 </details>
 
@@ -616,26 +654,34 @@ kubectl exec deployment/zk-evm-load-tester --namespace zero --container jumpbox 
 
 From there, you can list the witnesses, the leader outputs and the proofs.
 
-TODO: Update the list of witnesses and proofs.
+Please note that the primary distinction between the `.proof` file and the `.proof.sequence` file lies in their content structure. The proof file contains only the `.proof` JSON element, whereas the `.proof.sequence` file encapsulates the proof JSON element within an array. The `.proof.sequence` file is intended for use with the `verifier`.
 
 ```bash
-$ ls -al /data/witnesses/
-total 102184
-drwxr-xr-x 2 root root     4096 Jul 24 16:38 .
+$ ls -al /data/witnesses
+total 116976
+drwxr-xr-x 2 root root     4096 Jul 25 07:25 .
 drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
 -rw-r--r-- 1 root root  8351244 Jul 22 12:59 20362226.witness.json
--rw-r--r-- 1 root root       65 Jul 24 16:38 20362226.witness.json.leader.out
+-rw-r--r-- 1 root root   438896 Jul 24 18:14 20362226.witness.json.leader.out
+-rw-r--r-- 1 root root  1146468 Jul 24 18:14 20362226.witness.json.proof
+-rw-r--r-- 1 root root  1213518 Jul 25 07:25 20362226.witness.json.proof.sequence
 -rw-r--r-- 1 root root  8815832 Jul 22 12:59 20362227.witness.json
--rw-r--r-- 1 root root  7507010 Jul 22 13:00 20362228.witness.json
--rw-r--r-- 1 root root 11453230 Jul 22 13:00 20362229.witness.json
--rw-r--r-- 1 root root  8249897 Jul 22 13:00 20362230.witness.json
--rw-r--r-- 1 root root  7027307 Jul 22 13:00 20362231.witness.json
--rw-r--r-- 1 root root  5301822 Jul 22 13:00 20362232.witness.json
--rw-r--r-- 1 root root 12801427 Jul 22 13:01 20362233.witness.json
--rw-r--r-- 1 root root 10542021 Jul 22 13:01 20362234.witness.json
--rw-r--r-- 1 root root 10635944 Jul 22 13:01 20362235.witness.json
--rw-r--r-- 1 root root  3232495 Jul 22 13:01 20362236.witness.json
--rw-r--r-- 1 root root 10678725 Jul 22 13:01 20362237.witness.json
+-rw-r--r-- 1 root root   438815 Jul 24 18:47 20362227.witness.json.leader.out
+-rw-r--r-- 1 root root  1146387 Jul 24 18:47 20362227.witness.json.proof
+-rw-r--r-- 1 root root  1213437 Jul 25 07:25 20362227.witness.json.proof.sequence
+...
+```
+
+Verify one of the generated proofs.
+
+```bash
+verifier --file-path 20362226.witness.json.proof.sequence
+```
+
+After a few seconds, the verification output will appear.
+
+```bash
+2024-07-25T07:41:02.600742Z  INFO verifier: All proofs verified successfully!
 ```
 
 </details>
@@ -644,7 +690,7 @@ drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
 
 - **Enhance `leader` logs to be more operator-friendly**.
 
-  Currently, the logs lack detailed progress information during the proving process. It would be beneficial to display the progress of the proof, including metrics like the number of transactions proved, total transactions, and time elapsed.
+  Currently, the logs lack detailed progress information during the proving process. It would be beneficial to display the progress of the proof, including metrics like the number of transactions proved, total transactions, and time elapsed (essentially a progress bar showing % of transactions proven in a block so far).
 
   We should go from this:
 
@@ -657,7 +703,7 @@ drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
   ...
   ```
 
-  To something like this:
+  To something like this, where we don't log the proof.
 
   ```bash
   $ cat /tmp/witnesses/20362226.witness.json.leader.out
@@ -675,7 +721,9 @@ drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
 
 - **Enhance `worker` logs to be more operator-friendly**.
 
-  Instead of reporting `id="b20362227 - 79"`, it should report `block_hash=b20362227` and `tx_id=79`.
+  Instead of reporting `id="b20362227 - 79"`, the application should report `block_hash=b20362227` and `tx_id=79`.
+
+  Example of unclear values currently appearing in the zk_evm prover logs:
 
   ```bash
   2024-07-23T14:08:04.372779Z  INFO p_gen: evm_arithmetization::generation: CPU trace padded to 131072 cycles     id="b20362227 - 79"
@@ -684,24 +732,26 @@ drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
 - **Add Prometheus metrics to `zero-bin`**
   - Each metric should be labeled with `block_hash` and `tx_id`.
   - Relevant metrics could include `witnesses_proved`, `cpu_halts`, `cpu_trace_pads`, `and` trace_lengths.
+  - This would supercharge the DevTools team's ability to catch and debug critical system issues
 
 - **Add Version Subcommand**
 
   ```bash
-  $ worker --version
-  $ leader --version
+  leader --version
   ```
 
 - **Manage AMQP Cluster State**
 
   Develop a tool or command to manage the state of the AMQP cluster. This should include capabilities to clear the state of queues or remove specific block proof tasks.
 
+  For example, right now, there is no way to stop the provers once it has been fed a range of witnesses via the AMQP cluster. If many complicated witnesses pile up for proving, it is very difficult for the system to catch up unless we have some AMQP state management tooling for local testing and development.
+
 ## TODOs
 
-- [ ] The leader communicates with the pool of workers through RabbitMQ by creating a queue by proof request. However, [RabbitMQ Queue](https://keda.sh/docs/2.14/scalers/rabbitmq-queue/) can only scale the number of workers based on the size of the message backlog (for a specific queue), or the publish/sec rate. There is no way to scale the number of workers based on the total message backlog across all queues? I asked the [question](https://kubernetes.slack.com/archives/CKZJ36A5D/p1718671628824279) in the Kubernetes Slack.
-
-  => I started to work on that in `helm/templates/rabbitmq-hpa.tpl`.
+- [ ] The leader communicates with the pool of workers through RabbitMQ by creating a queue by proof request. However, [RabbitMQ Queue](https://keda.sh/docs/2.14/scalers/rabbitmq-queue/) can only scale the number of workers based on the size of the message backlog (for a specific queue), or the publish/sec rate. It looks like there is no way to scale the number of workers based on the total message backlog across all queues!? I asked the [question](https://kubernetes.slack.com/archives/CKZJ36A5D/p1718671628824279) in the Kubernetes Slack. We'll maybe need to switch to another way of scaling, maybe measuring CPU/MEM usage.
 
 - [ ] Collect metrics using `atop` while proving blocks.
 
 - [ ] The setup does not use any `jerrigon` node to generate the witnesses, instead, we provide the witnesses directly to the leader. This should be changed, especially because we would like to be able to follow the tip of the chain. We would then need to detect the new block (and probably introduce some kind of safety mechanism to make sure the block won't get reorged), generate a witness for the block and prove the block using the witness.
+
+- [ ] Automatic prover benchmarking suite, including metric collection and visualization (in progress)
