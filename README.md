@@ -227,6 +227,8 @@ Finally, review and adjust the parameters in [helm/values.yaml](./helm/values.ya
 |----------------------------------|----------------------------------------------------------------------------------------------------------|--------------------------------|
 | `image`                          | Docker image for the jumpbox                                                                             | `leovct/zk_evm_jumpbox:v0.6.0` |
 
+> Ensure you update the `network` parameter to correctly reflect the VPC name. Failing to do so will prevent the creation of the `circuits-volume`, which in turn will cause the entire configuration process to stall!
+
 Deploy the [zk_evm prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
 
 ```bash
