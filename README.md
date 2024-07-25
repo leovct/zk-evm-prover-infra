@@ -180,11 +180,11 @@ helm search hub kube-prometheus-stack --output yaml | yq '.[] | select(.reposito
 
 Finally, review and adjust the parameters in [helm/values.yaml](./helm/values.yaml).
 
-##### Jumpbox
+##### Common
 
-| Parameter                        | Description                                                                                              | Default Value                  |
-|----------------------------------|----------------------------------------------------------------------------------------------------------|--------------------------------|
-| `image`                          | Docker image for the jumpbox                                                                             | `leovct/zk_evm_jumpbox:v0.6.0` |
+| Parameter                        | Description                                                                                              | Default Value                |
+|----------------------------------|----------------------------------------------------------------------------------------------------------|------------------------------|
+| `network`                        | This identifier should match the name of your Virtual Private Cloud                                      | `my-network` (Mandatory)     |
 
 ##### Worker
 
@@ -220,6 +220,12 @@ Finally, review and adjust the parameters in [helm/values.yaml](./helm/values.ya
 | `cluster.nodeCount`              | Number of nodes in the RabbitMQ cluster                                                                  | `1`                          |
 | `cluster.credentials.username`   | RabbitMQ username                                                                                        | `guest`                      |
 | `cluster.credentials.password`   | RabbitMQ password                                                                                        | `guest`                      |
+
+##### Jumpbox
+
+| Parameter                        | Description                                                                                              | Default Value                  |
+|----------------------------------|----------------------------------------------------------------------------------------------------------|--------------------------------|
+| `image`                          | Docker image for the jumpbox                                                                             | `leovct/zk_evm_jumpbox:v0.6.0` |
 
 Deploy the [zk_evm prover](https://github.com/0xPolygonZero/zk_evm/tree/develop/zero_bin) infrastructure in Kubernetes.
 

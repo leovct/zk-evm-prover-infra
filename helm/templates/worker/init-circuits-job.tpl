@@ -90,3 +90,15 @@ spec:
   resources:
     requests:
       storage: 100Gi
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: custom-rwx
+provisioner: filestore.csi.storage.gke.io
+volumeBindingMode: Immediate
+allowVolumeExpansion: true
+parameters:
+  tier: standard
+  network: {{ .Values.network }}
