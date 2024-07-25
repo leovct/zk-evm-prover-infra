@@ -567,6 +567,7 @@ Format the proof content by extracting the proof out of the leader logs.
 
 ```bash
 tail -n1 "$witness_file.leader.out" | jq empty # validation step
+tail -n1 "$witness_file.leader.out" | jq > "$witness_file.proof.sequence"
 tail -n1 "$witness_file.leader.out" | jq '.[0]' > "$witness_file.proof"
 ```
 
@@ -600,11 +601,19 @@ Check the leader output
 Format the proof content by extracting the proof out of the leader logs.
 
 ```bash
-tail -n1 "$witness_file.leader.out" | jq empty
+tail -n1 "$witness_file.leader.out" | jq empty # validation step
+tail -n1 "$witness_file.leader.out" | jq > "$witness_file.proof.sequence"
 tail -n1 "$witness_file.leader.out" | jq '.[0]' > "$witness_file.proof"
 ```
 
-TODO: Show how to use the `verifier`.
+Now let's attempt to verify one of the generated proofs.
+
+When running the command for the first time, the `verifier` will attempt to generate the circuits. This can take a few minutes.
+
+```bash
+env RUST_LOG=info RUST_BACKTRACE=full \
+  verifier --file-path 20362226.witness.json.proof.sequence
+```
 
 </details>
 
@@ -633,26 +642,22 @@ kubectl exec deployment/zk-evm-load-tester --namespace zero --container jumpbox 
 
 From there, you can list the witnesses, the leader outputs and the proofs.
 
-TODO: Update the list of witnesses and proofs.
+Please note that the primary distinction between the `.proof` file and the `.proof.sequence` file lies in their content structure. The proof file contains only the `.proof` JSON element, whereas the `.proof.sequence` file encapsulates the proof JSON element within an array. The `.proof.sequence` file is intended for use with the `verifier`.
 
 ```bash
-$ ls -al /data/witnesses/
-total 102184
-drwxr-xr-x 2 root root     4096 Jul 24 16:38 .
+$ ls -al /data/witnesses
+total 116976
+drwxr-xr-x 2 root root     4096 Jul 25 07:25 .
 drwxr-xr-x 4 root root     4096 Jul 24 16:38 ..
 -rw-r--r-- 1 root root  8351244 Jul 22 12:59 20362226.witness.json
--rw-r--r-- 1 root root       65 Jul 24 16:38 20362226.witness.json.leader.out
+-rw-r--r-- 1 root root   438896 Jul 24 18:14 20362226.witness.json.leader.out
+-rw-r--r-- 1 root root  1146468 Jul 24 18:14 20362226.witness.json.proof
+-rw-r--r-- 1 root root  1213518 Jul 25 07:25 20362226.witness.json.proof.sequence
 -rw-r--r-- 1 root root  8815832 Jul 22 12:59 20362227.witness.json
--rw-r--r-- 1 root root  7507010 Jul 22 13:00 20362228.witness.json
--rw-r--r-- 1 root root 11453230 Jul 22 13:00 20362229.witness.json
--rw-r--r-- 1 root root  8249897 Jul 22 13:00 20362230.witness.json
--rw-r--r-- 1 root root  7027307 Jul 22 13:00 20362231.witness.json
--rw-r--r-- 1 root root  5301822 Jul 22 13:00 20362232.witness.json
--rw-r--r-- 1 root root 12801427 Jul 22 13:01 20362233.witness.json
--rw-r--r-- 1 root root 10542021 Jul 22 13:01 20362234.witness.json
--rw-r--r-- 1 root root 10635944 Jul 22 13:01 20362235.witness.json
--rw-r--r-- 1 root root  3232495 Jul 22 13:01 20362236.witness.json
--rw-r--r-- 1 root root 10678725 Jul 22 13:01 20362237.witness.json
+-rw-r--r-- 1 root root   438815 Jul 24 18:47 20362227.witness.json.leader.out
+-rw-r--r-- 1 root root  1146387 Jul 24 18:47 20362227.witness.json.proof
+-rw-r--r-- 1 root root  1213437 Jul 25 07:25 20362227.witness.json.proof.sequence
+...
 ```
 
 </details>

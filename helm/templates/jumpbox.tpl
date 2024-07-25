@@ -23,3 +23,6 @@ spec:
         image: {{ .Values.jumpbox.image }}
         command: [ "sleep" ]
         args: [ "infinity" ]
+        envFrom:
+        - configMapRef:
+            name: zk-evm-worker-cm

@@ -37,7 +37,7 @@ prove_initial_witness() {
     --amqp-uri=$AMQP_URI \
     stdio < "$witness_file" | tee "$leader_output"
 
-  format_proof "$leader_output" "$witness_file.proof"
+  format_proof "$leader_output" "$witness_file"
 }
 
 # Prove subsequent witnesses, with previous proof.
@@ -60,9 +60,10 @@ prove_subsequent_witness() {
 # Format the proof content.
 format_proof() {
   local leader_output=$1
-  local proof_file=$2
+  local witness_file=$2
   tail -n1 "$leader_output" | jq empty # validation step
-  tail -n1 "$leader_output" | jq '.[0]' > "$proof_file"
+  tail -n1 "$leader_output" | jq > "$witness_file.proof.sequence" # To be used with the verifier.
+  tail -n1 "$leader_output" | jq '.[0]' > "$witness_file.proof" # To be used with the leader.
 }
 
 # Check if correct number of arguments is provided.
