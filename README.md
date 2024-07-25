@@ -83,6 +83,7 @@ kubernetes_cluster_name = "leovct-test-01-gke-cluster"
 kubernetes_version = "1.29.6-gke.1038001"
 project_id = "my-gcp-project"
 region = "europe-west3"
+vpc_name = "leovct-test-01-vpc"
 zones = tolist([
   "europe-west3-b",
 ])

@@ -23,6 +23,7 @@ popd
 
 # Get GKE cluster info.
 CLUSTER_NAME=$(terraform -chdir=terraform output -raw kubernetes_cluster_name)
+VPC_NAME=$(terraform -chdir=terraform output -raw vpc_name)
 REGION=$(terraform -chdir=terraform output -raw region)
 
 # Zk EVM Prover Infrastructure Setup.
@@ -60,6 +61,7 @@ helm install prometheus-operator prometheus-community/kube-prometheus-stack \
   --create-namespace
 
 echo; echo "Deploying zk_evm prover infrastructure..."
+yq --in-place --yaml-roundtrip --arg n $VPC_NAME '.network = $n' helm/values.yaml
 helm install test --namespace zk-evm --create-namespace ./helm
 
 echo; echo "Setup completed successfully!"

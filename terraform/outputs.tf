@@ -18,6 +18,11 @@ output "kubernetes_cluster_name" {
   description = "The name of the GKE cluster"
 }
 
+output "vpc_name" {
+  value       = google_compute_network.vpc.name
+  description = "The name of the VPC"
+}
+
 output "kubernetes_version" {
   value       = google_container_cluster.primary.master_version
   description = "The Kubernetes version of the master"
