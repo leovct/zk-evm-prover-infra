@@ -73,7 +73,7 @@ jobs:
             --create-namespace
 
       - name: Render helm template
-        run: helm template test --namespace zero --create-namespace ./helm
+        run: helm template test --namespace zkevm --create-namespace ./helm
 
       - name: Install helm chart
-        run: helm install test --namespace zero --create-namespace ./helm
+        run: helm install test --namespace zkevm --create-namespace ./helm

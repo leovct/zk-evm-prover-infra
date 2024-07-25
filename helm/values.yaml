@@ -74,4 +74,4 @@ rabbitmq:
 # Jumpbox Configuration
 jumpbox:
   # The Docker image for the jumpbox (a secure entrypoint for accessing the cluster).
-  image: leovct/zero-jumpbox:v0.6.0-1
+  image: leovct/zk_evm_jumpbox:v0.6.0-1

@@ -60,8 +60,8 @@ helm install prometheus-operator prometheus-community/kube-prometheus-stack \
   --namespace kube-prometheus \
   --create-namespace
 
-echo "Deploying zero-prover infrastructure..."
-helm install test --namespace zero --create-namespace ./helm
+echo "Deploying zk_evm prover infrastructure..."
+helm install test --namespace zkevm --create-namespace ./helm
 
 echo "Setup completed successfully!"
 echo "It may take a few minutes for all pods to be ready."

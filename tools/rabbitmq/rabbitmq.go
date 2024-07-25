@@ -16,7 +16,7 @@ const (
 	// password  = "Ynumtrr4N8kLogVtGWSLsMJwxayCMcpb"
 	password = "guest"
 	hostname = "localhost"
-	//hostname  = "rabbitmq-cluster.zero.svc.cluster.local"
+	//hostname  = "rabbitmq-cluster.zkevm.svc.cluster.local"
 	port      = 5672
 	queueName = "hello"
 	message   = "test-msg"
