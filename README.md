@@ -229,6 +229,8 @@ helm install test --namespace zk-evm --create-namespace ./helm
 
 It should take a few minutes for the worker pods to be ready. This is because a job called `test-init-circuits` will first start and generate all the zk circuits needed by the workers. Meanwhile, the worker pods do not start, they wait for the circuits to be generated. Once the task has finished and the job has succeeded, the worker pods finally start and load the circuits.
 
+Note that you may need to enable the [Cloud Filestore API](https://cloud.google.com/firestore/docs/reference/rest) in your GCP project. It is used to create volumes (e.g. `circuits-volume`) that can be mounted as read-write by many nodes.
+
 Your cluster should now be ready to prove blocks!
 
 If you ever need to update the stack, you can use the following command.
