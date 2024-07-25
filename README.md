@@ -109,12 +109,6 @@ kubectl get nodes
 
 You should see at least two nodes. There may be more if you have updated the terraform configuration.
 
-```bash
-NAME                                                  STATUS   ROLES    AGE     VERSION
-gke-leovct-test-01-g-default-node-poo-9faa7f06-b0q6   Ready    <none>   10m     v1.29.6-gke.1038001
-gke-leovct-test-01-g-highmem-node-poo-c5b7d8d5-ms62   Ready    <none>   8m12s   v1.29.6-gke.1038001
-```
-
 You can now start to use [Lens](https://k8slens.dev/) to visualize and interact with the Kubernetes cluster.
 
 #### RabbitMQ Operator
@@ -125,7 +119,7 @@ First, install the [RabbitMQ Cluster Operator](https://www.rabbitmq.com/kubernet
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 helm install rabbitmq-cluster-operator bitnami/rabbitmq-cluster-operator \
-  --version 4.3.14 \
+  --version 4.3.16 \
   --namespace rabbitmq-cluster-operator \
   --create-namespace
 ```
@@ -153,7 +147,7 @@ Finally, install [Prometheus Operator](https://prometheus-operator.dev/).
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 helm install prometheus-operator prometheus-community/kube-prometheus-stack \
-  --version 61.3.1 \
+  --version 61.3.2 \
   --namespace kube-prometheus \
   --create-namespace
 ```
