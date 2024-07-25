@@ -748,10 +748,10 @@ After a few seconds, the verification output will appear.
 
 ## Next Steps
 
+- [ ] Automatic prover benchmarking suite, including metric collection and visualization (in progress).
+
+- [ ] Solve the problem when scaling zk_evm workers across multiple nodes. The circuit volume is only accessible on a single node, regardless of the access mode, `ReadWriteOnce` or `ReadWriteMany`. This limitation may be due to the way we have configured the GKE cluster.
+
 - [ ] The leader communicates with the pool of workers through RabbitMQ by creating a queue by proof request. However, [RabbitMQ Queue](https://keda.sh/docs/2.14/scalers/rabbitmq-queue/) can only scale the number of workers based on the size of the message backlog (for a specific queue), or the publish/sec rate. It looks like there is no way to scale the number of workers based on the total message backlog across all queues!? I asked the [question](https://kubernetes.slack.com/archives/CKZJ36A5D/p1718671628824279) in the Kubernetes Slack. We'll maybe need to switch to another way of scaling, maybe measuring CPU/MEM usage.
 
-- [ ] Collect metrics using `atop` while proving blocks.
-
 - [ ] The setup does not use any `jerrigon` node to generate the witnesses, instead, we provide the witnesses directly to the leader. This should be changed, especially because we would like to be able to follow the tip of the chain. We would then need to detect the new block (and probably introduce some kind of safety mechanism to make sure the block won't get reorged), generate a witness for the block and prove the block using the witness.
-
-- [ ] Automatic prover benchmarking suite, including metric collection and visualization (in progress)
