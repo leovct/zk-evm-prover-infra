@@ -79,19 +79,6 @@ data:
     done
 
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: zk-evm-worker-circuits-pvc
-spec:
-  accessModes:
-    - ReadWriteMany
-  storageClassName: standard-rwx
-  resources:
-    requests:
-      storage: 100Gi
-
----
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -102,3 +89,16 @@ allowVolumeExpansion: true
 parameters:
   tier: standard
   network: {{ .Values.network }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zk-evm-worker-circuits-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: custom-rwx
+  resources:
+    requests:
+      storage: 100Gi
