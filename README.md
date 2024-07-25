@@ -43,7 +43,7 @@ Before deploying anything, check which project is used. The resources will be de
 gcloud config get-value project
 ```
 
-Configure your infrastructure by reviewing `terraform/variables.tf`.
+Configure your infrastructure by reviewing [terraform/variables.tf](./terraform/variables.tf).
 
 | Option                           | Description                                                                                              | Default Value        |
 |----------------------------------|----------------------------------------------------------------------------------------------------------|----------------------|
@@ -178,7 +178,7 @@ helm search hub kube-prometheus-stack --output yaml | yq '.[] | select(.reposito
 
 #### Zk EVM Prover
 
-Finally, review and adjust the parameters in `helm/values.yaml`.
+Finally, review and adjust the parameters in [helm/values.yaml](./helm/values.yaml).
 
 ## Jumpbox
 
