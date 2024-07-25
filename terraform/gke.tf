@@ -27,7 +27,7 @@ locals {
 }
 
 resource "google_container_node_pool" "default_node_pool" {
-  name           = "${var.deployment_name}-default-node-pool"
+  name           = "default-node-pool"
   project        = var.project_id
   location       = var.region
   node_locations = var.zones
@@ -48,7 +48,7 @@ resource "google_container_node_pool" "default_node_pool" {
 }
 
 resource "google_container_node_pool" "highmem_node_pool" {
-  name           = "${var.deployment_name}-highmem-node-pool"
+  name           = "highmem-node-pool"
   project        = var.project_id
   location       = var.region
   node_locations = var.zones
