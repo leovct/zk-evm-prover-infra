@@ -246,6 +246,8 @@ kubectl get pods --namespace zk-evm -o wide
 
 Your cluster should now be ready to prove blocks!
 
+This setup showcases 10 zk_evm worker pods distributed across two high-memory nodes.
+
 ```bash
 NAME                                       READY   STATUS      RESTARTS   AGE     IP           NODE                                                  NOMINATED NODE   READINESS GATES
 rabbitmq-cluster-server-0                  1/1     Running     0          73m     10.20.0.26   gke-leovct-test-01-g-default-node-poo-f93cbb06-bsd4   <none>           <none>
