@@ -178,8 +178,6 @@ It should take a few minutes for the worker pods to be ready. This is because a 
 
 Your cluster should now be ready to prove blocks!
 
-#### Perform update on Zk EVM Prover stack
-
 If you ever need to update the stack, you can use the following command.
 
 ```bash
