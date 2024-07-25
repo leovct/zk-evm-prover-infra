@@ -1,77 +1,72 @@
-# The docker image for zk_evm.
-zk_evm_image: leovct/zk_evm:v0.6.0
+# ZK EVM Configuration
 
-# Type 1 Prover - Worker Configuration
 worker:
-  # Enable or disable the HPA worker autoscaler.
-  # If disabled, the number of workers deployed will be set according to `minWorkerCount`.
-  autoscaler: false
+  image: leovct/zk_evm:v0.6.0
 
-  # The minimum number of worker pods to maintain.
-  # The Horizontal Pod Autoscaler (HPA) will not scale down below this value.
-  minWorkerCount: 4
+  # Number of worker pods when autoscaler is disabled.
+  workerCount: 4
 
-  # The maximum number of worker pods to scale up to.
-  # We start with 2 nodes, so we limit the maximum workers to 8 (4 per node).
-  maxWorkerCount: 8
+  autoscaler:
+    # Enable or disable the worker autoscaler (HPA).
+    enabled: false
+    # Minimum number of worker pods to maintain.
+    minWorkerCount: 4
+    # Maximum number of worker pods to maintain.
+    maxWorkerCount: 8
+    # Interval (in seconds) for KEDA to check RabbitMQ's queue length and scale worker deployment.
+    pollingInterval: 10
 
-  # Worker flags.
   flags:
+    # Use the postcard serialization format.
     - --serializer=postcard
+    # Use the AMQP runtime environment.
     - --runtime=amqp
+    # Persist the processed circuits to disk.
     - --persistence=disk
+    # Load all the table circuits into a monolithic bundle.
     - --load-strategy=monolithic
 
-  # Worker environment variables.
   env:
-    RUST_BACKTRACE: full
+    # Verbosity level.
     RUST_LOG: info
+    # Capture Rust's full backtrace.
+    RUST_BACKTRACE: full
+    # Set Rust's thread stack size.
     RUST_MIN_STACK: 33554432
-    # Recommended circuit sizes by Robin.
-    # https://0xpolygon.slack.com/archives/C0772FWR8D7/p1721390017860929?thread_ts=1721348826.760799&cid=C0772FWR8D7
+
+    # The min/max size for the arithmetic table circuit.
     ARITHMETIC_CIRCUIT_SIZE: 16..25
+    # The min/max size for the byte packing table circuit.
     BYTE_PACKING_CIRCUIT_SIZE: 8..25
+    # The min/max size for the cpu table circuit.
     CPU_CIRCUIT_SIZE: 12..27
+    # The min/max size for the keccak table circuit.
     KECCAK_CIRCUIT_SIZE: 14..25
+    # The min/max size for the keccak sponge table circuit.
     KECCAK_SPONGE_CIRCUIT_SIZE: 9..20
+    # The min/max size for the logic table circuit.
     LOGIC_CIRCUIT_SIZE: 12..25
+    # The min/max size for the memory table circuit.
     MEMORY_CIRCUIT_SIZE: 17..28
 
   resources:
-    # Resource requests are used by the Kubernetes scheduler to decide which node to place the pod on.
+    # Resource requests for Kubernetes scheduler.
     requests:
       memory: 24G
       cpu: 5
-
-    # Resource limits are enforced by the Kubernetes kubelet to prevent containers from using more resources than specified.
+    # Resource limits enforced by Kubernetes kubelet.
     limits:
       memory: 230G
       cpu: 50
 
-# RabbitMQ Configuration
 rabbitmq:
   cluster:
-    # The Docker image for RabbitMQ.
     image: rabbitmq:3.13
-
-    # The number of nodes in the RabbitMQ cluster.
-    # It is recommended to use an odd number of nodes for better fault tolerance.
-    # https://www.rabbitmq.com/docs/clustering#node-count
+    # Number of nodes in the RabbitMQ cluster (odd number recommended for fault tolerance).
     nodeCount: 1
+    credentials:
+      username: guest
+      password: guest
 
-    # The default username for RabbitMQ.
-    username: guest
-
-    # The default password for RabbitMQ.
-    password: guest
-
-  # Horizontal Pod Autoscaler Configuration
-  hpa:
-    # The interval (in seconds) at which KEDA (Kubernetes Event-driven Autoscaler) will check the
-    # queue length and scale the deployment accordingly.
-    pollingInterval: 10
-
-# Jumpbox Configuration
 jumpbox:
-  # The Docker image for the jumpbox (a secure entrypoint for accessing the cluster).
   image: leovct/zk_evm_jumpbox:v0.6.0-1
