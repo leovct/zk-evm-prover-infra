@@ -55,7 +55,7 @@ worker:
   resources:
     # Resource requests for Kubernetes scheduler.
     requests:
-      memory: 24G
+      memory: 30G
       cpu: 5
     # Resource limits enforced by Kubernetes kubelet.
     limits:
