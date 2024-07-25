@@ -53,6 +53,7 @@ variable "default_pool_machine_type" {
   type        = string
   description = "Machine type for nodes in the default node pool, balancing performance and cost"
   default     = "e2-standard-16"
+  // https://gcloud-compute.com/instances.html
   // - e2-standard-16 (16 vCPU / 64GB of memory)
 }
 
@@ -76,7 +77,7 @@ variable "highmem_pool_machine_type" {
   default     = "t2d-standard-60"
   // https://gcloud-compute.com/instances.html
   // - t2d-standard-32 (32 vCPU / 128GB of memory)
-  // - t2d-standard-60 (60 vCPU / 240GB of memory)
+  // - t2d-standard-60 (60 vCPU / 240GB of memory) <- recommended
   // - c3d-highmem-60  (60 vCPU / 480GB of memory)
   // - c3d-highmem-90  (90 vCPU / 720GB of memory)
   // - c3d-highmem-180 (180 vCPU / 1.44TB of memory)
