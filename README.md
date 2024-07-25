@@ -180,13 +180,13 @@ helm search hub kube-prometheus-stack --output yaml | yq '.[] | select(.reposito
 
 Finally, review and adjust the parameters in [helm/values.yaml](./helm/values.yaml).
 
-## Jumpbox
+##### Jumpbox
 
 | Parameter                        | Description                                                                                              | Default Value                  |
 |----------------------------------|----------------------------------------------------------------------------------------------------------|--------------------------------|
 | `image`                          | Docker image for the jumpbox                                                                             | `leovct/zk_evm_jumpbox:v0.6.0` |
 
-## Worker
+##### Worker
 
 | Parameter                        | Description                                                                                              | Default Value                |
 |----------------------------------|----------------------------------------------------------------------------------------------------------|------------------------------|
@@ -212,7 +212,7 @@ Finally, review and adjust the parameters in [helm/values.yaml](./helm/values.ya
 | `resources.limits.memory`        | Memory limit for worker                                                                                  | `230G`                       |
 | `resources.limits.cpu`           | CPU limit for worker                                                                                     | `50`                         |
 
-## RabbitMQ
+##### RabbitMQ
 
 | Parameter                        | Description                                                                                              | Default Value                |
 |----------------------------------|----------------------------------------------------------------------------------------------------------|------------------------------|
