@@ -244,7 +244,7 @@ helm upgrade test --namespace zk-evm ./helm
 <details>
 <summary>Click to expand</summary>
 
-You can observe cluster metrics using [Grafana](https://grafana.com/). To access it, execute two separate commands in different terminal sessions. When prompted for login information, enter `admin` as the username and `prom-operator` as the password.
+You can observe cluster metrics using [Grafana](https://grafana.com/). When prompted for login information, enter `admin` as the username and `prom-operator` as the password.
 
 ```bash
 kubectl port-forward --namespace kube-prometheus --address localhost service/prometheus-operator-grafana 3000:http-web
