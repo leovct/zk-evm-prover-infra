@@ -118,21 +118,22 @@ spec:
   - type: rabbitmq
     metadata:
       # The protocol to be used for communication.
-      protocol: http
-      # Use regex to select queue instead of full name.
-      # Note: Only applies to host that use the http protocol.
-      useRegex: "true"
+      protocol: amqp
+
       # The name of the RabbitMQ queue.
-      # Proof generation tasks each create their own queue, so rather than targeting a specific queue,
-      # this setting applies to all queues created within the RabbitMQ cluster.
-      queueName: .*
-      # Operation that will be applied to compute the number of messages in case of useRegex enabled.
-      operation: sum
+      # The leader dispatches proof tasks to the 'nil' (or '000') queue.
+      # Sub-queues are created to coordinate workers with their respective sub-results.
+      # The 'fff' queue is designated for receiving errors from the workers.
+      # The length of the 'nil' queue exposes the total number of pending tasks.
+      # For reference: https://github.com/0xPolygonZero/paladin/blob/main/paladin-core/src/runtime/mod.rs#L123-L124
+      queueName: 00000000000000000000000000000000
+
       # The trigger mode. We chose to trigger on number of messages in the queue.
       mode: QueueLength
-      # The message backlog to trigger on.
+
+      # Message backlog to trigger on.
       # It must be a string.
-      value: "2"
+      value: {{ .Values.worker.autoscaler.messageQueueThreshold | quote }}
     authenticationRef:
       # The name of the TriggerAuthentication object.
       name: keda-trigger-auth-rabbitmq-conn

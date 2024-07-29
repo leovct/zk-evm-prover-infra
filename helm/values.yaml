@@ -16,6 +16,8 @@ worker:
     minWorkerCount: 4
     # Maximum number of worker pods to maintain.
     maxWorkerCount: 8
+    # Number of messages (pending tasks) in the queue that will trigger scaling actions.
+    messageQueueThreshold: 1
     # Interval (in seconds) for KEDA to check RabbitMQ's queue length and scale worker deployment.
     pollingInterval: 10
 
