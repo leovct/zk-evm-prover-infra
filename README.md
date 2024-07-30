@@ -160,13 +160,16 @@ helm install keda kedacore/keda \
 
 Finally, install [Prometheus Operator](https://prometheus-operator.dev/).
 
+Make sure to adjust the [scrape interval](https://prometheus.io/docs/prometheus/latest/configuration/configuration/) according to your needs. It determines how frequently Prometheus will scrape targets to collect metrics. By default, it is set to 30s, but for more accurate results, we have set it to 10s.
+
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 helm install prometheus-operator prometheus-community/kube-prometheus-stack \
   --version 61.3.2 \
   --namespace kube-prometheus \
-  --create-namespace
+  --create-namespace \
+  --set prometheus.prometheusSpec.scrapeInterval=10s
 ```
 
 These commands could have been written a while ago so make sure you use "recent" versions.
