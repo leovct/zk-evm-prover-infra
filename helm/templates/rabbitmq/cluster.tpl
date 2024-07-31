@@ -29,7 +29,8 @@ metadata:
   name: rabbitmq-cluster
   namespace: kube-prometheus
   labels:
-    release: {{ .Release.Name }}
+    # This label is mandatory to get scraped by Prometheus.
+    release: prometheus-operator
     app: rabbitmq
 spec:
   endpoints:
@@ -46,4 +47,3 @@ spec:
       app.kubernetes.io/component: rabbitmq
       app.kubernetes.io/name: rabbitmq-cluster
       app.kubernetes.io/part-of: rabbitmq
-      release: prometheus-operator # Mandatory to get scraped by Prometheus
