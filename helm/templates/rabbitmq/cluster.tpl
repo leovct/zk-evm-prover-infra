@@ -37,7 +37,6 @@ spec:
     - port: prometheus
       path: /metrics
       scheme: http
-      scrapeTimeout: 15s
   jobLabel: rabbitmq-cluster
   namespaceSelector:
     matchNames:
