@@ -35,7 +35,7 @@ metadata:
 spec:
   endpoints:
     - port: prometheus
-      path: /metrics
+      path: /metrics/per-object
       scheme: http
   jobLabel: rabbitmq-cluster
   namespaceSelector:
